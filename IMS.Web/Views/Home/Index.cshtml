@@ -1,0 +1,22 @@
+﻿@model IEnumerable<IMS.Models.Department>
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Department Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in Model)
+            {
+                <tr>
+                    <td>@item.DepartmentId</td>
+                    <td>@item.DepartmentName</td>
+                </tr>
+            }
+    </tbody>
+</table>

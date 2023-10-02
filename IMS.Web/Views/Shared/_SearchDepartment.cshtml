@@ -1,0 +1,29 @@
+﻿@model IEnumerable<IMS.Models.Department>
+
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.DepartmentName)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.DepartmentName)
+        </td>
+        <td class="text-end">
+            <a href="@Url.Action("Edit", "Department", new { id = item.DepartmentId })" class="btn btn-outline-primary">
+                <i class="fas fa-edit"></i>
+            </a>
+
+            <a href="@Url.Action("Delete", "Department", new { id = item.DepartmentId })" class="btn btn-outline-danger">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+        </td>
+    </tr>
+}
+
+</table>

@@ -1,0 +1,61 @@
+﻿@model IEnumerable<IMS.Models.Department>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="row pb-4 pt-2">
+    <div class="col-md-6">
+        <h2 class="text-uppercase">Department List</h2>
+    </div>
+    <div class="col-md-6 text-end">      
+        <a href="@Url.Action("Create","Department",null)" class="btn btn-outline-success"><i class='fas fa-plus'></i> Add New</a>
+    </div>
+</div>
+
+@using(Ajax.BeginForm("Index","Department",new AjaxOptions()
+{
+    HttpMethod="POST",
+    InsertionMode=InsertionMode.Replace,
+    UpdateTargetId="DivDepartment"
+}))
+            {
+                <div class="row mb-2 pt-4">
+                    <div class="col-10">
+                        <input type="text" name="dept" class="form-control" />
+                    </div>
+                    <div class="col-2">
+                        <button type="submit" class="form-control btn btn-outline-primary"><i class="fas fa-search"></i> Search</button>
+                    </div>
+                </div>                
+                
+            }
+<div id="DivDepartment">
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.DepartmentName)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DepartmentName)
+                </td>
+                <td class="text-end">
+                    <a href="@Url.Action("Edit", "Department", new { id = item.DepartmentId })" class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i> 
+                    </a>
+
+                    <a href="@Url.Action("Delete", "Department", new { id = item.DepartmentId })"class="btn btn-outline-danger">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+
+    </table>
+</div>
