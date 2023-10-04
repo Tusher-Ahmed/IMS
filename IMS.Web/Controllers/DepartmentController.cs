@@ -31,7 +31,7 @@ namespace IMS.Web.Controllers
             if (string.IsNullOrEmpty(dept) == false)
             {
                 var data = _department.GetAllDept();
-                var searchItem=data.Where(u=>u.DepartmentName.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status==1).ToList();
+                var searchItem=data.Where(u=>u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status==1).ToList();
                 return PartialView("_SearchDepartment",searchItem);
             }
             else
@@ -173,7 +173,7 @@ namespace IMS.Web.Controllers
             if (string.IsNullOrEmpty(dept) == false)
             {
                 var data = _department.GetAllDept();
-                var searchItem = data.Where(u => u.DepartmentName.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 0).ToList();
+                var searchItem = data.Where(u => u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 0).ToList();
                 return PartialView("_SearchDeactivateDepartment", searchItem);
             }
             else

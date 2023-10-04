@@ -9,11 +9,11 @@ namespace IMS.Models
 {
     public class Department
     {
-        public virtual long DepartmentId { get; set; }
+        public virtual long Id { get; set; }
         [Display(Name ="Department Name")]
         [Required(ErrorMessage = "Department Name is required.")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Department Name must be between 3 and 50 characters.")]
-        public virtual string DepartmentName { get; set; }
+        public virtual string Name { get; set; }
 
         public virtual long? CreatedBy { get; set; }
         public virtual DateTime? CreationDate { get; set; }

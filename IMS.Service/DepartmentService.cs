@@ -30,7 +30,7 @@ namespace IMS.Service
             {
                 Department department = new Department
                 {
-                    DepartmentName = dept.DepartmentName,
+                    Name = dept.Name,
                     CreatedBy = 1,
                     CreationDate = DateTime.Now,
                     Status = 1,
@@ -91,7 +91,7 @@ namespace IMS.Service
                 var deptData = _repository.GetById(id);
                 if (deptData != null)
                 {
-                    deptData.DepartmentName = dept.DepartmentName;
+                    deptData.Name = dept.Name;
                     deptData.ModifyBy = dept.ModifyBy;
                     deptData.Status = dept.Status;
                     deptData.ModificationDate = DateTime.Now;

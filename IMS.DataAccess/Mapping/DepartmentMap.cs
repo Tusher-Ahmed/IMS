@@ -11,8 +11,8 @@ namespace IMS.DataAccess.Mapping
     {
         public DepartmentMap()
         {
-            Id(x => x.DepartmentId);
-            Map(x => x.DepartmentName);
+            Id(x => x.Id);
+            Map(x => x.Name);
             Map(x => x.CreatedBy);
             Map(x => x.CreationDate);
             Map(x => x.ModifyBy);
