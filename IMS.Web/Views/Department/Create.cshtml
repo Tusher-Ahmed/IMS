@@ -5,12 +5,12 @@
 }
 
 <h2 class="text-uppercase">Create Department</h2>
-<div id="DivDept">@if (TempData["data"] != null) { <p>@TempData["data"]</p> }</div>
+<div id="DivDept">
+</div>
 @using (Ajax.BeginForm("Create", "Department", new AjaxOptions()
 {
     HttpMethod = "POST",
-    InsertionMode = InsertionMode.Replace,
-    UpdateTargetId="DivDept",
+    UpdateTargetId = "DivDept",
     OnComplete = "ClearFields"
 }))
 {
@@ -41,11 +41,27 @@
 
 @section Scripts {
     <script>
-        function ClearFields() {
-            document.getElementById("dName").value = "";
-        };
-    </script>
+        var messageTimer;
 
+        function updateDivDept(data) {
+            var divElement = document.getElementById("DivDept");
+            if (data && data.message) {
+                divElement.innerHTML = data.message;
+                divElement.classList.add("message");
+                // Clear the message after 3 seconds
+                messageTimer = setTimeout(function () {
+                    divElement.innerHTML = '';
+                }, 3000);
+            }
+        }
+
+        // AJAX form submission complete callback
+        function ClearFields(ajaxContext) {
+            updateDivDept(ajaxContext.responseJSON);
+            document.getElementById("dName").value = "";
+
+        }
+    </script>
 
     @Scripts.Render("~/bundles/jqueryval")
 }

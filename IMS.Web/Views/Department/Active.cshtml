@@ -1,0 +1,32 @@
+﻿@model IMS.Models.Department
+
+@{
+    ViewBag.Title = "Active";
+}
+
+<h2 class="text-uppercase">Active Department</h2>
+
+<h3>Are you sure you want to active this department?</h3>
+<div>
+    <br/>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.DepartmentName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DepartmentName)
+        </dd>
+   
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Active" class="btn btn-outline-success" /> 
+            @Html.ActionLink("Back to List", "Deactivate",null,new {@class="btn btn-outline-info"})
+        </div>
+    }
+</div>

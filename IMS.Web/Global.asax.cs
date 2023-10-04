@@ -1,4 +1,6 @@
-﻿using IMS.Web.App_Start;
+﻿using IMS.Service;
+using IMS.Web.ControllerFactory;
+using NHibernate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +15,15 @@ namespace IMS.Web
     {
         protected void Application_Start()
         {
-            DependencyConfig.RegisterDependencies();
+           
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            ISession session = NHibernateHelper.OpenSession();
+
+            ControllerBuilder.Current.SetControllerFactory(new CustomControllerFactory(session));
         }
     }
 }

@@ -11,7 +11,8 @@ namespace IMS.Models
     {
         public virtual long DepartmentId { get; set; }
         [Display(Name ="Department Name")]
-        [Required]
+        [Required(ErrorMessage = "Department Name is required.")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Department Name must be between 3 and 50 characters.")]
         public virtual string DepartmentName { get; set; }
 
         public virtual long? CreatedBy { get; set; }

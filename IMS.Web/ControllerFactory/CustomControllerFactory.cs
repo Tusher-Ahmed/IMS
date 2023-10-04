@@ -1,0 +1,32 @@
+﻿using IMS.Web.Controllers;
+using NHibernate;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace IMS.Web.ControllerFactory
+{
+    public class CustomControllerFactory: DefaultControllerFactory
+    {
+        private readonly ISession _session;
+
+        public CustomControllerFactory(ISession session)
+        {
+            _session = session;
+        }
+
+        protected override IController GetControllerInstance(System.Web.Routing.RequestContext requestContext, Type controllerType)
+        {
+            if (controllerType != null)
+            {
+                if (controllerType == typeof(DepartmentController))
+                {
+                    return new DepartmentController(_session);
+                }
+            }
+            return base.GetControllerInstance(requestContext, controllerType);
+        }
+    }
+}

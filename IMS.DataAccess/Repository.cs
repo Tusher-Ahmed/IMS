@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace IMS.DataAccess
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T>  where T : class
     {
-        private readonly ISession _session;
-        private readonly ITransaction _transaction;
+        private ISession _session;
 
-        public Repository(ISession session)
+        public ISession Session
         {
-            _session = session;
-            _transaction = _session.BeginTransaction();
+            get { return _session; }
+            set { _session = value; }
         }
+  
         public void Add(T entity)
         {
             _session.Save(entity);
@@ -42,19 +42,6 @@ namespace IMS.DataAccess
         {
             _session.Update(entity);
         }
-        public void Commit()
-        {
-            _transaction.Commit();
-        }
-
-        public void Rollback()
-        {
-            _transaction.Rollback();
-        }
-
-        public void Dispose()
-        {
-            _transaction.Dispose();
-        }
+       
     }
 }

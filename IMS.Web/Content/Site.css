@@ -18,3 +18,8 @@ select,
 textarea {
     max-width: 100% !important;
 }
+.message {
+    color: white !important;
+    background-color:green !important;
+    /* Set the desired text color, e.g., green */
+}

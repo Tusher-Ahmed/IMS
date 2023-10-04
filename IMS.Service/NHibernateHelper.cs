@@ -8,9 +8,9 @@ using System.ServiceModel.Channels;
 using System.Web;
 using IMS.Models;
 using NHibernate.Tool.hbm2ddl;
-using IMS.Web.Mapping;
+using IMS.DataAccess.Mapping;
 
-namespace IMS.Web
+namespace IMS.Service
 {
     public class NHibernateHelper
     {

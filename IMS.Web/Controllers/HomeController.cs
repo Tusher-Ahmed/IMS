@@ -1,4 +1,5 @@
 ﻿using IMS.Models;
+using IMS.Service;
 using NHibernate;
 using System;
 using System.Collections.Generic;
