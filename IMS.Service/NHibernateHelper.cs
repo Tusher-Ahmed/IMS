@@ -22,8 +22,13 @@ namespace IMS.Service
                               .ShowSql()
                 )
                .Mappings(m =>
-                          m.FluentMappings
-                              .AddFromAssemblyOf<DepartmentMap>())
+               {
+                   m.FluentMappings
+                                 .AddFromAssemblyOf<DepartmentMap>();
+                   m.FluentMappings
+                                 .AddFromAssemblyOf<ProductTypeMap>();
+
+               })
                 .ExposeConfiguration(cfg => new SchemaExport(cfg)
                                                 .Create(false, false))
                 .BuildSessionFactory();

@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="DepartmentService.cs" />
     <Compile Include="NHibernateHelper.cs" />
+    <Compile Include="ProductTypeService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

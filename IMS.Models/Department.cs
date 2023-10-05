@@ -13,6 +13,7 @@ namespace IMS.Models
         [Display(Name ="Department Name")]
         [Required(ErrorMessage = "Department Name is required.")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Department Name must be between 3 and 50 characters.")]
+        [RegularExpression(@"^[a-zA-Z]{3,}(?: [a-zA-Z]+)*$", ErrorMessage = "Invalid Keyword!!")]
         public virtual string Name { get; set; }
 
         public virtual long? CreatedBy { get; set; }

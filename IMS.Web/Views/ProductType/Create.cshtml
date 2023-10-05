@@ -1,16 +1,16 @@
-﻿@model IMS.Models.Department
+﻿@model IMS.Models.ProductType
 
 @{
     ViewBag.Title = "Create";
 }
 
-<h2 class="text-uppercase">Create Department</h2>
-<div id="DivDept">
+<h2 class="text-uppercase">Add Product Type</h2>
+<div id="DivPType">
 </div>
-@using (Ajax.BeginForm("Create", "Department", new AjaxOptions()
+@using (Ajax.BeginForm("Create", "ProductType", new AjaxOptions()
 {
     HttpMethod = "POST",
-    UpdateTargetId = "DivDept",
+    UpdateTargetId = "DivPType",
     OnComplete = "ClearFields"
 }))
 {
@@ -22,14 +22,14 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", id = "dName" } })
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", id = "PTName" } })
                 @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
             </div>
         </div>
         <br />
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Add Department" class="pl-2 pr-2 btn btn-outline-success" />
+                <input type="submit" value="Add Product type" class="pl-2 pr-2 btn btn-outline-success" />
                 @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-outline-info" })
             </div>
         </div>
@@ -44,16 +44,15 @@
         var messageTimer;
 
         function updateDivDept(data) {
-            var divElement = document.getElementById("DivDept");
+            var divElement = document.getElementById("DivPType");
             if (data && data.message) {
                 var messageElement = document.createElement("div");
                 messageElement.innerHTML = data.message;
 
                 if (data.success) {
-                    
                     messageElement.classList.add("message");
                 } else {
-                   
+
                     messageElement.classList.add("messageError");
                 }
 
@@ -68,10 +67,12 @@
         // AJAX form submission complete callback
         function ClearFields(ajaxContext) {
             updateDivDept(ajaxContext.responseJSON);
-            document.getElementById("dName").value = "";
+            document.getElementById("PTName").value = "";
 
         }
     </script>
 
     @Scripts.Render("~/bundles/jqueryval")
 }
+
+

@@ -1,29 +1,28 @@
-﻿@model IEnumerable<IMS.Models.Department>
+﻿@model IEnumerable<IMS.Models.ProductType>
 
 @{
     ViewBag.Title = "Index";
 }
 
 <div class="row pb-4 pt-2">
-    <div class="col-md-6">
-        <h2 class="text-uppercase">Department List</h2>
+    <div class="col-md-4">
+        <h2 class="text-uppercase">Product Types</h2>
     </div>
-    <div class="col-md-6 text-end">
-        <a href="@Url.Action("Create","Department",null)" class="btn btn-outline-success"><i class='fas fa-plus'></i> Add New</a>
-        <a href="@Url.Action("Deactivate","Department",null)" class="btn btn-outline-danger"> <i class="fas fa-times"></i> Deactivated Department</a>
+    <div class="col-md-8 text-end">
+        <a href="@Url.Action("Create","ProductType",null)" class="btn btn-outline-success"><i class='fas fa-plus'></i> Add New</a>
+        <a href="@Url.Action("Deactivate","ProductType",null)" class="btn btn-outline-danger"> <i class="fas fa-times"></i> Deactivated Types</a>
     </div>
 </div>
-
-@using (Ajax.BeginForm("Index", "Department", new AjaxOptions()
+@using (Ajax.BeginForm("Index", "ProductType", new AjaxOptions()
 {
     HttpMethod = "POST",
     InsertionMode = InsertionMode.Replace,
-    UpdateTargetId = "DivDepartment"
+    UpdateTargetId = "DivProductType"
 }))
 {
     <div class="row mb-2 pt-4">
         <div class="col-10">
-            <input type="text" name="dept" class="form-control" />
+            <input type="text" name="pType" class="form-control" />
         </div>
         <div class="col-2">
             <button type="submit" class="form-control btn btn-outline-primary"><i class="fas fa-search"></i> Search</button>
@@ -31,7 +30,7 @@
     </div>
 
 }
-<div id="DivDepartment">
+<div id="DivProductType">
     <table class="table">
         <tr>
             <th>
@@ -56,13 +55,13 @@
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
                     <td class="text-end">
-                        <a href="@Url.Action("Edit", "Department", new { id = item.Id })" class="btn btn-outline-primary">
+                        <a href="@Url.Action("Edit", "ProductType", new { id = item.Id })" class="btn btn-outline-primary">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a href="@Url.Action("Status", "Department", new { id = item.Id })" class="btn btn-outline-success">
+                        <a href="@Url.Action("Status", "ProductType", new { id = item.Id })" class="btn btn-outline-success">
                             <i class="fas fa-check-circle"></i>
                         </a>
-                        <a href="@Url.Action("Delete", "Department", new { id = item.Id })" class="btn btn-outline-danger">
+                        <a href="@Url.Action("Delete", "ProductType", new { id = item.Id })" class="btn btn-outline-danger">
                             <i class="fas fa-trash-alt"></i>
                         </a>
 
@@ -73,3 +72,4 @@
 
     </table>
 </div>
+

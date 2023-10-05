@@ -3,15 +3,16 @@ using IMS.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataAccess.Mapping
 {
-    public class DepartmentMap: ClassMap<Department>
+    public class ProductTypeMap: ClassMap<ProductType>
     {
-        public DepartmentMap()
+        public ProductTypeMap()
         {
-            Table("Department");
+            Table("ProductType");
             Id(x => x.Id);
             Map(x => x.Name);
             Map(x => x.CreatedBy);
@@ -21,8 +22,7 @@ namespace IMS.DataAccess.Mapping
             Map(x => x.Status);
             Map(x => x.Rank);
             Map(x => x.VersionNumber);
-            Map(x => x.BusinessId);
-
+            Map(x => x.BusinessId);            
         }
     }
 }

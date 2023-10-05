@@ -23,3 +23,7 @@ textarea {
     background-color:green !important;
     /* Set the desired text color, e.g., green */
 }
+.messageError {
+    color: white !important;
+    background-color: red !important;
+}

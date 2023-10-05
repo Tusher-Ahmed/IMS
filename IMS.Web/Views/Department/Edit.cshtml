@@ -4,16 +4,17 @@
     ViewBag.Title = "Edit";
 }
 
-<h2 class="text-uppercase">Edit Department</h2>
-<div id="DeptEdit">@if (TempData["Edata"] != null){<p>@TempData["Edata"]</p>}</div>
-@using (Ajax.BeginForm("Edit", "Department",new AjaxOptions(){
-                HttpMethod="POST",
-                InsertionMode=InsertionMode.Replace,
-                UpdateTargetId="DeptEdit"
+<h2 class="text-uppercase">Change Department</h2>
+<div id="DeptEdit"></div>
+@using (Ajax.BeginForm("Edit", "Department", new AjaxOptions()
+{
+    HttpMethod = "POST",
+    UpdateTargetId = "DeptEdit",
+    OnComplete = "ClearFields"
 }))
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <br />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -25,14 +26,49 @@
                 @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
             </div>
-        </div>   
-        <br/>
+        </div>
+        <br />
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Save" class="btn btn-outline-success" />
-                @Html.ActionLink("Back to List", "Index", null, new {@class="btn btn-outline-info"})
+                @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-outline-info" })
             </div>
         </div>
     </div>
 }
 
+@section Scripts {
+    <script>
+        var messageTimer;
+
+        function updateDivDept(data) {
+            var divElement = document.getElementById("DeptEdit");
+            if (data && data.message) {
+                var messageElement = document.createElement("div");
+                messageElement.innerHTML = data.message;
+
+                if (data.success) {
+
+                    messageElement.classList.add("message");
+                } else {
+
+                    messageElement.classList.add("messageError");
+                }
+
+                divElement.appendChild(messageElement);
+
+                messageTimer = setTimeout(function () {
+                    messageElement.remove();
+                }, 2000);
+            }
+        }
+
+        // AJAX form submission complete callback
+        function ClearFields(ajaxContext) {
+            updateDivDept(ajaxContext.responseJSON);
+
+        }
+    </script>
+
+    @Scripts.Render("~/bundles/jqueryval")
+}

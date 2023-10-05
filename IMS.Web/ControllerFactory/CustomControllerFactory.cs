@@ -25,6 +25,10 @@ namespace IMS.Web.ControllerFactory
                 {
                     return new DepartmentController(_session);
                 }
+                else if (controllerType == typeof(ProductTypeController))
+                {
+                    return new ProductTypeController(_session);
+                }
             }
             return base.GetControllerInstance(requestContext, controllerType);
         }

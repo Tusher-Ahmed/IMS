@@ -1,0 +1,31 @@
+﻿@model IMS.Models.ProductType
+
+@{
+    ViewBag.Title = "Status";
+}
+
+<h2 class="text-uppercase">Product Type Status</h2>
+
+<p class="text-danger">Are you sure you want to deactivate the product type?</p>
+<div>
+    <br/>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+    </dl>
+    <br/>
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Deactivate" class="btn btn-outline-danger" /> 
+            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-outline-info" })
+        </div>
+    }
+</div>

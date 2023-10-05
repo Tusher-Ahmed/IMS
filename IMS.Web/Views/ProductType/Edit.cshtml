@@ -1,16 +1,15 @@
-﻿@model IMS.Models.Department
+﻿@model IMS.Models.ProductType
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Edit";
 }
 
-<h2 class="text-uppercase">Create Department</h2>
-<div id="DivDept">
-</div>
-@using (Ajax.BeginForm("Create", "Department", new AjaxOptions()
+<h2 class="text-uppercase">Change Product Type</h2>
+<div id="ProductTypeEdit"></div>
+@using (Ajax.BeginForm("Edit", "ProductType", new AjaxOptions()
 {
     HttpMethod = "POST",
-    UpdateTargetId = "DivDept",
+    UpdateTargetId = "ProductTypeEdit",
     OnComplete = "ClearFields"
 }))
 {
@@ -19,41 +18,39 @@
     <div class="form-horizontal">
         <br />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+
         <div class="form-group">
-            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", id = "dName" } })
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+            <div class="col-12">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
             </div>
         </div>
         <br />
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Add Department" class="pl-2 pr-2 btn btn-outline-success" />
+                <input type="submit" value="Save" class="btn btn-outline-success" />
                 @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-outline-info" })
             </div>
         </div>
     </div>
 }
-
-
-
-
 @section Scripts {
     <script>
         var messageTimer;
 
         function updateDivDept(data) {
-            var divElement = document.getElementById("DivDept");
+            var divElement = document.getElementById("ProductTypeEdit");
             if (data && data.message) {
                 var messageElement = document.createElement("div");
                 messageElement.innerHTML = data.message;
 
                 if (data.success) {
-                    
+
                     messageElement.classList.add("message");
                 } else {
-                   
+
                     messageElement.classList.add("messageError");
                 }
 
@@ -68,7 +65,6 @@
         // AJAX form submission complete callback
         function ClearFields(ajaxContext) {
             updateDivDept(ajaxContext.responseJSON);
-            document.getElementById("dName").value = "";
 
         }
     </script>

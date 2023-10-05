@@ -167,6 +167,7 @@
     <Compile Include="ControllerFactory\CustomControllerFactory.cs" />
     <Compile Include="Controllers\DepartmentController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ProductTypeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -229,7 +230,14 @@
     <Content Include="Views\Department\Status.cshtml" />
     <Content Include="Views\Department\Deactivate.cshtml" />
     <Content Include="Views\Department\Active.cshtml" />
-    <Content Include="Views\Shared\_SearchDeactivateDepartment.cshtml" />
+    <Content Include="Views\ProductType\Index.cshtml" />
+    <Content Include="Views\Shared\_SearchProductType.cshtml" />
+    <Content Include="Views\ProductType\Create.cshtml" />
+    <Content Include="Views\ProductType\Edit.cshtml" />
+    <Content Include="Views\ProductType\Delete.cshtml" />
+    <Content Include="Views\ProductType\Status.cshtml" />
+    <Content Include="Views\ProductType\Deactivate.cshtml" />
+    <Content Include="Views\ProductType\Active.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,5 +1,4 @@
-﻿using IMS.DataAccess;
-using IMS.Models;
+﻿using IMS.Models;
 using IMS.Service;
 using NHibernate;
 using System;
@@ -10,37 +9,37 @@ using System.Web.Mvc;
 
 namespace IMS.Web.Controllers
 {
-    public class DepartmentController : Controller
+    public class ProductTypeController : Controller
     {
-        // GET: Department
-        private readonly DepartmentService _department;
-        public DepartmentController(ISession session)
+        // GET: ProductType
+        private readonly ProductTypeService _productType;
+        public ProductTypeController(ISession session)
         {
-            _department = new DepartmentService();
-            _department.Session= session;
-            
+            _productType = new ProductTypeService();
+            _productType.Session = session;
+
         }
 
         #region Index
         public ActionResult Index()
         {
-            var data=_department.GetAllDept().Where(u=>u.Status==1);
+            var data = _productType.GetAllType();
             return View(data);
         }
         [HttpPost]
-        public ActionResult Index(string dept)
+        public ActionResult Index(string pType)
         {
-            if (string.IsNullOrEmpty(dept) == false)
+            if (string.IsNullOrEmpty(pType) == false)
             {
-                var data = _department.GetAllDept();
-                var searchItem=data.Where(u=>u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status==1).ToList();
-                return PartialView("_SearchDepartment",searchItem);
+                var data = _productType.GetAllType();
+                var searchItem = data.Where(u => u.Name.IndexOf(pType, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status==1).ToList();
+                return PartialView("_SearchProductType", searchItem);
             }
             else
             {
 
-                var data = _department.GetAllDept();
-                return PartialView("_SearchDepartment",data);
+                var data = _productType.GetAllType();
+                return PartialView("_SearchProductType", data);
             }
         }
         #endregion
@@ -50,30 +49,29 @@ namespace IMS.Web.Controllers
         {
             return View();
         }
+        
         [HttpPost]
-        public ActionResult Create(Department dept)
+        public ActionResult Create(ProductType pType)
         {
             TempData["data"] = "";
-            var data = _department.GetAllDept().Where(u => u.Name == dept.Name);
-            if (data.Any())
+            var data = _productType.GetAllType().Where(u=>u.Name==pType.Name);
+            if(data.Any())
             {
-                ModelState.AddModelError("Name", "Department name is already in use.");
+                ModelState.AddModelError("Name", "Product Type is already in use.");
             }
 
             if (ModelState.IsValid)
-            {               
+            {
                 try
                 {
-                    _department.AddDept(dept);
-                    TempData["data"] = "Department Created Successfully.";
-                    //return Json(new { message = TempData["data"] });
+                    _productType.AddProductType(pType);
+                    TempData["data"] = "Product Type Added Successfully.";
                     return Json(new { success = true, message = TempData["data"] });
 
                 }
                 catch
                 {
                     TempData["data"] = "Data is not inserted!!"; ;
-                    //return Json(new { message = TempData["data"] });
                     return Json(new { success = false, message = TempData["data"] });
 
                 }
@@ -91,36 +89,30 @@ namespace IMS.Web.Controllers
             {
                 return HttpNotFound();
             }
-            var dept=_department.GetDeptById(id);
-            if (dept != null)
+            var productType = _productType.GetProductTypeById(id);
+            if (productType != null)
             {
-                return View(dept);
+                return View(productType);
             }
             return RedirectToAction("Index");
         }
+
         [HttpPost]
-        public ActionResult Edit(long id,Department dept)
+        public ActionResult Edit(long id,ProductType pType)
         {
-            if (dept == null)
+            if (pType == null)
             {
                 return HttpNotFound();
             }
-            var data = _department.GetAllDept().Where(u => u.Name == dept.Name);
-
-            if (data.Any())
-            {
-                ModelState.AddModelError("Name", "Department name is already in use.");
-            }
-
             if (ModelState.IsValid)
-            {  
+            {
                 try
                 {
-                    var deptData = _department.GetDeptById(id);
-                    if(deptData.Status!=null) { dept.Status = deptData.Status; }
-                    dept.ModifyBy = 3;
-                    _department.UpdateDept(id,dept);
-                    TempData["data"] = "Department Updated Successfully.";
+                    var deptData = _productType.GetProductTypeById(id);
+                    if (deptData.Status != null) { pType.Status = deptData.Status; }
+                    pType.ModifyBy = 3;
+                    _productType.UpdateProductType(id, pType);
+                    TempData["data"] = "Product Type Updated Successfully.";
                     return Json(new { success = true, message = TempData["data"] });
                 }
                 catch
@@ -142,19 +134,20 @@ namespace IMS.Web.Controllers
             {
                 return HttpNotFound();
             }
-            var dept = _department.GetDeptById(id);
-            if (dept != null)
+            var productType = _productType.GetProductTypeById(id);
+            if (productType != null)
             {
-                return View(dept);
+                return View(productType);
             }
             return RedirectToAction("Index");
         }
+
         [HttpPost]
         public ActionResult Delete(long id, Department dept)
         {
             if (dept != null)
             {
-                _department.DeleteDept(id);
+                _productType.DeleteProductType(id);
                 return RedirectToAction("Index");
             }
             return View();
@@ -168,24 +161,24 @@ namespace IMS.Web.Controllers
             {
                 return HttpNotFound();
             }
-            var dept = _department.GetDeptById(id);
-            if (dept != null)
+            var productType = _productType.GetProductTypeById(id);
+            if (productType != null)
             {
-                return View(dept);
+                return View(productType);
             }
             return RedirectToAction("Index");
         }
 
         [HttpPost]
-        public ActionResult Status(long id,Department dept)
+        public ActionResult Status(long id, Department dept)
         {
-            var deptarment = _department.GetDeptById(id);
-            if (deptarment != null)
+            var productType = _productType.GetProductTypeById(id);
+            if (productType != null)
             {
-                deptarment.Status = 0;
-                deptarment.ModifyBy = 3;               
-                _department.UpdateDept(id, deptarment);
-                return RedirectToAction("Index", "Department");
+                productType.Status = 0;
+                productType.ModifyBy = 3;
+                _productType.UpdateProductType(id, productType);
+                return RedirectToAction("Index", "ProductType");
             }
             return View();
         }
@@ -194,7 +187,7 @@ namespace IMS.Web.Controllers
         #region All Deactivate Status
         public ActionResult Deactivate()
         {
-            var data = _department.GetAllDept().Where(u => u.Status == 0);
+            var data = _productType.GetAllType().Where(u => u.Status == 0);
             return View(data);
         }
         [HttpPost]
@@ -202,15 +195,15 @@ namespace IMS.Web.Controllers
         {
             if (string.IsNullOrEmpty(dept) == false)
             {
-                var data = _department.GetAllDept();
+                var data = _productType.GetAllType();
                 var searchItem = data.Where(u => u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 0).ToList();
-                return PartialView("_SearchDepartment", searchItem);
+                return PartialView("_SearchProductType", searchItem);
             }
             else
             {
 
-                var data = _department.GetAllDept().Where(u=>u.Status==0);
-                return PartialView("_SearchDepartment", data);
+                var data = _productType.GetAllType().Where(u => u.Status == 0);
+                return PartialView("_SearchProductType", data);
             }
         }
         #endregion
@@ -218,24 +211,24 @@ namespace IMS.Web.Controllers
         #region Active Status
         public ActionResult Active(long id)
         {
-            var dept=_department.GetDeptById(id);
+            var dept = _productType.GetProductTypeById(id);
             if (dept != null)
             {
                 return View(dept);
             }
-            return RedirectToAction("Deactivate", "Department");
+            return RedirectToAction("Deactivate", "ProductType");
         }
 
         [HttpPost]
-        public ActionResult Active(long id,Department dept)
+        public ActionResult Active(long id, ProductType productType)
         {
-            var deptarment = _department.GetDeptById(id);
-            if (deptarment != null)
+            var ProductType = _productType.GetProductTypeById(id);
+            if (ProductType != null)
             {
-                deptarment.Status = 1;
-                deptarment.ModifyBy = 4;
-                _department.UpdateDept(id, deptarment);
-                return RedirectToAction("Deactivate", "Department");
+                ProductType.Status = 1;
+                ProductType.ModifyBy = 4;
+                _productType.UpdateProductType(id, ProductType);
+                return RedirectToAction("Deactivate", "ProductType");
             }
             return View();
         }
