@@ -62,7 +62,6 @@ namespace IMS.Web.Controllers
 
                 _garmentsService.CreateGarmentsProduct(model);
 
-                // Redirect to the index page or wherever appropriate
                 return RedirectToAction("Index");
             }
             
@@ -75,15 +74,51 @@ namespace IMS.Web.Controllers
                 ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
 
                 return View(model);
-            }
-            #endregion
-
-            #region Product List
-            public ActionResult ProductList()
-            {
-                var product = _garmentsService.GetAllP();
-                return View(product);
-            }
-            #endregion
         }
+         #endregion
+
+        #region Product List
+        public ActionResult ProductList()
+        {
+             var product = _garmentsService.GetAllP();
+             return View(product);
+        }
+        #endregion
+        #region Product Details
+        public ActionResult Details(long id)
+        {
+            var product = _garmentsService.GetGarmentsProductById(id);
+            return View(product);
+        }
+        #endregion
+        #region Edit Product
+        public ActionResult Edit(long id)
+        {
+            var product = _garmentsService.GetGarmentsProductById(id);
+            var departments = _departmentService.GetAllDept();
+            var productTypes = _productTypeService.GetAllType();
+            ViewBag.Departments = new SelectList(departments, "Id", "Name");
+            ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
+            return View(product);
+        }
+        [HttpPost]
+        public ActionResult Edit(long id, GarmentsProduct garmentsProduct)
+        {
+            var product = _garmentsService.GetGarmentsProductById(id);
+            if (ModelState.IsValid)
+            {
+                garmentsProduct.ProductType = _productTypeService.GetProductTypeById((long)garmentsProduct.ProductTypeId);
+                garmentsProduct.Department = _departmentService.GetDeptById((long)garmentsProduct.DepartmentId);
+                _garmentsService.UpdateGarmentsProduct(id, garmentsProduct);
+                return RedirectToAction("ProductList", "Garments");
+            }
+            var departments = _departmentService.GetAllDept();
+            var productTypes = _productTypeService.GetAllType();
+            ViewBag.Departments = new SelectList(departments, "Id", "Name");
+            ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
+            garmentsProduct.Image = product.Image;
+            return View(garmentsProduct);
+        }
+        #endregion
     }
+}
