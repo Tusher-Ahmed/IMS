@@ -27,3 +27,21 @@ textarea {
     color: white !important;
     background-color: red !important;
 }
+
+#productTable_length select {
+    width: 60px; /* Adjust the width as needed */
+}
+
+/* Align the dropdown content */
+#productTable_length select {
+    vertical-align: middle;
+    display: inline-block;
+    margin: 0;
+    padding: 2px;
+    font-size: 14px; 
+}
+
+
+#productTable_length {
+    margin-right: 20px; /* Adjust the margin as needed */
+}

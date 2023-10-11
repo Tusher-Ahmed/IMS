@@ -8,7 +8,7 @@ using System.ServiceModel.Channels;
 using System.Web;
 using IMS.Models;
 using NHibernate.Tool.hbm2ddl;
-using IMS.DataAccess.Mapping;
+using IMS.DAO.Mapping;
 
 namespace IMS.Service
 {
@@ -27,6 +27,10 @@ namespace IMS.Service
                                  .AddFromAssemblyOf<DepartmentMap>();
                    m.FluentMappings
                                  .AddFromAssemblyOf<ProductTypeMap>();
+                   m.FluentMappings
+                                 .AddFromAssemblyOf<ProductMap>();
+                   m.FluentMappings
+                                 .AddFromAssemblyOf<GarmentsProductMap>();
 
                })
                 .ExposeConfiguration(cfg => new SchemaExport(cfg)

@@ -1,0 +1,56 @@
+﻿@model IMS.Models.GarmentsProduct
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2 class="text-uppercase">Add Garments Product</h2>
+<br />
+@using (Html.BeginForm("Create", "Garments", FormMethod.Post, new { enctype = "multipart/form-data", @class = "pb-4 pt-2" }))
+{
+                @Html.AntiForgeryToken()
+    @Html.ValidationSummary("", new { @class = "text-danger" });
+
+                <div class="form-group">
+        @Html.TextBoxFor(model => model.Name, new { placeholder = "Product Name", @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+    </div>
+    <br />
+    <div class="form-group">
+        @Html.TextBoxFor(model => model.Price, new { placeholder = "Price", @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+    </div>
+    <br />
+    <div class="form-group">
+        @Html.TextBoxFor(model => model.SKU, new { placeholder = "SKU", @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.SKU, "", new { @class = "text-danger" })
+    </div>
+    <br />
+    <div class="form-group">
+        @Html.DropDownListFor(model => model.DepartmentId, (SelectList)ViewBag.Departments, "Select Department", new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.DepartmentId, "", new { @class = "text-danger" })
+    </div>
+    <br />
+    <div class="form-group">
+
+        @Html.DropDownListFor(model => model.ProductTypeId, (SelectList)ViewBag.ProductTypes, "Select Product Type", new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.ProductTypeId, "", new { @class = "text-danger" })
+    </div>
+    <br />
+    <div class="form-group">
+        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4" })
+        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+    </div>
+    <br />
+    <div class="form-group">
+        <input type="file" name="imageFile" id="imageFile" class="form-control" />
+    </div>
+
+    <!-- Other fields from the Product entity as needed -->
+    <br />
+    <button type="submit" class="btn btn-outline-primary">Add Product</button>
+    @Html.ActionLink("Back to List", "ProductList", null, new { @class = "btn btn-outline-info" })
+}
+
+
+

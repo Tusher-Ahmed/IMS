@@ -1,0 +1,83 @@
+﻿@model IMS.Models.ViewModel.ProductViewModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+
+@using (Html.BeginForm("Index", "Product", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+    <div class="row pb-5 pt-5">
+        <div class="col-md-3">
+            <div class="form-group">               
+                @Html.TextBoxFor(m => m.SearchProductName, new { placeholder = "Search by Product Name", @class = "form-control", id = "SearchProductName" })
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="form-group">
+                @Html.DropDownList("SearchDepartmentId", new SelectList(Model.Departments, "Id", "Name"), "Select Department", new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="form-group">
+                @Html.DropDownList("SearchProductTypeId", new SelectList(Model.ProductTypes, "Id", "Name"), "Select Product Type", new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="form-group">
+                <input type="submit" value="Search" class="btn btn-primary form-control" />
+            </div>
+        </div>
+    </div>
+}
+<div id="ProductList">
+    @Html.Partial("_ProductListPartial", Model)
+</div>
+
+@section Scripts{
+    <script>
+    $(document).ready(function () {
+        // Function to load products using AJAX
+        function loadProducts(pageNumber) {
+            // Gather search criteria
+            var searchProductName = $('#SearchProductName').val();
+            var searchProductTypeId = $('#SearchProductTypeId').val();
+            var searchDepartmentId = $('#SearchDepartmentId').val();
+
+            $.ajax({
+                url: '@Url.Action("Index", "Product")',
+                type: 'GET',
+                data: {
+                    SearchProductName: searchProductName,
+                    SearchProductTypeId: searchProductTypeId,
+                    SearchDepartmentId: searchDepartmentId,
+                    PageNumber: pageNumber
+                },
+                success: function (result) {
+                    // Update the product list and pagination
+                    $('#ProductList').html(result);
+                },
+                error: function () {
+                    alert('Error loading products.');
+                }
+            });
+        }
+
+        // Handle form submission for searching
+        $('#searchForm').submit(function (e) {
+            e.preventDefault();
+            loadProducts(1); // Load the first page of results
+        });
+
+        // Handle pagination links
+        $(document).on('click', '.pagination a', function (e) {
+            e.preventDefault();
+            var pageNumber = $(this).data('page');
+            loadProducts(pageNumber);
+        });
+    });
+    </script>
+}

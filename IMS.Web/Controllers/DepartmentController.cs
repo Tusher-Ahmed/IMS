@@ -1,5 +1,4 @@
-﻿using IMS.DataAccess;
-using IMS.Models;
+﻿using IMS.Models;
 using IMS.Service;
 using NHibernate;
 using System;
@@ -13,11 +12,11 @@ namespace IMS.Web.Controllers
     public class DepartmentController : Controller
     {
         // GET: Department
-        private readonly DepartmentService _department;
+        private readonly IDepartmentService _department;
         public DepartmentController(ISession session)
         {
-            _department = new DepartmentService();
-            _department.Session= session;
+            _department = new DepartmentService { Session=session};
+           
             
         }
 

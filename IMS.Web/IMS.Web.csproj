@@ -166,7 +166,9 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="ControllerFactory\CustomControllerFactory.cs" />
     <Compile Include="Controllers\DepartmentController.cs" />
+    <Compile Include="Controllers\GarmentsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Controllers\ProductTypeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -190,9 +192,16 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\dataTables.bootstrap5.min.css" />
+    <Content Include="Content\jquery.dataTables.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Images\sort_asc.png" />
+    <Content Include="Images\sort_asc_disabled.png" />
+    <Content Include="Images\sort_both.png" />
+    <Content Include="Images\sort_desc.png" />
+    <Content Include="Images\sort_desc_disabled.png" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -200,11 +209,13 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
+    <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.dataTables.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -238,6 +249,11 @@
     <Content Include="Views\ProductType\Status.cshtml" />
     <Content Include="Views\ProductType\Deactivate.cshtml" />
     <Content Include="Views\ProductType\Active.cshtml" />
+    <Content Include="Views\Product\Index.cshtml" />
+    <Content Include="Views\Shared\_ProductListPartial.cshtml" />
+    <Content Include="Views\Garments\Create.cshtml" />
+    <Content Include="Views\Garments\Index.cshtml" />
+    <Content Include="Views\Garments\ProductList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -271,9 +287,9 @@
     <Content Include="Scripts\jquery-3.4.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IMS.DataAccess\IMS.DataAccess.csproj">
+    <ProjectReference Include="..\IMS.DataAccess\IMS.DAO.csproj">
       <Project>{6bed7044-5b73-41f8-987c-02862ebc6299}</Project>
-      <Name>IMS.DataAccess</Name>
+      <Name>IMS.DAO</Name>
     </ProjectReference>
     <ProjectReference Include="..\IMS.Models\IMS.Models.csproj">
       <Project>{0FFE979E-836E-4CC5-83D6-9416604665AE}</Project>

@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IMS.DataAccess
+namespace IMS.DAO
 {
-    public class Repository<T>  where T : class
+    public class BaseDAO<T>  where T : class
     {
         private ISession _session;
 

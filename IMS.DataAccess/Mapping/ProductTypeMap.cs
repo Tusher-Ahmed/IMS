@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IMS.DataAccess.Mapping
+namespace IMS.DAO.Mapping
 {
     public class ProductTypeMap: ClassMap<ProductType>
     {

@@ -1,0 +1,45 @@
+﻿@model IMS.Models.ViewModel.ProductViewModel
+
+@{
+    ViewBag.Title = "_ProductListPartial";
+}
+
+
+<div class="row">
+    <br />
+    @foreach (var product in Model.Products)
+    {
+        <div class="card" style="width: 18rem;">
+            <img class="card-img-top" src="..." alt="Card image cap">
+            <div class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <a href="#" class="btn btn-primary">Go somewhere</a>
+            </div>
+        </div>
+    }
+    @*@for (int i = 0; i < 100; i++)
+    {
+        <div class="card" style="width: 18rem;">
+            <img class="card-img-top" src="..." alt="Card image cap">
+            <div class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <a href="#" class="btn btn-primary">Go somewhere</a>
+            </div>
+        </div>
+    }*@
+</div>
+<div>
+    Page @Model.PageNumber of @Math.Ceiling((double)Model.TotalCount / Model.PageSize)
+
+    @if (Model.PageNumber > 1)
+    {
+        @Html.ActionLink("Previous", "Index", new { page = Model.PageNumber - 1, /* other filters */ })
+    }
+
+    @if (Model.PageNumber < Math.Ceiling((double)Model.TotalCount / Model.PageSize))
+    {
+        @Html.ActionLink("Next", "Index", new { page = Model.PageNumber + 1, /* other filters */ })
+    }
+</div>

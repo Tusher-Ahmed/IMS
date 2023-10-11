@@ -1,4 +1,4 @@
-﻿using IMS.DataAccess;
+﻿using IMS.DAO;
 using IMS.Models;
 using NHibernate;
 using System;
@@ -9,9 +9,17 @@ using System.Threading.Tasks;
 
 namespace IMS.Service
 {
-    public class ProductTypeService
+    public interface IProductTypeService
     {
-        private readonly Repository<ProductType> _repository;
+        IEnumerable<ProductType> GetAllType();
+        void AddProductType(ProductType pType);
+        ProductType GetProductTypeById(long id);
+        void UpdateProductType(long id, ProductType pType);
+        void DeleteProductType(long id);
+    }
+    public class ProductTypeService : IProductTypeService
+    {
+        private readonly BaseDAO<ProductType> _repository;
         private ISession _session;
         public ISession Session
         {
@@ -20,12 +28,17 @@ namespace IMS.Service
         }
         public ProductTypeService()
         {
-            _repository = new Repository<ProductType>();
+            _repository = new BaseDAO<ProductType>();
         }
+
+        #region Get All Product Type
         public IEnumerable<ProductType> GetAllType()
         {
             return _repository.GetAll().ToList();
         }
+        #endregion
+
+        #region Add Product Type
         public void AddProductType(ProductType pType)
         {
             int highRank = Convert.ToInt32(_repository.GetAll().Max(u => u.Rank));
@@ -54,12 +67,16 @@ namespace IMS.Service
             }
 
         }
+        #endregion
 
+        #region Get Product Type By Id
         public ProductType GetProductTypeById(long id)
         {
             return _repository.GetById(id);
         }
+        #endregion
 
+        #region Update Product Type
         public void UpdateProductType(long id, ProductType pType)
         {
             using (var transaction = _session.BeginTransaction())
@@ -86,7 +103,9 @@ namespace IMS.Service
             }
 
         }
+        #endregion
 
+        #region Delete Product Type
         public void DeleteProductType(long id)
         {
             using (var transaction = _session.BeginTransaction())
@@ -108,5 +127,6 @@ namespace IMS.Service
             }
 
         }
+        #endregion
     }
 }

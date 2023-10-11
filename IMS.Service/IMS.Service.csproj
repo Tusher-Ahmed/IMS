@@ -63,14 +63,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DepartmentService.cs" />
+    <Compile Include="GarmentsService.cs" />
     <Compile Include="NHibernateHelper.cs" />
+    <Compile Include="ProductService.cs" />
     <Compile Include="ProductTypeService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IMS.DataAccess\IMS.DataAccess.csproj">
+    <ProjectReference Include="..\IMS.DataAccess\IMS.DAO.csproj">
       <Project>{6BED7044-5B73-41F8-987C-02862EBC6299}</Project>
-      <Name>IMS.DataAccess</Name>
+      <Name>IMS.DAO</Name>
     </ProjectReference>
     <ProjectReference Include="..\IMS.Models\IMS.Models.csproj">
       <Project>{0FFE979E-836E-4CC5-83D6-9416604665AE}</Project>

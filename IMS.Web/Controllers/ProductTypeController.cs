@@ -12,11 +12,10 @@ namespace IMS.Web.Controllers
     public class ProductTypeController : Controller
     {
         // GET: ProductType
-        private readonly ProductTypeService _productType;
+        private readonly IProductTypeService _productType;
         public ProductTypeController(ISession session)
         {
-            _productType = new ProductTypeService();
-            _productType.Session = session;
+            _productType = new ProductTypeService { Session=session};
 
         }
 

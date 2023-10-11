@@ -1,4 +1,4 @@
-﻿using IMS.DataAccess;
+﻿using IMS.DAO;
 using IMS.Models;
 using NHibernate;
 using System;
@@ -9,9 +9,17 @@ using System.Threading.Tasks;
 
 namespace IMS.Service
 {
-    public class DepartmentService
+   public interface IDepartmentService
     {
-        private readonly Repository<Department> _repository;
+        void AddDept(Department dept);
+        void DeleteDept(long id);
+        void UpdateDept(long id, Department dept);
+        IEnumerable<Department> GetAllDept();
+        Department GetDeptById(long id);
+    }
+    public class DepartmentService : IDepartmentService
+    {
+        private readonly BaseDAO<Department> _repository;
         private ISession _session;
         public ISession Session
         {
@@ -20,9 +28,9 @@ namespace IMS.Service
         }
         public DepartmentService()
         {
-            _repository = new Repository<Department>();
+            _repository = new BaseDAO<Department>();
         }
-
+        #region Add Department
         public void AddDept(Department dept)
         {
             int highRank = Convert.ToInt32(_repository.GetAll().Max(u => u.Rank));
@@ -51,7 +59,9 @@ namespace IMS.Service
             }
            
         }
+        #endregion
 
+        #region Delete Department
         public void DeleteDept(long id)
         {
             using (var transaction = _session.BeginTransaction())
@@ -73,17 +83,23 @@ namespace IMS.Service
             }
            
         }
+        #endregion
 
+        #region Get All Department
         public IEnumerable<Department> GetAllDept()
         {
            return _repository.GetAll().ToList();
         }
+        #endregion
 
+        #region Get Department By Id
         public Department GetDeptById(long id)
         {
             return _repository.GetById(id);
         }
+        #endregion
 
+        #region Update Deparment
         public void UpdateDept(long id,Department dept)
         {
             using (var transaction = _session.BeginTransaction())
@@ -110,5 +126,6 @@ namespace IMS.Service
             }
             
         }
+        #endregion
     }
 }

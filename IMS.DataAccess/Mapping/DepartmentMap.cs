@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace IMS.DataAccess.Mapping
+namespace IMS.DAO.Mapping
 {
     public class DepartmentMap: ClassMap<Department>
     {
