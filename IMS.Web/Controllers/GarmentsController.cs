@@ -80,10 +80,11 @@ namespace IMS.Web.Controllers
         #region Product List
         public ActionResult ProductList()
         {
-             var product = _garmentsService.GetAllP();
+             var product = _garmentsService.GetAllP().Where(u => u.Status == 1);
              return View(product);
         }
         #endregion
+
         #region Product Details
         public ActionResult Details(long id)
         {
@@ -91,6 +92,7 @@ namespace IMS.Web.Controllers
             return View(product);
         }
         #endregion
+
         #region Edit Product
         public ActionResult Edit(long id)
         {
@@ -118,6 +120,26 @@ namespace IMS.Web.Controllers
             ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
             garmentsProduct.Image = product.Image;
             return View(garmentsProduct);
+        }
+        #endregion
+
+        #region Status & Deactivation
+        public ActionResult Status(long id)
+        {
+            var product = _garmentsService.GetGarmentsProductById(id);
+            return View(product);
+        }
+
+        [HttpPost]
+        public ActionResult Status(long id,GarmentsProduct garmentsProduct)
+        {
+            var product=_garmentsService.GetGarmentsProductById(id);
+            if (product != null)
+            {
+                _garmentsService.UpdateStatus(id);
+                return RedirectToAction("ProductList");
+            }
+            return View(product);
         }
         #endregion
     }

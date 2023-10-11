@@ -5,6 +5,7 @@ using NHibernate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -18,6 +19,7 @@ namespace IMS.Service
         GarmentsProduct GetGarmentsProductById(long id);
         void CreateGarmentsProduct(GarmentsProduct garmentsProduct);
         void UpdateGarmentsProduct(long id, GarmentsProduct garmentsProduct);
+        void UpdateStatus(long id);
     }
     public class GarmentsService : IGarmentsService
     {
@@ -44,7 +46,7 @@ namespace IMS.Service
         #region Get All Product with Page number
         public GarmentsProductViewModel GetAllProduct(int pageNumber)
         {
-            var query = _repository.GetAll().ToList();
+            var query = _repository.GetAll().Where(u=>u.Status==1).ToList();
 
             int pageSize = 10;
             int totalCount = query.Count();
@@ -141,7 +143,36 @@ namespace IMS.Service
                     }
                 }
             }
-            #endregion
+
         }
+        #endregion
+
+        #region Deactivate status
+        public void UpdateStatus(long id)
+        {
+            var prod = this.GetGarmentsProductById(id);
+            if (prod != null)
+            {
+                using (var transaction = _session.BeginTransaction())
+                {
+                    prod.Status = 0;
+                    prod.VersionNumber=prod.VersionNumber + 1;
+                    prod.ModifyBy = 3;
+                    prod.ModificationDate = DateTime.Now;
+                    try
+                    {
+                        _repository.Update(prod);
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+
+        }
+        #endregion
     }
 }

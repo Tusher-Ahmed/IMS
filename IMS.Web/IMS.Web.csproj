@@ -256,6 +256,7 @@
     <Content Include="Views\Garments\ProductList.cshtml" />
     <Content Include="Views\Garments\Details.cshtml" />
     <Content Include="Views\Garments\Edit.cshtml" />
+    <Content Include="Views\Garments\Status.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
