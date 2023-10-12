@@ -1,4 +1,5 @@
 ﻿using FluentNHibernate.Data;
+using IMS.Models;
 using NHibernate;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,8 @@ namespace IMS.DAO
         {
             _session.Update(entity);
         }
-       
+
+
+
     }
 }

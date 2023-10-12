@@ -1,0 +1,54 @@
+﻿@model IMS.Models.InventoryOrderCart
+
+@using (Html.BeginForm("ProductDetails", "InventoryShopping", FormMethod.Post))
+{
+   <input type="hidden" name="ProductId" value="@Model.ProductId" />
+    <div class="card container">
+        <div class="card-header bg-dark text-light ml-0 row">
+            <div class="col-12 col-md-6">
+                <h2 class="text-white-50 text-uppercase">@Model.GarmentsProduct.Name</h2>
+                <p class="text-white">Garments Name:</p>
+            </div>
+        </div>
+        <div class="card-body row container">
+            <div class="container rounded p-2">
+                <div class="row">
+                    <div class="col-8 col-lg-8">
+                        <div class="row pl-2">
+                            <h5 class=" pb-2">Product Price: @Model.GarmentsProduct.Price.ToString("c")</h5>
+                        </div>
+                        <div class="row pl-2">
+                            <p class="text-secondary"><span class="text-dark">Department: </span> @Model.GarmentsProduct.Department.Name</p>
+                        </div>
+                        <div class="row pl-2">
+                            <p class="text-secondary"><span class="text-dark">Product Type:</span> @Model.GarmentsProduct.ProductType.Name</p>
+                        </div>
+                        <div class="row pl-2 pb-2">
+                            <p class="text-secondary"><span class="text-dark">Product Description:</span><br /> @Model.GarmentsProduct.Description</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-2">
+                                <h4>Count</h4>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    @Html.TextBoxFor(model => model.Count, new { @class = "form-control", type = "number" })
+                                    @Html.ValidationMessageFor(model => model.Count, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-9"></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-3 offset-lg-1 text-center">
+                        <img src="@Url.Content("~/Images/" + Model.GarmentsProduct.Image)" height="200" class="rounded" style="box-shadow: 0 10px 5px -5px rgba(0, 0, 0, 0.2) " alt="Product Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 text-end p-4">
+            <button type="submit" class="btn btn-outline-primary">Add Product to Cart</button>
+            @Html.ActionLink("Back to Home", "Index", "Home", new { @class = "btn btn-outline-success" })
+        </div>
+    </div>
+}
+

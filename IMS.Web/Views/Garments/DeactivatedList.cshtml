@@ -1,0 +1,65 @@
+﻿@model IEnumerable<IMS.Models.GarmentsProduct>
+
+@{
+    ViewBag.Title = "Deactivated List";
+}
+
+<h4 class="text-uppercase">Deactivated Product List</h4>
+<br/>
+<table class="table table-striped table-hover" id="deactivateTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Image)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SKU)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <img src="@Url.Content("~/Images/" + item.Image)" width="40" alt="img">
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SKU)
+                </td>
+                <td class="text-end">
+                    <a href="@Url.Action("Edit", "Garments", new { id = item.Id })" class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="@Url.Action("ActiveStatus", "Garments", new { id = item.Id })" class="btn btn-outline-warning">
+                        <i class="fas fa-times"></i>
+                    </a>
+                    <a href="@Url.Action("Details", "Garments", new { id = item.Id })" class="btn btn-outline-secondary">
+                        <i class="fas fa-info-circle"></i>
+                    </a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#deactivateTable").DataTable();
+        })
+    </script>
+}

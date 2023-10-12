@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="DepartmentService.cs" />
     <Compile Include="GarmentsService.cs" />
+    <Compile Include="InventoryShoppingService.cs" />
     <Compile Include="NHibernateHelper.cs" />
     <Compile Include="ProductService.cs" />
     <Compile Include="ProductTypeService.cs" />

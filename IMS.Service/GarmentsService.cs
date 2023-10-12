@@ -5,6 +5,7 @@ using NHibernate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,8 +19,10 @@ namespace IMS.Service
         GarmentsProductViewModel GetAllProduct(int pageNumber);
         GarmentsProduct GetGarmentsProductById(long id);
         void CreateGarmentsProduct(GarmentsProduct garmentsProduct);
+       
         void UpdateGarmentsProduct(long id, GarmentsProduct garmentsProduct);
         void UpdateStatus(long id);
+        void ActivateStatus(long id);
     }
     public class GarmentsService : IGarmentsService
     {
@@ -174,5 +177,35 @@ namespace IMS.Service
 
         }
         #endregion
+
+        #region Activate Status
+        public void ActivateStatus(long id)
+        {
+            var prod = GetGarmentsProductById(id);
+            if(prod != null)
+            {
+                using (var transaction = _session.BeginTransaction())
+                {
+                    prod.Status = 1;
+                    prod.VersionNumber = prod.VersionNumber + 1;
+                    prod.ModifyBy = 4;
+                    prod.ModificationDate = DateTime.Now;
+
+                    try
+                    {
+                        _repository.Update(prod);
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+        #endregion
+
+        
     }
 }

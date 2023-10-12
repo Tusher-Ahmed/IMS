@@ -142,5 +142,38 @@ namespace IMS.Web.Controllers
             return View(product);
         }
         #endregion
+
+        #region Show deactivated Product List
+        public ActionResult DeactivatedList()
+        {
+            var prod = _garmentsService.GetAllP().Where(u => u.Status == 0);
+            return View(prod);
+        }
+        #endregion
+
+        #region Activate Product from Deactivation
+        public ActionResult ActiveStatus(long id)
+        {
+            var prod = _garmentsService.GetGarmentsProductById(id);
+            if (prod != null)
+            {
+                return View(prod);
+            }
+            return RedirectToAction("DeactivatedList");
+        }
+        [HttpPost]
+        public ActionResult ActiveStatus(long id,GarmentsProduct garmentsProduct)
+        {
+            var prod = _garmentsService.GetGarmentsProductById(id);
+            if (prod != null)
+            {
+                _garmentsService.ActivateStatus(id);
+                return RedirectToAction("DeactivatedList", "Garments");
+            }
+            return View(prod);
+        }
+        #endregion
+
+       
     }
-}
+} 
