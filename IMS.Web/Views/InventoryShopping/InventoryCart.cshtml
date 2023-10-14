@@ -1,0 +1,109 @@
+﻿@model IMS.Models.ViewModel.InventoryCartViewModel
+
+<div class="card shadow border-0">
+    <div class="card-header bg-dark bg-gradient text-light ml-0 py-4">
+        <div class="row px-4">
+            <div class="col-6">
+                <h5 class="pt-2 text-white text-uppercase">
+                    Shopping Cart
+                </h5>
+            </div>
+        </div>
+    </div>
+    <div class="card-body my-4">
+        <div class="row">
+        </div>
+        <div class="row mb-3 pb-3">
+            <div class="col-md-2 offset-md-1">
+                @Html.ActionLink("Continue Shopping", "Index", "Garments", null, new { @class = "btn btn-outline-primary text-uppercase mb-5 btn-sm" })
+            </div>
+            @foreach (var item in Model.OrderCarts)
+            {
+                <div class="col-md-10 offset-md-1">
+                    <div id="product_@item.Id" class="row border-bottom pb-3">
+                        <div class="d-none d-lg-block col-lg-1 text-center py-2">
+                            <img src="@Url.Content("~/Images/" + item.GarmentsProduct.Image)" width="80" class="rounded" alt="Product Image">
+                        </div>
+                        <div class="col-12 col-lg-6 pt-md-3">
+                            <h5 class="text-uppercase text-secondary"><strong>@item.GarmentsProduct.Name</strong></h5>
+                            <p><small>Sizes: @item.GarmentsProduct.SKU</small></p>
+                        </div>
+                        <div class="col-12  col-lg-5 text-center row">
+                            <div class="col-4 text-md-right pt-2 pt-md-4">
+                                <h6>
+                                    @item.GarmentsProduct.Price.ToString("C") X <span id="count_@item.Id">@item.Count</span>
+                                </h6>
+                            </div>
+                            <div class="col-5 col-sm-4 col-lg-5 pt-2">
+                                <div class="w-75 btn-group" role="group">
+                                    <button class="btn btn-outline-success bg-gradient py-2" onclick="incrementProductCount('@item.Id')">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+
+                                    <button class="btn btn-outline-danger bg-gradient py-2" onclick="decrementProductCount('@item.Id')">
+
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+
+                                </div>
+                            </div>
+                            <div class="col-3 col-sm-4 pt-2 col-lg-2 offset-lg-1 text-right">
+                                <a href="@Url.Action("RemoveFromCart", "InventoryShopping", new { id = item.Id })" class="btn btn-danger bg-gradient py-2">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+        <div class="card-footer bg-white border-0">
+            <div class="row">
+                <div class="col-md-4 offset-md-4">
+                    <ul class="list-group mb-4">
+                        <li class="d-flex justify-content-between align-items-center">
+                            <h5 class="text-dark fw-semibold text-uppercase"> Total (USD)</h5>
+                            <h4 class="text-dark fw-bolder"><span id="totalPrice">@Model.TotalPrice.ToString("C")</span></h4>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 offset-md-5">
+                    @Html.ActionLink("Summary", "Summary", "Cart", null, new { @class = "btn btn-primary border-0 bg-gradient w-100 py-2" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function incrementProductCount(itemId) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("IncrementCount", "InventoryShopping")",
+                data: { id: itemId },
+                success: function (data) {
+                    $("#count_" + itemId).text(data.newCount);
+                    var formattedTotalPrice = data.newTotalPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+                    $("#totalPrice").text(formattedTotalPrice);
+                }
+            });
+        }
+
+        function decrementProductCount(itemId) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DecrementCount", "InventoryShopping")",
+                data: { id: itemId },
+                success: function (data) {
+                    $("#count_" + itemId).text(data.newCount);
+                    var formattedTotalPrice = data.newTotalPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+                    $("#totalPrice").text(formattedTotalPrice);
+                }
+            });
+        }
+    </script>
+}

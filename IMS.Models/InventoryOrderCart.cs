@@ -17,6 +17,7 @@ namespace IMS.Models
         public virtual long GarmentsId {  get; set; }
         public virtual long ProductId {  get; set; }
         public virtual GarmentsProduct GarmentsProduct { get; set; }
+  
 
     }
 }

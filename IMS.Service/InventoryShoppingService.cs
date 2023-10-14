@@ -7,12 +7,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace IMS.Service
 {
     public interface IInventoryShoppingService
     {
         void AddInventoryShoppingCart(InventoryOrderCart inventoryOrderCart);
+        IEnumerable<InventoryOrderCart> GetAllInventoryOrders();
+        InventoryOrderCart GetproductById(long id);
+        int IncrementCount(InventoryOrderCart inventoryOrderCart, int count);
+        int DecrementCount(InventoryOrderCart inventoryOrderCart, int count);
+        void RemoveProduct(InventoryOrderCart Cart);
     }
     public class InventoryShoppingService:IInventoryShoppingService
     {
@@ -47,8 +53,7 @@ namespace IMS.Service
 
                     if (Existproduct != null)
                     {
-                        IncrementCount(Existproduct, inventoryOrderCart.Count);
-                        _repository.Update(Existproduct);
+                        IncrementProductCount(Existproduct, inventoryOrderCart.Count);
                     }
                     else
                     {
@@ -57,10 +62,8 @@ namespace IMS.Service
                     
                     transaction.Commit();
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine($"Exception: {ex.Message}");
-                    Console.WriteLine($"Stack Trace: {ex.StackTrace}");
                     transaction.Rollback();
                     throw;
                 }
@@ -68,13 +71,82 @@ namespace IMS.Service
         }
         #endregion
 
+        public InventoryOrderCart GetproductById(long id)
+        {
+            return _repository.GetById(id);
+        }
 
+        public IEnumerable<InventoryOrderCart> GetAllInventoryOrders()
+        {
+            return _repository.GetAll();
+        }
 
+        public int IncrementProductCount(InventoryOrderCart inventoryOrderCart, int count)
+        {
+            inventoryOrderCart.Count += count;
+           _repository.Update(inventoryOrderCart);
+            return inventoryOrderCart.Count;
+        }
 
         public int IncrementCount(InventoryOrderCart inventoryOrderCart, int count)
         {
             inventoryOrderCart.Count += count;
+            using (var transaction = _session.BeginTransaction())
+            {
+                try
+                {
+                    _repository.Update(inventoryOrderCart);
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+
             return inventoryOrderCart.Count;
+        }
+
+        public int DecrementCount(InventoryOrderCart inventoryOrderCart, int count)
+        {
+            if (inventoryOrderCart.Count > 1)
+            {
+                inventoryOrderCart.Count -= count;
+                using (var transaction = _session.BeginTransaction())
+                {
+                    try
+                    {
+                        _repository.Update(inventoryOrderCart);
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+
+            }
+                          
+            return inventoryOrderCart.Count;
+        }
+
+        public void RemoveProduct(InventoryOrderCart Cart)
+        {
+            using (var transaction = _session.BeginTransaction())
+            {
+                try
+                {
+                    _repository.Delete(Cart);
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
     }
 }
