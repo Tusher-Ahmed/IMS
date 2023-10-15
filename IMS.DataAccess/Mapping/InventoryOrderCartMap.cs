@@ -18,7 +18,6 @@ namespace IMS.DataAccess.Mapping
             Map(x => x.EmployeeId);
             Map(x => x.GarmentsId);
             References(x => x.GarmentsProduct, "ProductId").Column("ProductId").Cascade.None();
-
         }
     }
 }

@@ -21,11 +21,11 @@
             {
                 <div class="col-md-10 offset-md-1">
                     <div id="product_@item.Id" class="row border-bottom pb-3">
-                        <div class="d-none d-lg-block col-lg-1 text-center py-2">
-                            <img src="@Url.Content("~/Images/" + item.GarmentsProduct.Image)" width="80" class="rounded" alt="Product Image">
+                        <div class="d-none p-2 d-lg-block col-lg-1 text-center py-2">
+                            <img src="@Url.Content("~/Images/" + item.GarmentsProduct.Image)" width="70" class="rounded" alt="Product Image">
                         </div>
                         <div class="col-12 col-lg-6 pt-md-3">
-                            <h5 class="text-uppercase text-secondary"><strong>@item.GarmentsProduct.Name</strong></h5>
+                            <h6 class="text-uppercase text-secondary"><strong>@item.GarmentsProduct.Name</strong></h6>
                             <p><small>Sizes: @item.GarmentsProduct.SKU</small></p>
                         </div>
                         <div class="col-12  col-lg-5 text-center row">
@@ -39,9 +39,8 @@
                                     <button class="btn btn-outline-success bg-gradient py-2" onclick="incrementProductCount('@item.Id')">
                                         <i class="fas fa-plus"></i>
                                     </button>
-
+                                    <span class="p-1"></span>
                                     <button class="btn btn-outline-danger bg-gradient py-2" onclick="decrementProductCount('@item.Id')">
-
                                         <i class="fas fa-minus"></i>
                                     </button>
 
@@ -71,7 +70,9 @@
             </div>
             <div class="row">
                 <div class="col-md-2 offset-md-5">
-                    @Html.ActionLink("Summary", "Summary", "Cart", null, new { @class = "btn btn-primary border-0 bg-gradient w-100 py-2" })
+                    <form method="post" action="@Url.Action("PlaceOrder", "Product")">
+                        <input type="submit" value="Place Order" class="btn btn-success border-0 bg-gradient w-100 py-2" />
+                    </form>
                 </div>
             </div>
         </div>

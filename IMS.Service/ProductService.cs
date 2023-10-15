@@ -14,6 +14,9 @@ namespace IMS.Service
     public interface IProductService
     {
         ProductViewModel GetProducts(ProductViewModel product);
+        IEnumerable<Product> GetAllProduct();
+        void Add(Product product);
+        Product GetProductById(long id);
     }
 
     public class ProductService:IProductService
@@ -30,6 +33,7 @@ namespace IMS.Service
             _repository = new BaseDAO<Product>();
             
         }
+        #region Customer Home page
         public ProductViewModel GetProducts(ProductViewModel product)
         {
             int pageNumber = 1;
@@ -70,6 +74,21 @@ namespace IMS.Service
             };
 
             return resultModel;
+        }
+        #endregion
+
+        public IEnumerable<Product> GetAllProduct()
+        {
+            return _repository.GetAll();
+        }
+
+        public void Add(Product product)
+        {
+            _repository.Add(product);
+        }
+        public Product GetProductById(long id)
+        {
+            return _repository.GetById(id);
         }
     }
 }

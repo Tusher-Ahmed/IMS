@@ -1,0 +1,35 @@
+﻿@model IMS.Models.ViewModel.OrderHistoryViewModel
+
+
+
+<div class="row">
+    <div class="col-8">
+        <h4 class="text-uppercase">History Details</h4>
+    </div>
+    <div class="col-4 text-end">
+        @Html.ActionLink("Back to History", "History", null, new { @class = "btn btn-outline-info" })
+    </div>
+</div>
+<br />
+<span class="text-danger">Order Id: @Model.OrderId</span><span class="p-4"></span><span class="text-danger">order Total: @Model.TotalPrice.ToString("C")</span>
+<br />
+<br />
+<div class="pb-4">
+    <div class="row">
+        <div class="col-md-4">
+            <img src="@Url.Content("~/Images/" + Model.Image)" alt="Product Image" Height="350" style="box-shadow: 0 10px 5px -5px rgba(0, 0, 0, 0.2) ">
+        </div>
+        <div class="col-md-8">
+            <h3 class="text-uppercase">@Model.Name</h3><br />
+            <p><span style="font-weight:bold">Price (each):</span>  @Model.Price.ToString("C")</p>
+            <p><span style="font-weight:bold">Sizes:</span> @Model.SKU</p>
+            <p><span style="font-weight:bold">Department:</span> @Model.Department</p>
+            <p><span style="font-weight:bold">Product Type:</span> @Model.ProductType</p>
+            <p><span style="font-weight:bold">Order By:</span> @Model.EmployeeId</p>
+            <p><span style="font-weight:bold">Quantity:</span> @Model.Quantity</p>
+            <br />
+            <p style="text-align:justify"><span style="font-weight:bold">Product Description:</span><br />@Model.Description</p>
+        </div>
+    </div>
+
+</div>

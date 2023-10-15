@@ -18,7 +18,7 @@ namespace IMS.Models
         public virtual string Name { get; set; }
         [Required(ErrorMessage = "Product Image is required.")]
         [Display(Name = "Product Image")]
-        public virtual byte[] Image { get; set; }
+        public virtual string Image { get; set; }
         [Required(ErrorMessage = "Product Image is required.")]
         public virtual decimal Price { get; set; }
         [Required(ErrorMessage = "Stock Keeping Unit is required")]
@@ -28,7 +28,10 @@ namespace IMS.Models
         public virtual int Quantity { get; set; }
         [Required]
         public virtual string Description { get; set; }
-        public virtual string ContentType { get; set; }
+        public virtual int ProductCode { get; set; }
+        public virtual long OrderHistoryId { get; set; }
+        public virtual decimal BuyingPrice { get; set; }
+        public virtual bool IsPriceAdded { get; set; }
         public virtual long? CreatedBy { get; set; }
         public virtual DateTime? CreationDate { get; set; }
         public virtual long? ModifyBy { get; set; }
@@ -39,6 +42,7 @@ namespace IMS.Models
         public virtual int? Rank { get; set; }
         public virtual int? VersionNumber { get; set; }
         public virtual string BusinessId { get; set; }
+        public virtual long GarmentsId {  get; set; }
 
         public virtual Department Department { get; set; }
         public virtual ProductType ProductType { get; set; }

@@ -19,6 +19,7 @@ namespace IMS.Service
         int IncrementCount(InventoryOrderCart inventoryOrderCart, int count);
         int DecrementCount(InventoryOrderCart inventoryOrderCart, int count);
         void RemoveProduct(InventoryOrderCart Cart);
+        void RemoveProductFromList(InventoryOrderCart Cart);
     }
     public class InventoryShoppingService:IInventoryShoppingService
     {
@@ -79,6 +80,23 @@ namespace IMS.Service
         public IEnumerable<InventoryOrderCart> GetAllInventoryOrders()
         {
             return _repository.GetAll();
+        }
+
+        public void RemoveProductFromList(InventoryOrderCart Cart)
+        {
+            using (var transaction = _session.BeginTransaction())
+            {
+                try
+                {
+                    _repository.Delete(Cart);
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
 
         public int IncrementProductCount(InventoryOrderCart inventoryOrderCart, int count)

@@ -30,7 +30,8 @@
                         <ul class="dropdown-menu dropdown-menu-dark">
                             <li>@Html.ActionLink("Department", "Index", "Department", new { area = "" }, new { @class = "nav-link" })</li>
                             <li>@Html.ActionLink("Product Type", "Index", "ProductType", new { area = "" }, new { @class = "nav-link" })</li>
-                            <li>@Html.ActionLink("Add Product", "Create", "Product", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Manage Price", "UpdateRecentProduct", "Product", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Order History", "History", "Product", new { area = "" }, new { @class = "nav-link" })</li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -40,6 +41,14 @@
                         <ul class="dropdown-menu dropdown-menu-dark">
                             <li>@Html.ActionLink("Product List", "ProductList", "Garments", new { area = "" }, new { @class = "nav-link" })</li>
                             <li>@Html.ActionLink("Deactivated List", "DeactivatedList", "Garments", new { area = "" }, new { @class = "nav-link" })</li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Manage Product
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li>@Html.ActionLink("Arrived Product", "ApproveProduct", "Product", new { area = "" }, new { @class = "nav-link" })</li>                    
                         </ul>
                     </li>
                     <li>

@@ -59,8 +59,7 @@ namespace IMS.Web.Controllers
                     };
 
                     // Add the inventoryOrder to the shopping cart
-                    _inventoryShoppingService.AddInventoryShoppingCart(inventoryOrder);
-
+                    _inventoryShoppingService.AddInventoryShoppingCart(inventoryOrder);                    
                     return RedirectToAction("Index", "Garments");
                 }
             }
@@ -70,7 +69,7 @@ namespace IMS.Web.Controllers
         }
         #endregion
 
-
+        #region Inventory Cart
         public ActionResult InventoryCart()
         {
             InventoryCartViewModel inventoryCartViewModel = new InventoryCartViewModel
@@ -81,11 +80,12 @@ namespace IMS.Web.Controllers
             {
                 inventoryCartViewModel.TotalPrice += (cart.GarmentsProduct.Price * cart.Count);
             }
-
+           
             return View(inventoryCartViewModel);
         }
+        #endregion
 
-
+        #region Inventory Cart Operation
         [HttpPost]
         public JsonResult IncrementCount(long id)
         {
@@ -119,5 +119,7 @@ namespace IMS.Web.Controllers
             decimal total = orderCarts.Sum(cart => cart.GarmentsProduct.Price * cart.Count);
             return total;
         }
+
+        #endregion
     }
 }

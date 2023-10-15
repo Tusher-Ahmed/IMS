@@ -168,6 +168,7 @@
     <Compile Include="Controllers\DepartmentController.cs" />
     <Compile Include="Controllers\GarmentsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\InventoryOrderHistoryController.cs" />
     <Compile Include="Controllers\InventoryShoppingController.cs" />
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Controllers\ProductTypeController.cs" />
@@ -262,10 +263,14 @@
     <Content Include="Views\Garments\ActiveStatus.cshtml" />
     <Content Include="Views\InventoryShopping\ProductDetails.cshtml" />
     <Content Include="Views\InventoryShopping\InventoryCart.cshtml" />
+    <Content Include="Views\Product\History.cshtml" />
+    <Content Include="Views\Product\HistoryDetails.cshtml" />
+    <Content Include="Views\Product\ApproveProduct.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
+    <Folder Include="Views\InventoryOrderHistory\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

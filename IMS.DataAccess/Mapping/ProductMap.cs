@@ -16,13 +16,16 @@ namespace IMS.DAO.Mapping
 
             Id(x => x.Id);
             Map(x => x.Name);
-            Map(x => x.Image)
-                .CustomSqlType("VARBINARY(MAX)");
+            Map(x => x.Image);
             Map(x => x.Price);
             Map(x => x.SKU);
             Map(x => x.Quantity);
             Map(x => x.Description);
-            Map(x => x.ContentType);
+            Map(x => x.BuyingPrice);
+            Map(x => x.IsPriceAdded);
+            Map(x => x.ProductCode);
+            Map(x => x.GarmentsId);
+            Map(x => x.OrderHistoryId);
             Map(x => x.CreatedBy);
             Map(x => x.CreationDate);
             Map(x => x.ModifyBy);

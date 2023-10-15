@@ -41,6 +41,10 @@ namespace IMS.Web.ControllerFactory
                 {
                     return new InventoryShoppingController(_session);
                 }
+                else if (controllerType == typeof(InventoryOrderHistoryController))
+                {
+                    return new InventoryOrderHistoryController(_session);
+                }
             }
             return base.GetControllerInstance(requestContext, controllerType);
         }

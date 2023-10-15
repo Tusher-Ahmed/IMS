@@ -34,6 +34,9 @@ namespace IMS.Service
                                  .AddFromAssemblyOf<GarmentsProductMap>();
                    m.FluentMappings
                                  .AddFromAssemblyOf<InventoryOrderCartMap>();
+                   m.FluentMappings
+                                 .AddFromAssemblyOf<OrderHistoryMap>();
+
 
                })
                 .ExposeConfiguration(cfg => new SchemaExport(cfg)

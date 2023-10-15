@@ -1,0 +1,45 @@
+﻿@model IEnumerable<IMS.Models.Product>
+@{
+    ViewBag.Title = "ApproveProduct";
+}
+
+<h2 class="text-uppercase">Check Product And Approve</h2>
+<br />
+<table class="table table-striped table-hover" id="approveTable">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>SKU</th>
+            <th>Quantity</th>
+            <th>Garments Name</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <img src="@Url.Content("~/Images/" + item.Image)" width="30" class="rounded" alt="Product Image">
+                </td>
+                <td>@item.Name</td>
+                <td>@item.SKU</td>
+                <td>@item.Quantity</td>
+                <td>@item.GarmentsId</td>
+                <td>
+                    <a href="@Url.Action("EditByStaff", "Product", new { id = item.Id })" class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#approveTable").DataTable();
+        })
+    </script>
+}

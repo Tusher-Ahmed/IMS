@@ -1,0 +1,49 @@
+﻿@model List<IMS.Models.ViewModel.OrderHistoryViewModel>
+
+<h4 class="text-uppercase">Order History</h4>
+<br />
+<table class="table table-striped table-hover" id="historyTable">
+    <thead>
+        <tr>
+            <th>OrderId</th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>ProductType</th>
+            <th>EmployeeId</th>
+            <th>Quantity</th>
+            <th>Price(each)</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderByDescending(u => u.Rank))
+        {
+            <tr>
+                <td>@item.OrderId</td>
+                <td><img src="@Url.Content("~/Images/" + item.Image)" width="40" class="rounded" alt="Product Image"></td>
+                <td>@item.Name</td>
+                <td>@item.Department</td>
+                <td>@item.ProductType</td>
+                <td>@item.EmployeeId</td>
+                <td>@item.Quantity</td>
+                <td>@item.Price</td>
+                <td>@item.OrderDate.ToShortDateString()</td>
+                <td>
+                    <a href="@Url.Action("HistoryDetails", "Product", new { id = item.ProductId,orderId=item.OrderId })" class="btn btn-outline-success">
+                        <i class="fas fa-info-circle"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#historyTable").DataTable();
+        })
+    </script>
+}
