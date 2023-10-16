@@ -266,6 +266,9 @@
     <Content Include="Views\Product\History.cshtml" />
     <Content Include="Views\Product\HistoryDetails.cshtml" />
     <Content Include="Views\Product\ApproveProduct.cshtml" />
+    <Content Include="Views\Product\EditByStaff.cshtml" />
+    <Content Include="Views\Product\ManagePrice.cshtml" />
+    <Content Include="Views\Product\SetPrice.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

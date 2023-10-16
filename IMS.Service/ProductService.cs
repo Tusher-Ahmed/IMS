@@ -17,6 +17,9 @@ namespace IMS.Service
         IEnumerable<Product> GetAllProduct();
         void Add(Product product);
         Product GetProductById(long id);
+        void UpdateProduct(Product product);
+        void DeleteProduct(Product product);
+        Product GetProductByProductCode(int ProductCode);
     }
 
     public class ProductService:IProductService
@@ -39,7 +42,7 @@ namespace IMS.Service
             int pageNumber = 1;
             int pageSize =  10; 
 
-            var query = _repository.GetAll(); 
+            var query = _repository.GetAll().Where(u=>u.IsPriceAdded==true && u.Status==1); 
 
             
             if (product.SearchProductTypeId.HasValue && product.SearchDepartmentId.HasValue)
@@ -57,7 +60,8 @@ namespace IMS.Service
             }
             if (!string.IsNullOrWhiteSpace(product.SearchProductName))
             {
-                query = query.Where(p => p.Name.Contains(product.SearchProductName));
+                string searchKeyword = product.SearchProductName.ToLower();
+                query = query.Where(p => p.Name.ToLower().Contains(searchKeyword));
             }
 
             int totalCount = query.Count();
@@ -84,11 +88,61 @@ namespace IMS.Service
 
         public void Add(Product product)
         {
-            _repository.Add(product);
+            using (var transaction = _session.BeginTransaction())
+            {   
+                try
+                {
+                    _repository.Add(product);
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
         public Product GetProductById(long id)
         {
             return _repository.GetById(id);
+        }
+        public Product GetProductByProductCode(int ProductCode)
+        {
+            return _session.Query<Product>().FirstOrDefault(u => u.ProductCode == ProductCode && u.Status==1 && u.IsPriceAdded==true && u.Approved==true);
+        }
+
+
+        public void UpdateProduct(Product product)
+        {            
+            using (var transaction = _session.BeginTransaction())
+            {
+                try
+                {
+                    _repository.Update(product);
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+        public void DeleteProduct(Product product)
+        {            
+            using (var transaction = _session.BeginTransaction())
+            {
+                try
+                {
+                    _repository.Delete(product);
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
     }
 }

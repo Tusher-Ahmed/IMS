@@ -9,26 +9,19 @@
     <br />
     @foreach (var product in Model.Products)
     {
-        <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="..." alt="Card image cap">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
+        <div class="col-md-3 mt-2 mb-2">
+            <div class="card" style="width: 16rem;">
+                <img src="@Url.Content("~/Images/" + product.Image)" height="200" class="card-img-top" alt="Product Image">
+                <div class="card-body">
+                    <p class="card-title text-uppercase" style="font-weight:bold;font-size:15px;">@product.Name</p>
+                    <p class="card-text" style="font-size:12px;">Sizes: @product.SKU</p>
+                    <p class="card-text" style="font-size:12px;">Price: @product.Price.ToString("C")</p>
+                    @Html.ActionLink("Product Details", "ProductDetails", "Product", new { ProductId = product.Id }, new { @class = "btn btn-success" })
+                </div>
             </div>
         </div>
     }
-    @*@for (int i = 0; i < 100; i++)
-    {
-        <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="..." alt="Card image cap">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
-            </div>
-        </div>
-    }*@
+
 </div>
 <div>
     Page @Model.PageNumber of @Math.Ceiling((double)Model.TotalCount / Model.PageSize)

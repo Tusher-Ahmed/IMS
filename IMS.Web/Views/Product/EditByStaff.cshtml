@@ -1,0 +1,43 @@
+﻿@model IMS.Models.Product
+
+@{
+    ViewBag.Title = "EditByStaff";
+}
+
+<h4 class="text-uppercase">Product Approval</h4>
+
+<p class="text-danger">Are you sure you want to Approve this product?</p>
+<div>
+<br/>
+    <div>
+        <div class="row">
+            <div class="col-md-6">
+                <img src="@Url.Content("~/Images/" + Model.Image)" alt="Product Image" width="350" class="img-fluid" style="box-shadow: 0 10px 5px -5px rgba(0, 0, 0, 0.2) ">
+            </div>
+            <div class="col-md-6">
+                <h3 class="text-uppercase">@Model.Name</h3><br />
+                <p>@if (Model.Approved != null)
+                {<span class="badge bg-success text-uppercase">Product Approved</span> }
+                else
+                {<span class="badge bg-danger text-uppercase">Product is Not Approved yet</span>}</p>
+                <p><span style="font-weight:bold">Sizes:</span> @Model.SKU</p>
+                <p><span style="font-weight:bold">Quantity:</span> @Model.Quantity</p>
+                <p><span style="font-weight:bold">Department:</span> @Model.Department.Name</p>
+                <p><span style="font-weight:bold">Product Type:</span> @Model.ProductType.Name</p>
+                <br />
+                <p style="text-align:justify"><span style="font-weight:bold">Product Description:</span><br />@Model.Description</p>
+            </div>
+        </div>
+    </div>
+    <div class="pb-4 pt-2 text-end">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-actions no-color">
+                <input type="submit" value="Approve the Product" class="btn btn-outline-success" /> 
+                @Html.ActionLink("Back to List", "ApproveProduct", null, new {@class="btn btn-outline-info"})
+            </div>
+        }
+    </div>       
+</div>

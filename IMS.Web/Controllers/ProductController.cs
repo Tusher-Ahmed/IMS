@@ -46,7 +46,7 @@ namespace IMS.Web.Controllers
         }
         #endregion
 
-        #region Place Order and Create product
+        #region Place Order and Add product
         public ActionResult PlaceOrder()
         {
             var Order = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == 1);
@@ -176,19 +176,90 @@ namespace IMS.Web.Controllers
         }
         #endregion
 
-        #region Update Price By Manager
+        #region Staff Product Approval
         public ActionResult ApproveProduct()
         {
             var product=_product.GetAllProduct().Where(u=>u.Approved==null).ToList();
             return View(product);
         }
-        #endregion
 
-        #region Staff Product Approval 
         public ActionResult EditByStaff(long id)
         {
             var prod=_product.GetProductById(id);
             return View(prod);
+        }
+
+        [HttpPost]
+        public ActionResult EditByStaff(long id, Product product)
+        {
+            var prod = _product.GetProductById(id);
+            if (prod != null)
+            {
+                prod.Approved = true;
+                prod.ApprovedBy = 1;
+                prod.ModificationDate = DateTime.Now;
+                prod.VersionNumber = 1;
+                _product.UpdateProduct(prod);
+            }
+            return RedirectToAction("ApproveProduct");
+        }
+        #endregion
+
+        #region Update Price and Status by Manager
+        public ActionResult ManagePrice()
+        {
+            var product=_product.GetAllProduct().Where(u=>u.Approved==true && u.IsPriceAdded==false && u.Status==0);
+            return View(product);
+        }
+
+        public ActionResult SetPrice(long id)
+        {
+            var prod = _product.GetProductById(id);
+            if(prod != null)
+            {
+                return View(prod);
+            }
+            return RedirectToAction("ManagePrice");
+        }
+
+        [HttpPost]
+        public ActionResult SetPrice(long id,Product product)
+        {
+            var prod = _product.GetProductById(id);
+            
+            if (prod != null)
+            {
+                var existingProduct = _product.GetProductByProductCode(prod.ProductCode);
+                if(existingProduct != null)
+                {
+                    existingProduct.Quantity=prod.Quantity+existingProduct.Quantity;
+                    existingProduct.Price = product.Price;
+                    existingProduct.Name = product.Name;
+                    existingProduct.Description = product.Description;
+                    existingProduct.IsPriceAdded = true;
+                    existingProduct.ModifyBy = 2;//ManagerId
+                    existingProduct.Status = 1;
+                    existingProduct.VersionNumber = existingProduct.VersionNumber + 1;
+                    _product.UpdateProduct(existingProduct);
+                    _product.DeleteProduct(prod);
+                    return RedirectToAction("ManagePrice");
+                }
+                else
+                {
+                    prod.Price = product.Price;
+                    prod.Name = product.Name;
+                    prod.Description = product.Description;
+                    prod.IsPriceAdded = true;
+                    prod.ModifyBy = 2;//ManagerId
+                    prod.Status = 1;
+                    prod.VersionNumber = prod.VersionNumber + 1;
+
+                    _product.UpdateProduct(prod);
+                    return RedirectToAction("ManagePrice");
+                }
+                
+            }
+            return RedirectToAction("ManagePrice");
         }
         #endregion
     }
