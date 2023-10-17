@@ -36,6 +36,8 @@ namespace IMS.Service
                                  .AddFromAssemblyOf<InventoryOrderCartMap>();
                    m.FluentMappings
                                  .AddFromAssemblyOf<OrderHistoryMap>();
+                   m.FluentMappings
+                                 .AddFromAssemblyOf<ShoppingCartMap>();
 
 
                })

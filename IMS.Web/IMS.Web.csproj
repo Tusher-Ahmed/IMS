@@ -165,6 +165,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="ControllerFactory\CustomControllerFactory.cs" />
+    <Compile Include="Controllers\CustomerShoppingController.cs" />
     <Compile Include="Controllers\DepartmentController.cs" />
     <Compile Include="Controllers\GarmentsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -269,11 +270,12 @@
     <Content Include="Views\Product\EditByStaff.cshtml" />
     <Content Include="Views\Product\ManagePrice.cshtml" />
     <Content Include="Views\Product\SetPrice.cshtml" />
+    <Content Include="Views\CustomerShopping\ProductDetails.cshtml" />
+    <Content Include="Views\CustomerShopping\ShoppingCart.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
-    <Folder Include="Views\InventoryOrderHistory\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

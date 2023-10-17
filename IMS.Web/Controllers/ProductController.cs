@@ -46,7 +46,19 @@ namespace IMS.Web.Controllers
         }
         #endregion
 
-        #region Place Order and Add product
+        #region Product Details
+        public ActionResult ProductDetails(long ProductId)
+        {
+            var product=_product.GetProductById(ProductId);
+            if (product != null)
+            {
+                return View(product);
+            }
+            return RedirectToAction("Index");
+        }
+        #endregion
+
+        #region Inventory Place Order and Add product
         public ActionResult PlaceOrder()
         {
             var Order = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == 1);

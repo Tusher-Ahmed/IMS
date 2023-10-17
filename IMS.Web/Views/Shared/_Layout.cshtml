@@ -48,12 +48,17 @@
                             Staff Approval
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark">
-                            <li>@Html.ActionLink("Arrived Product", "ApproveProduct", "Product", new { area = "" }, new { @class = "nav-link" })</li>                    
+                            <li>@Html.ActionLink("Arrived Product", "ApproveProduct", "Product", new { area = "" }, new { @class = "nav-link" })</li>
                         </ul>
                     </li>
                     <li>
                         <a href="@Url.Action("InventoryCart", "InventoryShopping")" class="nav-link">
                             <i class="fas fa-shopping-cart"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("ShoppingCart", "CustomerShopping")" class="nav-link">
+                            <i class="fas fa-shopping-cart text-danger"></i>
                         </a>
                     </li>
                 </ul>

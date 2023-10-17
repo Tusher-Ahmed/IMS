@@ -68,6 +68,7 @@
     <Compile Include="Mapping\OrderHistoryMap.cs" />
     <Compile Include="Mapping\ProductMap.cs" />
     <Compile Include="Mapping\ProductTypeMap.cs" />
+    <Compile Include="Mapping\ShoppingCartMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseDAO.cs" />
   </ItemGroup>
