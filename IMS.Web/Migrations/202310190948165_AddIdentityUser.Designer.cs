@@ -7,13 +7,13 @@ namespace IMS.Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class AddIdentity : IMigrationMetadata
+    public sealed partial class AddIdentityUser : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddIdentity));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddIdentityUser));
         
         string IMigrationMetadata.Id
         {
-            get { return "202310181202139_AddIdentity"; }
+            get { return "202310190948165_AddIdentityUser"; }
         }
         
         string IMigrationMetadata.Source

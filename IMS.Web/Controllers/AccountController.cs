@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace IMS.Web.Controllers
 {
@@ -134,7 +135,7 @@ namespace IMS.Web.Controllers
         }
 
         //
-        // GET: /Account/Register
+        // GET: /Account/Register as a customer
         [AllowAnonymous]
         public ActionResult Register()
         {
@@ -150,17 +151,67 @@ namespace IMS.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                
+                var user = new ApplicationUser 
+                {
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    ShopName=model.ShopName,
+                    City=model.City,
+                    StreetAddress=model.StreetAddress,
+                    Thana=model.Thana,
+                    PostalCode=model.PostalCode,
+                    PhoneNumber=model.PhoneNumber,
+                    
+                };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    await UserManager.AddToRoleAsync(user.Id, "Customer");
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    return RedirectToAction("Index", "Home");
+                }
+                AddErrors(result);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        public ActionResult GRegister()
+        {
+            return View();
+        }
+
+        //
+        // POST: /Account/Register as a Garments
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> GRegister(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+
+                var user = new ApplicationUser
+                {
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    GarmentsName = model.GarmentsName,
+                    City = model.City,
+                    StreetAddress = model.StreetAddress,
+                    Thana = model.Thana,
+                    PostalCode = model.PostalCode,
+                    PhoneNumber = model.PhoneNumber,
+
+                };
+                var result = await UserManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    await UserManager.AddToRoleAsync(user.Id, "Garments");
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -174,9 +225,9 @@ namespace IMS.Web.Controllers
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
-        public async Task<ActionResult> ConfirmEmail(string userId, string code)
+        public async Task<ActionResult> ConfirmEmail(long userId, string code)
         {
-            if (userId == null || code == null)
+            if (userId == 0 || code == null)
             {
                 return View("Error");
             }
@@ -287,7 +338,7 @@ namespace IMS.Web.Controllers
         public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
         {
             var userId = await SignInManager.GetVerifiedUserIdAsync();
-            if (userId == null)
+            if (userId == 0)
             {
                 return View("Error");
             }

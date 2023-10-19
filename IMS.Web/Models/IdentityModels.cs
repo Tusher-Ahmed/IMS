@@ -6,24 +6,75 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
+using IMS.Web.App_Start;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace IMS.Web.Models
 {
-    public class ApplicationUser : IdentityUser
+    public class UserRoleIntPk : IdentityUserRole<long>
     {
-        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
+    }
+
+    public class UserClaimIntPk : IdentityUserClaim<long>
+    {
+    }
+
+    public class UserLoginIntPk : IdentityUserLogin<long>
+    {
+    }
+
+    public class RoleIntPk : IdentityRole<long, UserRoleIntPk>
+    {
+        public RoleIntPk() { }
+        public RoleIntPk(string name) { Name = name; }
+    }
+
+    public class UserStoreIntPk : UserStore<ApplicationUser, RoleIntPk, long,
+        UserLoginIntPk, UserRoleIntPk, UserClaimIntPk>
+    {
+        public UserStoreIntPk(ApplicationDbContext context)
+            : base(context)
         {
-            // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
-            var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
+        }
+    }
+
+    public class RoleStoreIntPk : RoleStore<RoleIntPk, long, UserRoleIntPk>
+    {
+        public RoleStoreIntPk(ApplicationDbContext context)
+            : base(context)
+        {
+        }
+    }
+    public class ApplicationUser : IdentityUser<long, UserLoginIntPk, UserRoleIntPk, UserClaimIntPk>
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public override long Id { get; set; }
+        public string ShopName { get; set; }
+        public string GarmentsName { get; set; }
+        public string City { get; set; }
+        public string StreetAddress { get; set; }
+        public string Thana { get; set; }
+        public string PostalCode { get; set; }
+       
+
+        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(ApplicationUserManager manager)
+        {
+            var userIdentity = await manager.CreateIdentityAsync(this,
+                               DefaultAuthenticationTypes.ApplicationCookie);
+
             // Add custom user claims here
             return userIdentity;
         }
     }
 
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, RoleIntPk, long,
+        UserLoginIntPk, UserRoleIntPk, UserClaimIntPk>
     {
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("DefaultConnection")
         {
         }
 
