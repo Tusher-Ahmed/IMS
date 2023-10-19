@@ -16,8 +16,10 @@ namespace IMS.Models
 
         [Required(ErrorMessage = "Product Name is required.")]
         [Display(Name = "Product Name")]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Product Name must be between 3 and 50 characters.")]
-        [RegularExpression(@"^[a-zA-Z]{3,}(?: [a-zA-Z]+)*$", ErrorMessage = "Invalid Keyword!!")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Product Name must be between 3 and 50 characters.")]
+        //[RegularExpression(@"^[a-zA-Z]{3,}(?: [a-zA-Z]+)*$", ErrorMessage = "Invalid Keyword!!")]
+        [RegularExpression(@"^[a-zA-Z]{3,}([- ][a-zA-Z]+)*$", ErrorMessage = "Invalid Keyword!!")]
+
         public virtual string Name { get; set; }
         public virtual string Image { get; set; }
         public virtual IFormFile ImageFile { get; set; }

@@ -49,7 +49,13 @@ namespace IMS.Web.Controllers
             {
                 if (ImageFile != null && ImageFile.ContentLength > 0)
                 {
-
+                    int maxFileSizeBytes = 2 * 1024 * 1024;
+                    if (ImageFile.ContentLength > maxFileSizeBytes)
+                    {
+                        ModelState.AddModelError("ImageFile", "File size cannot exceed 1 MB.");
+                        
+                        return View(model);
+                    }
                     var fileName = Path.GetFileName(ImageFile.FileName);
                     var path = Path.Combine(Server.MapPath("~/Images"), fileName);
                     ImageFile.SaveAs(path);
