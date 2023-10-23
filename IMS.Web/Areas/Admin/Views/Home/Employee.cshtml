@@ -1,0 +1,52 @@
+﻿@model List<IMS.Models.ViewModel.UserDetailViewModel>
+
+@{
+    ViewBag.Title = "Employee Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row pb-4 pt-2">
+    <div class="col-md-6">
+        <h4 class="text-uppercase">Employee List</h4>
+    </div>
+    <div class="col-6 text-end">
+        @Html.ActionLink("+ Create Employee", "ERegister","Account", new { area = "" }, new {@class="btn btn-outline-success"})
+    </div>
+</div>
+
+<table id="employeeTable" class="table table-hover table-striped">
+    <thead>
+        <tr>
+            <th>User Id</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>City</th>
+            <th>Street Address</th>
+            <th>Thana</th>
+            <th>Postal Code</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Email</td>
+                <td>@item.Phone</td>
+                <td>@item.ERole</td>
+                <td>@item.City</td>
+                <td>@item.StreetAddress</td>
+                <td>@item.Thana</td>
+                <td>@item.PostalCode</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>$(document).ready(function () {
+            $("#employeeTable").DataTable();
+        })</script>
+}
+

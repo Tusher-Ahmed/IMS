@@ -134,6 +134,7 @@ namespace IMS.Web.Controllers
             }
         }
 
+        #region Customer Registration
         //
         // GET: /Account/Register as a customer
         [AllowAnonymous]
@@ -154,7 +155,7 @@ namespace IMS.Web.Controllers
                 
                 var user = new ApplicationUser 
                 {
-                    UserName = model.UserName,
+                    UserName = model.Email,
                     Email = model.Email,
                     ShopName=model.ShopName,
                     City=model.City,
@@ -170,7 +171,7 @@ namespace IMS.Web.Controllers
                     await UserManager.AddToRoleAsync(user.Id, "Customer");
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Product", new { area = "" });
                 }
                 AddErrors(result);
             }
@@ -178,7 +179,9 @@ namespace IMS.Web.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
+        #endregion
 
+        #region Garments Register
         [AllowAnonymous]
         public ActionResult GRegister()
         {
@@ -197,7 +200,7 @@ namespace IMS.Web.Controllers
 
                 var user = new ApplicationUser
                 {
-                    UserName = model.UserName,
+                    UserName = model.Email,
                     Email = model.Email,
                     GarmentsName = model.GarmentsName,
                     City = model.City,
@@ -213,7 +216,7 @@ namespace IMS.Web.Controllers
                     await UserManager.AddToRoleAsync(user.Id, "Garments");
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Garments", new { area = "" });
                 }
                 AddErrors(result);
             }
@@ -221,6 +224,64 @@ namespace IMS.Web.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
+        #endregion
+
+        #region Employee Registration by Admin
+        [AllowAnonymous]
+        public ActionResult ERegister()
+        {
+            var roles = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Manager", Text = "Manager" },
+                new SelectListItem { Value = "Staff", Text = "Staff" }
+            };
+
+            ViewBag.RolesList = new SelectList(roles, "Value", "Text");
+            return View();
+        }
+
+        //
+        // POST: /Account/Register
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ERegister(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    City = model.City,
+                    StreetAddress = model.StreetAddress,
+                    Thana = model.Thana,
+                    PostalCode = model.PostalCode,
+                    PhoneNumber = model.PhoneNumber,
+
+                };
+                var result = await UserManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    await UserManager.AddToRoleAsync(user.Id, model.ERoles);
+                    //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+
+                    return RedirectToAction("Index", "Product", new { area = "" });
+                }
+                AddErrors(result);
+            }
+            var roles = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Manager", Text = "Manager" },
+                new SelectListItem { Value = "Staff", Text = "Staff" }
+            };
+
+            ViewBag.RolesList = new SelectList(roles, "Value", "Text");
+
+            return View(model);
+        }
+        #endregion
 
         //
         // GET: /Account/ConfirmEmail
@@ -442,7 +503,7 @@ namespace IMS.Web.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Product", new { area = "" });
         }
 
         //
@@ -499,7 +560,7 @@ namespace IMS.Web.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Product");
         }
 
         internal class ChallengeResult : HttpUnauthorizedResult

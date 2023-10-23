@@ -96,11 +96,13 @@
     <Compile Include="ProductType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShoppingCart.cs" />
+    <Compile Include="ViewModel\AdminDashboardViewModel.cs" />
     <Compile Include="ViewModel\CustomerShoppingCartViewModel.cs" />
     <Compile Include="ViewModel\GarmentsProductViewModel.cs" />
     <Compile Include="ViewModel\InventoryCartViewModel.cs" />
     <Compile Include="ViewModel\OrderHistoryViewModel.cs" />
     <Compile Include="ViewModel\ProductViewModel.cs" />
+    <Compile Include="ViewModel\UserDetailViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

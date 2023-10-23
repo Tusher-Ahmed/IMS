@@ -7,31 +7,29 @@
 <main aria-labelledby="title">
     <div class="row">
         <div class="col-6">
-            <h4 class="text-uppercase">Create a new account</h4>
+            <h4 class="text-uppercase">Create a new employee account</h4>
         </div>
         <div class="col-6 text-end">
-            @Html.ActionLink("Register as a Germents", "GRegister", "Account", new { @class = "btn btn-outline-secondary" })
+            @Html.ActionLink("Back To Employee List", "Employee", "Home", new {area="Admin"} ,new {@class="btn btn-outline-success"})
         </div>
     </div>
 
-    <br/>
-    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
+    <br />
+    @using (Html.BeginForm("ERegister", "Account", FormMethod.Post, new { role = "form" }))
     {
         @Html.AntiForgeryToken()
 
         @Html.ValidationSummary("", new { @class = "text-danger" })
 <div class="row">
-    @*<div class="col-md-12 pb-2">
-        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Enter your username" })
-    </div>*@
+
     <div class="col-md-12 pb-2">
         @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter your email" })
     </div>
     <div class="col-md-6 pb-2">
-        @Html.TextBoxFor(m => m.ShopName, new { @class = "form-control", placeholder = "Enter your shop name" })
+        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "Enter your phone number" })
     </div>
     <div class="col-md-6 pb-2">
-        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "Enter your phone number" })
+        @Html.DropDownListFor(m => m.ERoles, ViewBag.RolesList as SelectList, "-- Select a Role --", new { @class = "form-control text-muted" })
     </div>
     <div class="col-md-6 pb-2">
         @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
@@ -52,14 +50,10 @@
         @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control", placeholder = "Postal code" })
     </div>
 </div>
-        
+
         <div class="row">
             <div class="text-center p-2">
-                <input type="submit" value="CREATE YOUR ACCOUNT" class="btn btn-success" style="width:100%"/>
-                <div class="d-block pt-4">
-                    <span class="pt-4">Already Registered?</span>
-                    @Html.ActionLink("Login", "Login", "Account", new { @class = "btn pt-1 text-primary" })
-                </div>
+                <input type="submit" value="CREATE EMPLOYEE ACCOUNT" class="btn btn-success" style="width:100%" />               
             </div>
         </div>
     }

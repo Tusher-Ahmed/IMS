@@ -1,4 +1,5 @@
-﻿using IMS.Web.Controllers;
+﻿using IMS.Web.Areas.Admin.Controllers;
+using IMS.Web.Controllers;
 using NHibernate;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,10 @@ namespace IMS.Web.ControllerFactory
                 else if (controllerType == typeof(CustomerShoppingController))
                 {
                     return new CustomerShoppingController(_session);
+                }
+                else if (controllerType == typeof(HomeController))
+                {
+                    return new HomeController(_session);
                 }
             }
             return base.GetControllerInstance(requestContext, controllerType);

@@ -97,11 +97,11 @@ namespace IMS.Web.Models
         [Required]
         [Display(Name = "Postal Code")]
         public string PostalCode { get; set; }
-        [Required]
-        public string UserName { get; set; }
+
         [Required]
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
+        public string ERoles { get; set; }
 
     }
 
