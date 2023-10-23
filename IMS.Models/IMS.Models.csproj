@@ -98,6 +98,7 @@
     <Compile Include="ShoppingCart.cs" />
     <Compile Include="ViewModel\AdminDashboardViewModel.cs" />
     <Compile Include="ViewModel\CustomerShoppingCartViewModel.cs" />
+    <Compile Include="ViewModel\GarmentsDashboardViewModel.cs" />
     <Compile Include="ViewModel\GarmentsProductViewModel.cs" />
     <Compile Include="ViewModel\InventoryCartViewModel.cs" />
     <Compile Include="ViewModel\OrderHistoryViewModel.cs" />

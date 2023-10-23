@@ -1,6 +1,7 @@
 ﻿using IMS.Models;
 using IMS.Models.ViewModel;
 using IMS.Service;
+using Microsoft.AspNet.Identity;
 using NHibernate;
 using System;
 using System.Collections.Generic;
@@ -65,7 +66,7 @@ namespace IMS.Web.Controllers
                 }
                 model.ProductType = _productTypeService.GetProductTypeById((long)model.ProductTypeId);
                 model.Department = _departmentService.GetDeptById((long)model.DepartmentId);
-
+                model.GarmentsId=  Convert.ToInt64(User.Identity.GetUserId());
                 _garmentsService.CreateGarmentsProduct(model);
 
                 return RedirectToAction("Index");
@@ -86,7 +87,8 @@ namespace IMS.Web.Controllers
         #region Product List
         public ActionResult ProductList()
         {
-             var product = _garmentsService.GetAllP().Where(u => u.Status == 1);
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
+            var product = _garmentsService.GetAllP().Where(u => u.Status == 1 && u.GarmentsId==userId);
              return View(product);
         }
         #endregion
@@ -152,7 +154,8 @@ namespace IMS.Web.Controllers
         #region Show deactivated Product List
         public ActionResult DeactivatedList()
         {
-            var prod = _garmentsService.GetAllP().Where(u => u.Status == 0);
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
+            var prod = _garmentsService.GetAllP().Where(u => u.Status == 0 && u.GarmentsId == userId);
             return View(prod);
         }
         #endregion

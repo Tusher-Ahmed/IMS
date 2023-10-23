@@ -1,4 +1,5 @@
 ﻿using IMS.Web.Areas.Admin.Controllers;
+using IMS.Web.Areas.Garmentss.Controllers;
 using IMS.Web.Controllers;
 using NHibernate;
 using System;
@@ -54,6 +55,11 @@ namespace IMS.Web.ControllerFactory
                 {
                     return new HomeController(_session);
                 }
+                else if (controllerType == typeof(GarmentsHomeController))
+                {
+                    return new GarmentsHomeController(_session);
+                }
+
             }
             return base.GetControllerInstance(requestContext, controllerType);
         }

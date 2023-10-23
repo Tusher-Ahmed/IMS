@@ -1,4 +1,4 @@
-﻿@model IMS.Models.ViewModel.AdminDashboardViewModel
+﻿@model IMS.Models.ViewModel.GarmentsDashboardViewModel
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -9,19 +9,16 @@
         <!-- Left Side - Action Buttons -->
         <div class="col-md-3 bg-dark text-dark pt-4" style="height:700px">
             <h5 class="pb-2 p-2 mb-5 text-white"><i class="fa-solid fa-user-tie"></i>&nbsp; @User.Identity.Name</h5>
-            <a href="@Url.Action("Index", "Home")" class="btn btn-dark mb-2  w-100 text-start"><i class="fa-solid fa-box"></i>&nbsp; Dashboard</a>
-            <a href="@Url.Action("Employee","Home")" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-users"></i>&nbsp; Employee</a>
-            <a href="@Url.Action("ProductList", "Home")" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-store"></i>&nbsp; Manage Product</a>
-            <a href="@Url.Action("Index", "Department", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-table"></i>&nbsp; Manage Department</a>
-            <a href="@Url.Action("Index", "ProductType", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-shirt"></i>&nbsp; Manage Product Type</a>
+            <a href="@Url.Action("Index", "GarmentsHome", new {area="Garments"})" class="btn btn-dark mb-2  w-100 text-start"><i class="fa-solid fa-box"></i>&nbsp; Dashboard</a>
+            <a href="@Url.Action("ProductList", "Garments", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-store"></i>&nbsp; Manage Product</a>
             <a href="@Url.Action("Index", "Manage", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-gear"></i>&nbsp; Setting</a>
         </div>
 
         <!-- Right Side - View of Corresponding Action -->
         <div class="col-md-9" id="result-container">
             <div class="row">
-                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a href="@Url.Action("ProductList", "Home")" style="text-decoration:none;">
+                <div class="col-md-6 col-lg-6 col-xlg-6 pb-2">
+                    <a href="@Url.Action("ProductList", "Garments", new {area=""})" style="text-decoration:none;">
                         <div class="box bg-primary text-center text-light p-3">
                             <i class="fa-solid fa-warehouse font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalProduct</h5>
@@ -30,57 +27,16 @@
                     </a>
                 </div>
                 <br />
-                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a href="@Url.Action("Employee", "Home")" id="totalProduct" style="text-decoration:none;">
+                <div class="col-md-6 col-lg-6 col-xlg-6 pb-2">
+                    <a href="@Url.Action("OrderHistory", "GarmentsHome", new {area="Garmentss"})" id="totalProduct" style="text-decoration:none;">
                         <div class="box bg-warning text-center text-light p-3">
                             <i class="fa-solid fa-user font-16"></i>
-                            <h5 class="mb-0 mt-1">@Model.TotalEmployee</h5>
-                            <small class="font-light">Total Employee</small>
+                            <h5 class="mb-0 mt-1">@Model.TotalHistory</h5>
+                            <small class="font-light">Order</small>
                         </div>
                     </a>
                 </div>
                 <br />
-                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a href="@Url.Action("Shop", "Home")" style="text-decoration:none;">
-                        <div class="box bg-success text-center text-light p-3">
-                            <i class="fa-solid fa-shop font-16"></i>
-                            <h5 class="mb-0 mt-1">@Model.TotalShop</h5>
-                            <small class="font-light">Total Shop</small>
-                        </div>
-                    </a>
-                </div>
-                <br />
-                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a href="@Url.Action("InventoryCart", "InventoryShopping")" id="totalProduct" style="text-decoration:none;">
-                        <div class="box bg-secondary text-center text-light p-3">
-                            <i class="fa-solid fa-bag-shopping font-16"></i>
-                            <h5 class="mb-0 mt-1">656</h5>
-                            <small class="font-light">Total Order</small>
-                        </div>
-                    </a>
-                </div>
-                <br />
-                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a href="@Url.Action("InventoryCart", "InventoryShopping")" id="totalProduct" style="text-decoration:none;">
-                        <div class="box bg-info text-center text-light p-3">
-                            <i class="fa-solid fa-table font-16"></i>
-                            <h5 class="mb-0 mt-1">656</h5>
-                            <small class="font-light">Pending Orders</small>
-                        </div>
-                    </a>
-                </div>
-                <br />
-                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a href="@Url.Action("InventoryCart", "InventoryShopping")" id="totalProduct" style="text-decoration:none;">
-                        <div class="box bg-danger text-center text-light p-3">
-                            <i class="fa-solid fa-circle-left font-16"></i>
-                            <h5 class="mb-0 mt-1">656</h5>
-                            <small class="font-light">Return Orders</small>
-                        </div>
-                    </a>
-                </div>
-                <br />
-
             </div>
 
             <div class="row pt-4">

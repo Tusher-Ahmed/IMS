@@ -317,6 +317,8 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
+    <Compile Include="Areas\Garmentss\Controllers\GarmentsHomeController.cs" />
+    <Compile Include="Areas\Garmentss\GarmentssAreaRegistration.cs" />
     <Compile Include="ControllerFactory\CustomControllerFactory.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CustomerShoppingController.cs" />
@@ -395,6 +397,10 @@
     <Content Include="Areas\Admin\Views\Home\ChangeStatus.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Employee.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Shop.cshtml" />
+    <Content Include="Areas\Garmentss\Views\web.config" />
+    <Content Include="Areas\Garmentss\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Garmentss\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Garmentss\Views\GarmentsHome\Index.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -481,6 +487,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="Areas\Garmentss\Data\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
