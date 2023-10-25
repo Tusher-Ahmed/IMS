@@ -34,3 +34,8 @@ textarea {
     /* border-top: var(--bs-card-border-width) solid var(--bs-card-border-color); */
 }
 
+@media print {
+    .no-print {
+        display: none;
+    }
+}

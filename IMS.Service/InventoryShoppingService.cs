@@ -41,7 +41,7 @@ namespace IMS.Service
         #region Add Inventory Shopping Cart
         public void AddInventoryShoppingCart(InventoryOrderCart inventoryOrderCart)
         {
-            inventoryOrderCart.EmployeeId = 1;
+            
             inventoryOrderCart.GarmentsId = inventoryOrderCart.GarmentsProduct.GarmentsId; // Correctly set GarmentsId based on the selected ProductId
 
 

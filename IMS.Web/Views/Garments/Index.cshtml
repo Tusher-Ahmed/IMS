@@ -4,8 +4,8 @@
     @foreach (var product in Model.GarmentsProducts)
     {
         <div class="col-md-3 mt-2 mb-2">
-            <div class="card" style="width: 16rem;">
-                <img src="@Url.Content("~/Images/" + product.Image)" class="card-img-top" alt="Product Image" style="height:200px;width:auto">
+            <div class="card" style="width: 17rem;">
+                <img src="@Url.Content("~/Images/" + product.Image)" class="card-img-top" alt="Product Image" style="height:280px;width:auto">
                 <div class="card-body">
                     <p class="card-title text-uppercase" style="font-weight:bold;font-size:14px;">@product.Name</p>
                     <p class="card-text" style="font-size:12px;">Sizes: @product.SKU</p>

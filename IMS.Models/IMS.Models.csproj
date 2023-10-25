@@ -101,6 +101,7 @@
     <Compile Include="ViewModel\GarmentsDashboardViewModel.cs" />
     <Compile Include="ViewModel\GarmentsProductViewModel.cs" />
     <Compile Include="ViewModel\InventoryCartViewModel.cs" />
+    <Compile Include="ViewModel\InventoryInvoiceViewModel.cs" />
     <Compile Include="ViewModel\OrderHistoryViewModel.cs" />
     <Compile Include="ViewModel\ProductViewModel.cs" />
     <Compile Include="ViewModel\UserDetailViewModel.cs" />

@@ -21,8 +21,8 @@ namespace IMS.Service
         void CreateGarmentsProduct(GarmentsProduct garmentsProduct);
        
         void UpdateGarmentsProduct(long id, GarmentsProduct garmentsProduct);
-        void UpdateStatus(long id);
-        void ActivateStatus(long id);
+        void UpdateStatus(long id,GarmentsProduct prod);
+        void ActivateStatus(long id, GarmentsProduct product);
     }
     public class GarmentsService : IGarmentsService
     {
@@ -80,12 +80,12 @@ namespace IMS.Service
                     Image = model.Image,
                     SKU = model.SKU,
                     Price = model.Price,
-                    GarmentsId = 1,
+                    GarmentsId = model.GarmentsId,
                     Description = model.Description,
                     ProductType = model.ProductType,
                     Department = model.Department,
                     ProductCode = prod + 1,
-                    CreatedBy = 1,
+                    CreatedBy = model.GarmentsId,
                     CreationDate = DateTime.Now,
                     Status = 1,
                     Rank = highRank + 1,
@@ -131,7 +131,7 @@ namespace IMS.Service
                     prod.ProductCode = garmentsProduct.ProductCode;
                     prod.Description = garmentsProduct.Description;
                     prod.VersionNumber = prod.VersionNumber + 1;
-                    prod.ModifyBy = 2;
+                    prod.ModifyBy = garmentsProduct.ModifyBy;
                     prod.ModificationDate = DateTime.Now;
 
                     try
@@ -151,7 +151,7 @@ namespace IMS.Service
         #endregion
 
         #region Deactivate status
-        public void UpdateStatus(long id)
+        public void UpdateStatus(long id, GarmentsProduct product)
         {
             var prod = this.GetGarmentsProductById(id);
             if (prod != null)
@@ -160,7 +160,7 @@ namespace IMS.Service
                 {
                     prod.Status = 0;
                     prod.VersionNumber=prod.VersionNumber + 1;
-                    prod.ModifyBy = 3;
+                    prod.ModifyBy = product.ModifyBy;
                     prod.ModificationDate = DateTime.Now;
                     try
                     {
@@ -179,7 +179,7 @@ namespace IMS.Service
         #endregion
 
         #region Activate Status
-        public void ActivateStatus(long id)
+        public void ActivateStatus(long id, GarmentsProduct product)
         {
             var prod = GetGarmentsProductById(id);
             if(prod != null)
@@ -188,7 +188,7 @@ namespace IMS.Service
                 {
                     prod.Status = 1;
                     prod.VersionNumber = prod.VersionNumber + 1;
-                    prod.ModifyBy = 4;
+                    prod.ModifyBy = product.ModifyBy;
                     prod.ModificationDate = DateTime.Now;
 
                     try

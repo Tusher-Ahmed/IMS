@@ -1,0 +1,52 @@
+﻿@model IEnumerable<IMS.Models.OrderHistory>
+@{
+    ViewBag.Title = "Inventory Order History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row pt-2 pb-4 mb-4">
+    <div class="col-6">
+        <h4 class="text-uppercase">Inventory Order History</h4>
+    </div>
+    <div class="col-6 text-end">
+        @Html.ActionLink("Back to Dashboard", "Index", "Home", new { area = "Admin", @class = "btn btn-outline-success" })
+    </div>
+</div>
+<table class="table table-striped table-hover pt-2 pb-4" id="historyOrder">
+    <thead>
+        <tr>
+            <th class="border-top-0">Order Id</th>
+            <th class="border-top-0">Garments Id</th>
+            <th class="border-top-0">Order By</th>
+            <th class="border-top-0">ORDER DATE</th>
+            <th class="border-top-0">TOTAL PRICE</th>
+            <th class="border-top-0">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="txt-oflo">@item.OrderId</td>
+                <td class="txt-oflo">@item.GarmentsId</td>
+                <td class="txt-oflo">@item.CreatedBy</td>
+                <td class="txt-oflo">@item.CreationDate</td>
+                <td class="txt-oflo">@item.TotalPrice.ToString("C")</td>
+                <td>
+                    <a href="@Url.Action("Invoice", "Home",new {area="Admin", orderId = item.OrderId })" class="btn btn-outline-success">
+                        <i class="fas fa-info-circle"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("#historyOrder").DataTable({
+                "order": [[0, "desc"]]
+            });
+        });
+    </script>
+}

@@ -1,5 +1,6 @@
 ﻿using IMS.Models;
 using IMS.Service;
+using Microsoft.AspNet.Identity;
 using NHibernate;
 using System;
 using System.Collections.Generic;
@@ -63,6 +64,7 @@ namespace IMS.Web.Controllers
             {
                 try
                 {
+                    pType.CreatedBy= Convert.ToInt64(User.Identity.GetUserId());
                     _productType.AddProductType(pType);
                     TempData["data"] = "Product Type Added Successfully.";
                     return Json(new { success = true, message = TempData["data"] });
@@ -109,7 +111,7 @@ namespace IMS.Web.Controllers
                 {
                     var deptData = _productType.GetProductTypeById(id);
                     if (deptData.Status != null) { pType.Status = deptData.Status; }
-                    pType.ModifyBy = 3;
+                    pType.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                     _productType.UpdateProductType(id, pType);
                     TempData["data"] = "Product Type Updated Successfully.";
                     return Json(new { success = true, message = TempData["data"] });
@@ -175,7 +177,7 @@ namespace IMS.Web.Controllers
             if (productType != null)
             {
                 productType.Status = 0;
-                productType.ModifyBy = 3;
+                productType.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                 _productType.UpdateProductType(id, productType);
                 return RedirectToAction("Index", "ProductType");
             }
@@ -225,7 +227,7 @@ namespace IMS.Web.Controllers
             if (ProductType != null)
             {
                 ProductType.Status = 1;
-                ProductType.ModifyBy = 4;
+                ProductType.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                 _productType.UpdateProductType(id, ProductType);
                 return RedirectToAction("Deactivate", "ProductType");
             }

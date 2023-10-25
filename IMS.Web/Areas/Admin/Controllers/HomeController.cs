@@ -330,5 +330,38 @@ namespace IMS.Web.Areas.Admin.Controllers
             return View(usersDetails);
         }
         #endregion
+
+        public ActionResult InventoryOrder()
+        {
+            var history = _inventoryOrderHistoryService.GetAll().GroupBy(u=>u.OrderId).Select(u=>u.First());
+            return View(history);
+        }
+        public ActionResult Invoice(long orderId)
+        {
+            var context = new ApplicationDbContext();
+            
+            var History = _inventoryOrderHistoryService.GetByOrderId(orderId);
+            var firstOrderHistory = History.FirstOrDefault(); 
+
+            if (firstOrderHistory != null)
+            {
+                var employeeId = firstOrderHistory.EmployeeId;
+                var GarmentsId=firstOrderHistory.GarmentsId;
+                var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
+                var garments= context.Users.FirstOrDefault(u => u.Id == GarmentsId);
+                if (manager != null && garments!=null)
+                {
+                    InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
+                    {
+                        orderHistories = History,
+                        GarmentsName = garments.GarmentsName,
+                        ManagerEmail = manager.Email,
+                    };
+                    return View(inventoryInvoiceViewModel);
+                }
+            }
+            
+            return RedirectToAction("Index","Home");
+        }
     }
 }

@@ -9,7 +9,7 @@
         <h4 class="text-uppercase">Product List</h4>
     </div>
     <div class="col-md-6 text-end">
-        <a href="@Url.Action("Create", "Garments", null)" class="btn btn-outline-success"><i class='fas fa-plus'></i> Add New product</a>
+        <a href="@Url.Action("Create", "Garments", new {area=""})" class="btn btn-outline-success"><i class='fas fa-plus'></i> Add New product</a>
     </div>
 </div>
 
@@ -27,7 +27,7 @@
         {
             <tr>
                 <td>
-                    <img src="@Url.Content("~/Images/" + item.Image)" width="40" alt="img" />
+                    <img src="@Url.Content("~/Images/" + item.Image)" width="30" alt="img" />
                 </td>
                 <td>@item.Name</td>
                 <td>@item.Price.ToString("C")</td>

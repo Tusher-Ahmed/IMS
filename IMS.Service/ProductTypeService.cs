@@ -47,7 +47,7 @@ namespace IMS.Service
                 ProductType productType = new ProductType
                 {
                     Name = pType.Name,
-                    CreatedBy = 1,
+                    CreatedBy = pType.CreatedBy,
                     CreationDate = DateTime.Now,
                     Status = 1,
                     VersionNumber = 1,

@@ -1,6 +1,7 @@
 ﻿using IMS.Models;
 using IMS.Models.ViewModel;
 using IMS.Service;
+using Microsoft.AspNet.Identity;
 using NHibernate;
 using NHibernate.Criterion;
 using System;
@@ -61,7 +62,8 @@ namespace IMS.Web.Controllers
         #region Inventory Place Order and Add product
         public ActionResult PlaceOrder()
         {
-            var Order = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == 1);
+            long userId= Convert.ToInt64(User.Identity.GetUserId());
+            var Order = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == userId);
             var orderId=_inventoryOrderHistoryService.GetAll().Count();
             var garmentsProduct = _garmentsService.GetAllP();
             if (Order.Any())
@@ -78,7 +80,7 @@ namespace IMS.Web.Controllers
                         Price = gProduct.Price,
                         GarmentsId = order.GarmentsId,
                         OrderId = orderId + 1,
-                        CreatedBy=order.EmployeeId,
+                        CreatedBy=userId,
                         CreationDate=DateTime.Now,
                         Rank=rank+1,
                         VersionNumber=1,
@@ -100,7 +102,7 @@ namespace IMS.Web.Controllers
                         Description = gProduct.Description,
                         BuyingPrice = gProduct.Price,
                         BusinessId = Guid.NewGuid().ToString(),
-                        CreatedBy = order.EmployeeId,
+                        CreatedBy = userId,
                         CreationDate = DateTime.Now,
                         Status = 0,
                         Rank = productRank + 1,
@@ -208,7 +210,7 @@ namespace IMS.Web.Controllers
             if (prod != null)
             {
                 prod.Approved = true;
-                prod.ApprovedBy = 1;
+                prod.ApprovedBy = Convert.ToInt64(User.Identity.GetUserId());
                 prod.ModificationDate = DateTime.Now;
                 prod.VersionNumber = 1;
                 _product.UpdateProduct(prod);
@@ -249,7 +251,7 @@ namespace IMS.Web.Controllers
                     existingProduct.Name = product.Name;
                     existingProduct.Description = product.Description;
                     existingProduct.IsPriceAdded = true;
-                    existingProduct.ModifyBy = 2;//ManagerId
+                    existingProduct.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());//ManagerId
                     existingProduct.Status = 1;
                     existingProduct.VersionNumber = existingProduct.VersionNumber + 1;
                     _product.UpdateProduct(existingProduct);
@@ -262,7 +264,7 @@ namespace IMS.Web.Controllers
                     prod.Name = product.Name;
                     prod.Description = product.Description;
                     prod.IsPriceAdded = true;
-                    prod.ModifyBy = 2;//ManagerId
+                    prod.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());//ManagerId
                     prod.Status = 1;
                     prod.VersionNumber = prod.VersionNumber + 1;
 

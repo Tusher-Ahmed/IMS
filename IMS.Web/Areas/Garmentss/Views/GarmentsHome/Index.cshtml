@@ -8,9 +8,10 @@
     <div class="row">
         <!-- Left Side - Action Buttons -->
         <div class="col-md-3 bg-dark text-dark pt-4" style="height:700px">
-            <h5 class="pb-2 p-2 mb-5 text-white"><i class="fa-solid fa-user-tie"></i>&nbsp; @User.Identity.Name</h5>
+            <h5 class="pb-2 p-2 mb-5 text-white"><i class="fa-solid fa-building-user"></i>&nbsp; @User.Identity.Name</h5>
             <a href="@Url.Action("Index", "GarmentsHome", new {area="Garments"})" class="btn btn-dark mb-2  w-100 text-start"><i class="fa-solid fa-box"></i>&nbsp; Dashboard</a>
             <a href="@Url.Action("ProductList", "Garments", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-store"></i>&nbsp; Manage Product</a>
+            <a href="@Url.Action("DeactivatedList", "Garments", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-ban"></i>&nbsp; Deactivated Product</a>
             <a href="@Url.Action("Index", "Manage", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-gear"></i>&nbsp; Setting</a>
         </div>
 
@@ -44,66 +45,31 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Latest Sales</h4>
+                            <h4 class="card-title text-uppercase">Latest Sales</h4>
                         </div>
                         <div class="table-responsive p-2">
-                            <table class="table table-hover">
+                            <table class="table table-hover" id="latestSale">
                                 <thead>
                                     <tr>
-                                        <th class="border-top-0">SHOP NAME</th>
-                                        <th class="border-top-0">NAME</th>
-                                        <th class="border-top-0">STATUS</th>
-                                        <th class="border-top-0">DATE</th>
-                                        <th class="border-top-0">PRICE</th>
+                                        <th class="border-top-0">Order Id</th>
+                                        <th class="border-top-0">ORDER DATE</th>
+                                        <th class="border-top-0">TOTAL PRICE</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td class="txt-oflo">Arose Dress</td>
-                                        <td class="txt-oflo">Believers Hoodie</td>
-                                        <td><span class="label label-info label-rounded">PROCESSING</span></td>
-                                        <td class="txt-oflo">September 18, 2023</td>
-                                        <td><span class="font-medium">$240</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="txt-oflo">Online Dress Collection</td>
-                                        <td class="txt-oflo">Levi’s Jeans</td>
-                                        <td><span class="label label-info label-rounded">PROCESSING</span></td>
-                                        <td class="txt-oflo">September 19, 2023</td>
-                                        <td><span class="font-medium">$1250</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="txt-oflo">Nabila</td>
-                                        <td class="txt-oflo">Louis Philippe Shirt</td>
-                                        <td><span class="label label-purple label-rounded">PENDING</span></td>
-                                        <td class="txt-oflo">September 18, 2023</td>
-                                        <td><span class="font-medium">$1250</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="txt-oflo">Dress Line Bangladesh</td>
-                                        <td class="txt-oflo">Monte Carlo Sweater</td>
-                                        <td><span class="label label-info label-rounded">PROCESSING</span></td>
-                                        <td class="txt-oflo">September 18, 2023</td>
-                                        <td><span class="font-medium">$424</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="txt-oflo">Dhrupodi Fashios</td>
-                                        <td class="txt-oflo">Mufti CLUB Wear</td>
-                                        <td><span class="label label-info label-rounded">PROCESSING</span></td>
-                                        <td class="txt-oflo">September 19, 2023</td>
-                                        <td><span class="font-medium">$724</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="txt-oflo">Taash Clothing</td>
-                                        <td class="txt-oflo">Pepe Jeans</td>
-                                        <td><span class="label label-info label-rounded">PROCESSING</span></td>
-                                        <td class="txt-oflo">September 19, 2023</td>
-                                        <td><span class="font-medium">$1040</span></td>
-                                    </tr>
+                                    @foreach (var item in Model.History.GroupBy(item => item.OrderId).Select(group => group.First()).OrderByDescending(i=>i.CreationDate).Take(5))
+                                    {
+                                        <tr>
+                                            <td class="txt-oflo">@item.OrderId</td>
+                                            <td class="txt-oflo">@item.CreationDate</td>
+                                            <td class="txt-oflo">@item.TotalPrice.ToString("C")</td>                                            
+                                        </tr>
+                                    }
                                 </tbody>
                             </table>
-                            <div class="text-end p-2"><input type="submit" value="Show More" class="btn btn-success text-light" /></div>
-
+                            <div class="text-end p-2">
+                                @Html.ActionLink("Show More", "OrderHistory", "GarmentsHome", new { area = "Garmentss" }, new { @class = "btn btn-outline-success" })
+                            </div>        
                         </div>
                     </div>
                 </div>

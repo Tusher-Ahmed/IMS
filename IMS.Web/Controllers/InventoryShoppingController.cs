@@ -1,6 +1,7 @@
 ﻿using IMS.Models;
 using IMS.Models.ViewModel;
 using IMS.Service;
+using Microsoft.AspNet.Identity;
 using NHibernate;
 using System;
 using System.Collections.Generic;
@@ -52,8 +53,8 @@ namespace IMS.Web.Controllers
                     InventoryOrderCart inventoryOrder = new InventoryOrderCart
                     {
                         Count = inventoryOrderCart.Count,
-                        EmployeeId = 1,
-                        GarmentsId = 1,
+                        EmployeeId = Convert.ToInt64(User.Identity.GetUserId()),
+                        GarmentsId = garmentsProduct.GarmentsId,
                         GarmentsProduct = garmentsProduct,
                         ProductId=inventoryOrderCart.ProductId,
                     };
@@ -72,9 +73,10 @@ namespace IMS.Web.Controllers
         #region Inventory Cart
         public ActionResult InventoryCart()
         {
+            long userId= Convert.ToInt64(User.Identity.GetUserId());
             InventoryCartViewModel inventoryCartViewModel = new InventoryCartViewModel
             {
-                OrderCarts = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == 1).ToList()
+                OrderCarts = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == userId).ToList()
             };
             foreach(var cart in inventoryCartViewModel.OrderCarts)
             {
@@ -115,7 +117,8 @@ namespace IMS.Web.Controllers
 
         private decimal CalculateTotalPrice()
         {
-            var orderCarts = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == 1).ToList();
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
+            var orderCarts = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == userId).ToList();
             decimal total = orderCarts.Sum(cart => cart.GarmentsProduct.Price * cart.Count);
             return total;
         }

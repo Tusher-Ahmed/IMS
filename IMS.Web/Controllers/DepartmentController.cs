@@ -1,5 +1,6 @@
 ﻿using IMS.Models;
 using IMS.Service;
+using Microsoft.AspNet.Identity;
 using NHibernate;
 using System;
 using System.Collections.Generic;
@@ -63,6 +64,7 @@ namespace IMS.Web.Controllers
             {               
                 try
                 {
+                    dept.CreatedBy= Convert.ToInt64(User.Identity.GetUserId());
                     _department.AddDept(dept);
                     TempData["data"] = "Department Created Successfully.";
                     //return Json(new { message = TempData["data"] });
@@ -117,7 +119,7 @@ namespace IMS.Web.Controllers
                 {
                     var deptData = _department.GetDeptById(id);
                     if(deptData.Status!=null) { dept.Status = deptData.Status; }
-                    dept.ModifyBy = 3;
+                    dept.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                     _department.UpdateDept(id,dept);
                     TempData["data"] = "Department Updated Successfully.";
                     return Json(new { success = true, message = TempData["data"] });
@@ -182,7 +184,7 @@ namespace IMS.Web.Controllers
             if (deptarment != null)
             {
                 deptarment.Status = 0;
-                deptarment.ModifyBy = 3;               
+                deptarment.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());               
                 _department.UpdateDept(id, deptarment);
                 return RedirectToAction("Index", "Department");
             }
@@ -232,7 +234,7 @@ namespace IMS.Web.Controllers
             if (deptarment != null)
             {
                 deptarment.Status = 1;
-                deptarment.ModifyBy = 4;
+                deptarment.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                 _department.UpdateDept(id, deptarment);
                 return RedirectToAction("Deactivate", "Department");
             }

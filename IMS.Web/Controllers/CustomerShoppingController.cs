@@ -1,6 +1,7 @@
 ﻿using IMS.Models;
 using IMS.Models.ViewModel;
 using IMS.Service;
+using Microsoft.AspNet.Identity;
 using NHibernate;
 using System;
 using System.Collections.Generic;
@@ -50,7 +51,7 @@ namespace IMS.Web.Controllers
                     ShoppingCart customerOrder = new ShoppingCart
                     {
                         Count = shoppingCart.Count,
-                        CustomerId = 1,
+                        CustomerId = Convert.ToInt64(User.Identity.GetUserId()),
                         Product = Product,
                         ProductId = shoppingCart.ProductId,
                     };
@@ -69,9 +70,10 @@ namespace IMS.Web.Controllers
         #region Shopping Cart
         public ActionResult ShoppingCart()
         {
+            long userId= Convert.ToInt64(User.Identity.GetUserId());
             CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
             {
-                shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == 1).ToList()
+                shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList()
             };
             foreach (var cart in shoppingCartViewModel.shoppingCarts)
             {
@@ -109,7 +111,8 @@ namespace IMS.Web.Controllers
         }
         private decimal CalculateTotalPrice()
         {
-            var orderCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == 1).ToList();
+            long userId= Convert.ToInt64(User.Identity.GetUserId());
+            var orderCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList();
             decimal total = orderCarts.Sum(cart => cart.Product.Price * cart.Count);
             return total;
         }

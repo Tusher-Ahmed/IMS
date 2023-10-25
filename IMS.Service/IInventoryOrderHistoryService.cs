@@ -13,6 +13,7 @@ namespace IMS.Service
     {
         void Add(OrderHistory orderHistory);
         IEnumerable<OrderHistory> GetAll();
+        IEnumerable<OrderHistory> GetByOrderId(long orderId);
     }
     public class InventoryOrderHistoryService:IInventoryOrderHistoryService
     {
@@ -50,6 +51,10 @@ namespace IMS.Service
         public IEnumerable<OrderHistory> GetAll()
         {
             return _repository.GetAll();
+        }
+        public IEnumerable<OrderHistory> GetByOrderId(long orderId)
+        {
+            return _session.Query<OrderHistory>().Where(u=>u.OrderId == orderId);
         }
 
     }

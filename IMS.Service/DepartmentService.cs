@@ -39,7 +39,7 @@ namespace IMS.Service
                 Department department = new Department
                 {
                     Name = dept.Name,
-                    CreatedBy = 1,
+                    CreatedBy = dept.CreatedBy,
                     CreationDate = DateTime.Now,
                     Status = 1,
                     VersionNumber = 1,

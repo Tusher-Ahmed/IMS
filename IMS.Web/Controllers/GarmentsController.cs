@@ -119,6 +119,7 @@ namespace IMS.Web.Controllers
             {
                 garmentsProduct.ProductType = _productTypeService.GetProductTypeById((long)garmentsProduct.ProductTypeId);
                 garmentsProduct.Department = _departmentService.GetDeptById((long)garmentsProduct.DepartmentId);
+                garmentsProduct.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                 _garmentsService.UpdateGarmentsProduct(id, garmentsProduct);
                 return RedirectToAction("ProductList", "Garments");
             }
@@ -144,7 +145,8 @@ namespace IMS.Web.Controllers
             var product=_garmentsService.GetGarmentsProductById(id);
             if (product != null)
             {
-                _garmentsService.UpdateStatus(id);
+                product.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                _garmentsService.UpdateStatus(id,product);
                 return RedirectToAction("ProductList");
             }
             return View(product);
@@ -176,7 +178,8 @@ namespace IMS.Web.Controllers
             var prod = _garmentsService.GetGarmentsProductById(id);
             if (prod != null)
             {
-                _garmentsService.ActivateStatus(id);
+                prod.ModifyBy= Convert.ToInt64(User.Identity.GetUserId());
+                _garmentsService.ActivateStatus(id,prod);
                 return RedirectToAction("DeactivatedList", "Garments");
             }
             return View(prod);
