@@ -1,0 +1,38 @@
+﻿@model IMS.Models.ViewModel.InventoryInvoiceViewModel
+
+@{
+    ViewBag.Title = "Product Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h4 class="text-uppercase">Prduct Details</h4>
+
+<div class="p-4">
+    @foreach(var item in Model.orderHistories) {
+    
+    <div class="row pb-5">
+        <div class="col-md-6">
+            <img src="@Url.Content("~/Images/" + item.GarmentsProduct.Image)" alt="Product Image" class="img-fluid" width="350"  style="box-shadow: 0 10px 5px -5px rgba(0, 0, 0, 0.2);">
+        </div>
+        <div class="col-md-6">
+            <h3 class="text-uppercase">@item.GarmentsProduct.Name</h3><br />
+            <p><span style="font-weight:bold">Garments Name:</span>  @Model.GarmentsName</p>
+            <p><span style="font-weight:bold">Order By:</span>  @Model.ManagerEmail</p>
+            <p><span style="font-weight:bold">Buying Price:</span>  @item.Price.ToString("C")</p>
+            <p><span style="font-weight:bold">Quantity:</span>  @item.Quantity</p>
+            <p><span style="font-weight:bold">Sizes:</span> @item.GarmentsProduct.SKU</p>
+            <p><span style="font-weight:bold">Department:</span> @item.GarmentsProduct.Department.Name</p>
+            <p><span style="font-weight:bold">Product Type:</span> @item.GarmentsProduct.ProductType.Name</p>
+            <br />
+            <p style="text-align:justify"><span style="font-weight:bold">Product Description:</span><br />@item.GarmentsProduct.Description</p>
+        </div>
+    </div>
+    <hr/>
+    }
+    
+    <div class="mt-4 text-end">
+        @Html.ActionLink("Back to List", "InventoryOrder", "Home", new {area="Admin", @class = "btn btn-outline-info" })
+
+    </div>
+</div>
+

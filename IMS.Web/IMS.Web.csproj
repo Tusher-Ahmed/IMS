@@ -409,6 +409,7 @@
     <Content Include="Areas\Garmentss\Views\GarmentsHome\Details.cshtml" />
     <Content Include="Areas\Admin\Views\Home\InventoryOrder.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Invoice.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\ProductDetails.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />

@@ -29,7 +29,10 @@
                 <td class="txt-oflo">@item.CreationDate</td>
                 <td class="txt-oflo">@item.TotalPrice.ToString("C")</td>
                 <td>
-                    <a href="@Url.Action("Details", "GarmentsHome",new {area="Garmentss", orderId = item.OrderId })" class="btn btn-outline-success">
+                    <a href="@Url.Action("Details", "GarmentsHome",new {area="Garmentss", orderId = item.OrderId })" class="btn btn-outline-warning">                       
+                        <i class="fa-regular fa-lightbulb"></i>
+                    </a>
+                    <a href="@Url.Action("ProductDetails", "GarmentsHome",new {area="Garmentss", orderId = item.Id })" class="btn btn-outline-success">
                         <i class="fas fa-info-circle"></i>
                     </a>
                 </td>
@@ -45,4 +48,4 @@
             });
         });
     </script>
-    }
+}
