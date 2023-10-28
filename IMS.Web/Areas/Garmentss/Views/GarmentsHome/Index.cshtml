@@ -57,19 +57,21 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in Model.History.GroupBy(item => item.OrderId).Select(group => group.First()).OrderByDescending(i=>i.CreationDate).Take(5))
+                                    @foreach (var item in Model.History.GroupBy(item => item.OrderId).Select(group => group.First()).OrderByDescending(i => i.CreationDate).Take(5))
                                     {
                                         <tr>
                                             <td class="txt-oflo">@item.OrderId</td>
                                             <td class="txt-oflo">@item.CreationDate</td>
-                                            <td class="txt-oflo">@item.TotalPrice.ToString("C")</td>                                            
+                                            <td class="txt-oflo">@item.TotalPrice.ToString("C")</td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                             <div class="text-end p-2">
-                                @Html.ActionLink("Show More", "OrderHistory", "GarmentsHome", new { area = "Garmentss" }, new { @class = "btn btn-outline-success" })
-                            </div>        
+                                
+                                    @Html.ActionLink("Show More", "OrderHistory", "GarmentsHome", new { area = "Garmentss" }, new { @class = "btn btn-outline-success" })
+                                
+                            </div>
                         </div>
                     </div>
                 </div>

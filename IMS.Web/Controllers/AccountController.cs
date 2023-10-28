@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity.EntityFramework;
+using NHibernate;
+using IMS.Models;
+using IMS.Service;
 
 namespace IMS.Web.Controllers
 {
@@ -17,9 +20,15 @@ namespace IMS.Web.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private readonly ICustomerService _customerService;
+        private readonly IEmployeeService _employeeService;
+        private readonly ISupplierService _supplierService;
 
-        public AccountController()
+        public AccountController(ISession session)
         {
+            _customerService=new CustomerService { Session= session };
+            _employeeService=new EmployeeService { Session=session };
+            _supplierService=new SupplierService { Session=session };
         }
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
@@ -157,19 +166,24 @@ namespace IMS.Web.Controllers
                 {
                     UserName = model.Email,
                     Email = model.Email,
-                    ShopName=model.ShopName,
-                    City=model.City,
-                    StreetAddress=model.StreetAddress,
-                    Thana=model.Thana,
-                    PostalCode=model.PostalCode,
                     PhoneNumber=model.PhoneNumber,
                     
                 };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await UserManager.AddToRoleAsync(user.Id, "Customer");
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                   await UserManager.AddToRoleAsync(user.Id, "Customer");
+                    Customer customer = new Customer
+                    {
+                        Name = model.ShopName,
+                        City = model.City,
+                        StreetAddress = model.StreetAddress,
+                        Thana = model.Thana,
+                        PostalCode = model.PostalCode,
+                        UserId= user.Id,
+                    };
+                   _customerService.AddCustomer(customer);
+                   await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                     return RedirectToAction("Index", "Product", new { area = "" });
                 }
@@ -181,7 +195,7 @@ namespace IMS.Web.Controllers
         }
         #endregion
 
-        #region Garments Register
+        #region Supplier Register
         [AllowAnonymous]
         public ActionResult GRegister()
         {
@@ -202,18 +216,23 @@ namespace IMS.Web.Controllers
                 {
                     UserName = model.Email,
                     Email = model.Email,
-                    GarmentsName = model.GarmentsName,
-                    City = model.City,
-                    StreetAddress = model.StreetAddress,
-                    Thana = model.Thana,
-                    PostalCode = model.PostalCode,
                     PhoneNumber = model.PhoneNumber,
 
                 };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await UserManager.AddToRoleAsync(user.Id, "Garments");
+                    await UserManager.AddToRoleAsync(user.Id, "Supplier");
+                    Supplier supplier = new Supplier
+                    {
+                        Name = model.GarmentsName,
+                        City = model.City,
+                        StreetAddress = model.StreetAddress,
+                        Thana = model.Thana,
+                        PostalCode = model.PostalCode,
+                        UserId = user.Id,
+                    };
+                    _supplierService.AddSupplier(supplier);
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                     return RedirectToAction("Index", "Garments", new { area = "" });
@@ -249,15 +268,11 @@ namespace IMS.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-
+                var AdminId= Convert.ToInt64(User.Identity.GetUserId());
                 var user = new ApplicationUser
                 {
                     UserName = model.Email,
                     Email = model.Email,
-                    City = model.City,
-                    StreetAddress = model.StreetAddress,
-                    Thana = model.Thana,
-                    PostalCode = model.PostalCode,
                     PhoneNumber = model.PhoneNumber,
 
                 };
@@ -265,9 +280,19 @@ namespace IMS.Web.Controllers
                 if (result.Succeeded)
                 {
                     await UserManager.AddToRoleAsync(user.Id, model.ERoles);
+                    Employee employee = new Employee
+                    {
+                        City = model.City,
+                        StreetAddress = model.StreetAddress,
+                        Thana = model.Thana,
+                        PostalCode = model.PostalCode,
+                        UserId = user.Id,
+                        CreatedBy = AdminId,
+                    };
+                    _employeeService.AddEmployee(employee);
                     //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
-                    return RedirectToAction("Index", "Product", new { area = "" });
+                    return RedirectToAction("ERegister", "Account", new { area = "" });
                 }
                 AddErrors(result);
             }
@@ -283,6 +308,55 @@ namespace IMS.Web.Controllers
         }
         #endregion
 
+        #region Staff Registration by Admin
+        [AllowAnonymous]
+        public ActionResult StaffRegister()
+        {
+            return View();
+        }
+
+        //
+        // POST: /Account/Register
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> StaffRegister(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var ManagerId = Convert.ToInt64(User.Identity.GetUserId());
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+
+                };
+                var result = await UserManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    await UserManager.AddToRoleAsync(user.Id, "Staff");
+                    Employee employee = new Employee
+                    {
+                        City = model.City,
+                        StreetAddress = model.StreetAddress,
+                        Thana = model.Thana,
+                        PostalCode = model.PostalCode,
+                        UserId = user.Id,
+                        CreatedBy = ManagerId,
+                    };
+                    _employeeService.AddEmployee(employee);
+                    //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+
+                    return RedirectToAction("StaffRegister", "Account", new { area = "" });
+                }
+                AddErrors(result);
+            }
+           
+
+            return View(model);
+        }
+        #endregion
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]

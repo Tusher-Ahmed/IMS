@@ -51,14 +51,7 @@ namespace IMS.Web.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public override long Id { get; set; }
-        public string ShopName { get; set; }
-        public string GarmentsName { get; set; }
-        public string City { get; set; }
-        public string StreetAddress { get; set; }
-        public string Thana { get; set; }
-        public string PostalCode { get; set; }
        
-
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(ApplicationUserManager manager)
         {
             var userIdentity = await manager.CreateIdentityAsync(this,

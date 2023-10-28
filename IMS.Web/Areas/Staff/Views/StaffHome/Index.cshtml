@@ -1,0 +1,92 @@
+﻿@model IMS.Models.ViewModel.StaffDashboardViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid p-0">
+    <div class="row">
+        <!-- Left Side - Action Buttons -->
+        <div class="col-md-3 bg-dark text-dark pt-4" style="height:700px">
+            <h5 class="pb-2 p-2 mb-5 text-white"><i class="fa-solid fa-user-tie"></i>&nbsp; @User.Identity.Name</h5>
+            <a href="@Url.Action("Index", "StaffHome")" class="btn btn-dark mb-2  w-100 text-start"><i class="fa-solid fa-box"></i>&nbsp; Dashboard</a>
+            <a href="@Url.Action("ApproveProduct", "Product", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-store"></i>&nbsp; New Product </a>
+            <a href="@Url.Action("Index", "Manage", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-gear"></i>&nbsp; Setting</a>
+        </div>
+
+        <!-- Right Side - View of Corresponding Action -->
+        <div class="col-md-9" id="result-container">
+            <div class="row">
+                <div class="col-md-6 col-lg-6 col-xlg-6 pb-2">
+                    <a href="@Url.Action("ApproveProduct", "Product", new {area=""})" style="text-decoration:none;">
+                        <div class="box bg-primary text-center text-light p-3">
+                            <i class="fa-solid fa-warehouse font-16"></i>
+                            <h5 class="mb-0 mt-1">@Model.TotalNewProduct</h5>
+                            <small class="font-light">New Products</small>
+                        </div>
+                    </a>
+                </div>
+                <br />
+                <div class="col-md-6 col-lg-6 col-xlg-6 pb-2">
+                    <a href="@Url.Action("ApprovedProducts", "StaffHome", new {area="Staff"})" style="text-decoration:none;">
+                        <div class="box bg-success text-center text-light p-3">
+                            <i class="fa-solid fa-check-double"></i>
+                            <h5 class="mb-0 mt-1">@Model.TotalApprovedProduct</h5>
+                            <small class="font-light">Approved Products</small>
+                        </div>
+                    </a>
+                </div>
+                <br />
+            </div>
+
+            <div class="row pt-4">
+                <!-- column -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Latest Product</h4>
+                        </div>
+                        <div class="table-responsive p-2">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="border-top-0">Image</th>
+                                        <th class="border-top-0">Product Name</th>
+                                        <th class="border-top-0">Quantity</th>
+                                        <th class="border-top-0">Garments Id</th>
+                                        <th class="border-top-0">Order Date</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Products.OrderByDescending(i => i.CreationDate).Take(5))
+                                    {
+                                        <tr>
+                                            <td class="txt-oflo"><img src="@Url.Content("~/Images/" + item.Image)" width="40" alt="img" /></td>
+                                            <td class="txt-oflo">@item.Name</td>
+                                            <td class="txt-oflo">@item.Quantity</td>
+                                            <td class="txt-oflo">@item.GarmentsId</td>
+                                            <td class="txt-oflo">@item.CreationDate.ToString().AsDateTime().ToShortDateString()</td>
+                                            <td>
+                                                <a href="@Url.Action("EditByStaff", "Product", new { id = item.Id,area="" })" class="btn btn-outline-primary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="text-end p-2">
+                                @if (Model.TotalNewProduct > 5)
+                                {
+                                    @Html.ActionLink("Show More", "ApproveProduct", "Product", new { area = "" }, new { @class = "btn btn-outline-success" })
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

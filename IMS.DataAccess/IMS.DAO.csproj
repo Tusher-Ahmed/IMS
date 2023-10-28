@@ -62,13 +62,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mapping\CustomerMap.cs" />
     <Compile Include="Mapping\DepartmentMap.cs" />
+    <Compile Include="Mapping\EmployeeMap.cs" />
     <Compile Include="Mapping\GarmentsProductMap.cs" />
     <Compile Include="Mapping\InventoryOrderCartMap.cs" />
     <Compile Include="Mapping\OrderHistoryMap.cs" />
     <Compile Include="Mapping\ProductMap.cs" />
     <Compile Include="Mapping\ProductTypeMap.cs" />
     <Compile Include="Mapping\ShoppingCartMap.cs" />
+    <Compile Include="Mapping\SupplierMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseDAO.cs" />
   </ItemGroup>

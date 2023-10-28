@@ -1,5 +1,7 @@
 ﻿using IMS.Web.Areas.Admin.Controllers;
 using IMS.Web.Areas.Garmentss.Controllers;
+using IMS.Web.Areas.Manager.Controllers;
+using IMS.Web.Areas.Staff.Controllers;
 using IMS.Web.Controllers;
 using NHibernate;
 using System;
@@ -59,7 +61,18 @@ namespace IMS.Web.ControllerFactory
                 {
                     return new GarmentsHomeController(_session);
                 }
-
+                else if (controllerType == typeof(ManagerHomeController))
+                {
+                    return new ManagerHomeController(_session);
+                }
+                else if (controllerType == typeof(AccountController))
+                {
+                    return new AccountController(_session);
+                }
+                else if (controllerType == typeof(StaffHomeController))
+                {
+                    return new StaffHomeController(_session);
+                }
             }
             return base.GetControllerInstance(requestContext, controllerType);
         }

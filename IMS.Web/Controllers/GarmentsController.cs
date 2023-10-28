@@ -50,7 +50,7 @@ namespace IMS.Web.Controllers
             {
                 if (ImageFile != null && ImageFile.ContentLength > 0)
                 {
-                    int maxFileSizeBytes = 2 * 1024 * 1024;
+                    long maxFileSizeBytes = 2 * 1024 * 1024;
                     if (ImageFile.ContentLength > maxFileSizeBytes)
                     {
                         ModelState.AddModelError("ImageFile", "File size cannot exceed 1 MB.");

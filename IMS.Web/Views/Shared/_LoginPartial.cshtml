@@ -10,15 +10,31 @@
     {
         <li>
             <a href="@Url.Action("Index", "Home", new {area="Admin"})" class="text-decoration-none text-white">
-                <i class="fa-solid fa-user pt-2" style="font-size:18px;padding:0px 6px 0px 0px"></i>
+                <i class="fa-solid fa-user-secret mt-2" style="font-size:18px;padding:0px 6px 0px 0px;"></i>
             </a>
         </li>
     }
-    else if (User.IsInRole("Garments"))
+    else if (User.IsInRole("Supplier"))
     {
         <li>
             <a href="@Url.Action("Index", "GarmentsHome", new {area="Garmentss"})" class="text-decoration-none text-white">
-                <i class="fa-solid fa-user pt-2" style="font-size:18px;padding:0px 6px 0px 0px"></i>
+                <i class="fa-solid fa-user mt-2" style="font-size:18px;padding:0px 6px 0px 0px"></i>
+            </a>
+        </li>
+    }
+    else if (User.IsInRole("Manager"))
+    {
+        <li>
+            <a href="@Url.Action("Index", "ManagerHome", new {area="Manager"})" class="text-decoration-none text-white">
+                <i class="fa-solid fa-user mt-2" style="font-size:18px;padding:0px 6px 0px 0px"></i>
+            </a>
+        </li>
+    }
+    else if (User.IsInRole("Staff"))
+    {
+        <li>
+            <a href="@Url.Action("Index", "StaffHome", new {area="Staff"})" class="text-decoration-none text-white">
+                <i class="fa-solid fa-user mt-2" style="font-size:18px;padding:0px 6px 0px 0px"></i>
             </a>
         </li>
     }

@@ -4,8 +4,6 @@ using IMS.Service;
 using IMS.Web.App_Start;
 using IMS.Web.Models;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNet.Identity.Owin;
 using NHibernate;
 using System;
 using System.Collections.Generic;
@@ -13,83 +11,38 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-
-
-
-namespace IMS.Web.Areas.Admin.Controllers
+namespace IMS.Web.Areas.Manager.Controllers
 {
-
-    public class HomeController : Controller
+    public class ManagerHomeController : Controller
     {
         private readonly IProductService _product;
-        private readonly IDepartmentService _department;
-        private readonly IProductTypeService _productType;
-        private readonly IInventoryShoppingService _inventoryShoppingService;
         private readonly IInventoryOrderHistoryService _inventoryOrderHistoryService;
-        private readonly IGarmentsService _garmentsService;
         private readonly IEmployeeService _employeeService;
         private readonly ISupplierService _supplierService;
-        private readonly ICustomerService _customerService;
-        private ApplicationUserManager _userManager;
-
-        // GET: Admin/Home
-        public HomeController(ISession session)
+        public ManagerHomeController(ISession session)
         {
             _product = new ProductService { Session = session };
-            _department = new DepartmentService { Session = session };
-            _productType = new ProductTypeService { Session = session };
-            _inventoryShoppingService = new InventoryShoppingService { Session = session };
             _inventoryOrderHistoryService = new InventoryOrderHistoryService { Session = session };
-            _garmentsService = new GarmentsService { Session = session };
-            _employeeService = new EmployeeService { Session = session };
+            _employeeService=new EmployeeService { Session = session };
             _supplierService = new SupplierService { Session = session };
-            _customerService = new CustomerService { Session = session };
         }
-        public HomeController(ApplicationUserManager userManager)
-        {
-            UserManager = userManager;
-        }
-        public ApplicationUserManager UserManager
-        {
-            get
-            {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
-        }
-        #region ProductList
+        // GET: Manager/ManagerHome
         public ActionResult Index()
         {
-
-            AdminDashboardViewModel prod = new AdminDashboardViewModel
+            ManagerDashboardViewModel managerDashboardView = new ManagerDashboardViewModel
             {
-                Products = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true),
-                TotalProduct = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true).Count(),
-                TotalEmployee = GetEmployeeWithRoles(),
-                TotalShop = GetShopsWithRoles()
-
+                TotalProducts = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true).Count(),
+                TotalStaff = GetAllStaff(),
+                NewArrival= _product.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).Count()
             };
-            return View(prod);
+            
+            return View(managerDashboardView);
         }
-        #endregion
-
-        #region Dashboard
-        public ActionResult Dashboard()
-        {
-            return RedirectToAction("Index", "Home");
-        }
-        #endregion
-
-        #region Product List
         public ActionResult ProductList()
         {
-            IEnumerable<Product> products = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true);
-            return View(products);
+            var product = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true);
+            return View(product);
         }
-        #endregion
 
         #region Edit
         public ActionResult Edit(long id)
@@ -208,74 +161,13 @@ namespace IMS.Web.Areas.Admin.Controllers
         }
         #endregion
 
-        #region EmployeeList
-        public ActionResult TotalEmployee()
-        {
-            return View();
-        }
-        #endregion
-
-        #region Get total employee and store
-        public int GetEmployeeWithRoles()
-        {
-            #region last effort
-            //var context = new ApplicationDbContext();
-            //var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-            //var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-
-            //// Define the role names you want to filter on.
-            //string[] roleNames = { "Manager", "Staff" }; // Replace with your actual role names.
-
-            //// Get a list of users who have any of the specified roles.
-            //// Get the role IDs for the specified role names.
-            //var roleIds = roleManager.Roles
-            //    .Where(r => roleNames.Contains(r.Name))
-            //    .Select(r => r.Id)
-            //    .ToList();
-
-            //// Get a list of users who have any of the specified roles.
-            //var usersWithRoles = context.Users
-            //    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-            //    .ToList();
-
-            //return usersWithRoles.Count();
-            #endregion
-            var employee = _employeeService.GetAllEmployee().ToList();
-            return employee.Count();
-        }
-
-        public int GetShopsWithRoles()
-        {
-            #region last effort
-            //var context = new ApplicationDbContext();
-            //var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-            //var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-
-            //string roleName = "Customer"; 
-            //var roleIds = roleManager.Roles
-            //    .Where(r => roleName.Contains(r.Name))
-            //    .Select(r => r.Id);
-
-
-            //// Get a list of users who have any of the specified roles.
-            //var usersWithRoles = context.Users
-            //    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-            //    .ToList();
-
-            //return usersWithRoles.Count();
-            #endregion
-            var shops = _supplierService.GetSuppliers().ToList();
-            return shops.Count();
-        }
-        #endregion
-
-        #region Employee
-        public ActionResult Employees()
+        #region get Total staff (number)
+        public int GetAllStaff()
         {
             var context = new ApplicationDbContext();
             var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
             var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-            string[] roleNames = { "Manager", "Staff" };
+            string roleNames ="Staff";
             var roleIds = roleManager.Roles
                 .Where(r => roleNames.Contains(r.Name))
                 .Select(r => r.Id)
@@ -284,35 +176,27 @@ namespace IMS.Web.Areas.Admin.Controllers
             var usersWithDetails = context.Users
                 .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
                 .ToList();
-            List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
+            List<Employee> staffs = new List<Employee>();
             foreach (var user in usersWithDetails)
             {
                 var employee = _employeeService.GetEmployeeByUserId(user.Id);
-                UserDetailViewModel userDetails = new UserDetailViewModel
+                if (employee != null)
                 {
-                    Id = user.Id,
-                    Email = user.Email,
-                    Phone = user.PhoneNumber,
-                    City = employee.City,
-                    StreetAddress = employee.StreetAddress,
-                    Thana = employee.Thana,
-                    PostalCode = employee.PostalCode,
-                    ERole = userManager.GetRoles(user.Id).FirstOrDefault()
-                };
-                usersDetails.Add(userDetails);
-            }
+                    staffs.Add(employee);
 
-            return View(usersDetails);
+                }
+            }
+            return staffs.Count();
         }
         #endregion
 
-        #region Shop
-        public ActionResult Shop()
+        #region get staff details
+        public ActionResult TotalStaff()
         {
             var context = new ApplicationDbContext();
             var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
             var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-            string roleNames = "Customer";
+            string roleNames = "Staff";
             var roleIds = roleManager.Roles
                 .Where(r => roleNames.Contains(r.Name))
                 .Select(r => r.Id)
@@ -321,34 +205,39 @@ namespace IMS.Web.Areas.Admin.Controllers
             var usersWithDetails = context.Users
                 .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
                 .ToList();
-            List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
+            List<UserDetailViewModel> staffs = new List<UserDetailViewModel>();
             foreach (var user in usersWithDetails)
             {
-                var customer = _customerService.GetCustomerByUserId(user.Id);
-                var userDetails = new UserDetailViewModel
+                var employee = _employeeService.GetEmployeeByUserId(user.Id);
+                if (employee != null)
                 {
-                    Id = user.Id,
-                    Email = user.Email,
-                    Phone = user.PhoneNumber,
-                    ShopName = customer.Name,
-                    City = customer.City,
-                    StreetAddress = customer.StreetAddress,
-                    Thana = customer.Thana,
-                    PostalCode = customer.PostalCode,
-                };
-                usersDetails.Add(userDetails);
+                    UserDetailViewModel users = new UserDetailViewModel
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        Phone = user.PhoneNumber,
+                        City = employee.City,
+                        StreetAddress = employee.StreetAddress,
+                        Thana = employee.Thana,
+                        PostalCode = employee.PostalCode,
+                        ERole = userManager.GetRoles(user.Id).FirstOrDefault()
+                    };
+                    staffs.Add(users);
+                }
             }
-
-            return View(usersDetails);
+            return View(staffs);
         }
         #endregion
 
-        #region invoice
+        #region Inventory Order
         public ActionResult InventoryOrder()
         {
             var history = _inventoryOrderHistoryService.GetAll().GroupBy(u => u.OrderId).Select(u => u.First());
             return View(history);
         }
+        #endregion
+
+        #region Invoice
         public ActionResult Invoice(long orderId)
         {
             var context = new ApplicationDbContext();
@@ -407,5 +296,7 @@ namespace IMS.Web.Areas.Admin.Controllers
             return RedirectToAction("InventoryOrder", "Home");
         }
         #endregion
+
+
     }
 }

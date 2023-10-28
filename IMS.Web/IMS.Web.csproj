@@ -322,6 +322,10 @@
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Garmentss\Controllers\GarmentsHomeController.cs" />
     <Compile Include="Areas\Garmentss\GarmentssAreaRegistration.cs" />
+    <Compile Include="Areas\Manager\Controllers\ManagerHomeController.cs" />
+    <Compile Include="Areas\Manager\ManagerAreaRegistration.cs" />
+    <Compile Include="Areas\Staff\Controllers\StaffHomeController.cs" />
+    <Compile Include="Areas\Staff\StaffAreaRegistration.cs" />
     <Compile Include="ControllerFactory\CustomControllerFactory.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CustomerShoppingController.cs" />
@@ -335,17 +339,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202310190948165_AddIdentityUser.cs" />
-    <Compile Include="Migrations\202310190948165_AddIdentityUser.designer.cs">
-      <DependentUpon>202310190948165_AddIdentityUser.cs</DependentUpon>
+    <Compile Include="Migrations\202310260942220_AddIdentityToIMS.cs" />
+    <Compile Include="Migrations\202310260942220_AddIdentityToIMS.designer.cs">
+      <DependentUpon>202310260942220_AddIdentityToIMS.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202310190949247_DbInitializer.cs" />
-    <Compile Include="Migrations\202310190949247_DbInitializer.designer.cs">
-      <DependentUpon>202310190949247_DbInitializer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202310191128357_OverrideId.cs" />
-    <Compile Include="Migrations\202310191128357_OverrideId.designer.cs">
-      <DependentUpon>202310191128357_OverrideId.cs</DependentUpon>
+    <Compile Include="Migrations\202310261119178_SeedRoles.cs" />
+    <Compile Include="Migrations\202310261119178_SeedRoles.designer.cs">
+      <DependentUpon>202310261119178_SeedRoles.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -392,14 +392,12 @@
     <Content Include="Areas\Admin\Views\web.config" />
     <Content Include="Areas\Admin\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Admin\Views\Shared\_Layout.cshtml" />
-    <Content Include="Areas\Admin\Views\Home\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Home\ProductList.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Status.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Details.cshtml" />
     <Content Include="Areas\Admin\Views\Home\DeactivatedList.cshtml" />
     <Content Include="Areas\Admin\Views\Home\ChangeStatus.cshtml" />
-    <Content Include="Areas\Admin\Views\Home\Employee.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Shop.cshtml" />
     <Content Include="Areas\Garmentss\Views\web.config" />
     <Content Include="Areas\Garmentss\Views\_ViewStart.cshtml" />
@@ -410,6 +408,27 @@
     <Content Include="Areas\Admin\Views\Home\InventoryOrder.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Invoice.cshtml" />
     <Content Include="Areas\Admin\Views\Home\ProductDetails.cshtml" />
+    <Content Include="Areas\Manager\Views\web.config" />
+    <Content Include="Areas\Manager\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Manager\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\Index.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\ProductList.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\Edit.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\Status.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\Details.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\DeactivatedList.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\ChangeStatus.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\Employees.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\InventoryOrder.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\Invoice.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\ProductDetails.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\TotalStaff.cshtml" />
+    <Content Include="Areas\Staff\Views\web.config" />
+    <Content Include="Areas\Staff\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Staff\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Staff\Views\StaffHome\Index.cshtml" />
+    <Content Include="Areas\Staff\Views\StaffHome\ApprovedProducts.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -492,11 +511,14 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Account\GRegister.cshtml" />
     <Content Include="Views\Account\ERegister.cshtml" />
+    <Content Include="Views\Account\StaffRegister.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Garmentss\Data\" />
+    <Folder Include="Areas\Manager\Data\" />
+    <Folder Include="Areas\Staff\Data\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
@@ -540,14 +562,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202310190948165_AddIdentityUser.resx">
-      <DependentUpon>202310190948165_AddIdentityUser.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202310260942220_AddIdentityToIMS.resx">
+      <DependentUpon>202310260942220_AddIdentityToIMS.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202310190949247_DbInitializer.resx">
-      <DependentUpon>202310190949247_DbInitializer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202310191128357_OverrideId.resx">
-      <DependentUpon>202310191128357_OverrideId.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202310261119178_SeedRoles.resx">
+      <DependentUpon>202310261119178_SeedRoles.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

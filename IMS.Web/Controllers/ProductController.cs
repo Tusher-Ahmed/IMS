@@ -64,7 +64,8 @@ namespace IMS.Web.Controllers
         {
             long userId= Convert.ToInt64(User.Identity.GetUserId());
             var Order = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == userId);
-            var orderId=_inventoryOrderHistoryService.GetAll().Count();
+            var maxOrderId = _inventoryOrderHistoryService.GetAll().Max(u => (long?)u.OrderId);
+            long orderId = maxOrderId.HasValue ? maxOrderId.Value + 1 : 1;
             var garmentsProduct = _garmentsService.GetAllP();
             if (Order.Any())
             {
@@ -79,7 +80,7 @@ namespace IMS.Web.Controllers
                         Quantity = order.Count,
                         Price = gProduct.Price,
                         GarmentsId = order.GarmentsId,
-                        OrderId = orderId + 1,
+                        OrderId = orderId,
                         CreatedBy=userId,
                         CreationDate=DateTime.Now,
                         Rank=rank+1,
@@ -120,7 +121,7 @@ namespace IMS.Web.Controllers
 
             }
             
-            return RedirectToAction("Index","Garments");
+            return RedirectToAction("Invoice","ManagerHome", new { area = "Manager", orderId=orderId });
         }
         #endregion
 

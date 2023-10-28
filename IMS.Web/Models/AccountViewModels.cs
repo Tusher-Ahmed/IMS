@@ -102,6 +102,7 @@ namespace IMS.Web.Models
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
         public string ERoles { get; set; }
+       
 
     }
 

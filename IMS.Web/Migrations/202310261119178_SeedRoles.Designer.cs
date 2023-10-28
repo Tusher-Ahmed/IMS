@@ -7,13 +7,13 @@ namespace IMS.Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class OverrideId : IMigrationMetadata
+    public sealed partial class SeedRoles : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(OverrideId));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(SeedRoles));
         
         string IMigrationMetadata.Id
         {
-            get { return "202310191128357_OverrideId"; }
+            get { return "202310261119178_SeedRoles"; }
         }
         
         string IMigrationMetadata.Source

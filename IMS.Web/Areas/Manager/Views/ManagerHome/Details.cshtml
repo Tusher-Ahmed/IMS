@@ -1,0 +1,39 @@
+﻿@model IMS.Models.Product
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h4 class="text-uppercase">Prduct Details</h4>
+
+<div class="p-4">
+    <div class="row">
+        <div class="col-md-6">
+            <img src="@Url.Content("~/Images/" + Model.Image)" alt="Product Image" class="img-fluid" width="400" style="box-shadow: 0 10px 5px -5px rgba(0, 0, 0, 0.2);">
+        </div>
+        <div class="col-md-6">
+            <h3 class="text-uppercase">@Model.Name</h3><br />
+            <p>
+                @if (Model.Status == 1)
+                {<span class="badge bg-success">Active</span> }
+                else
+                {<span class="badge bg-danger">Inactive</span>}
+            </p>
+            <p><span style="font-weight:bold">Buying Price:</span>  @Model.BuyingPrice.ToString("C")</p>
+            <p><span style="font-weight:bold">Price:</span>  @Model.BuyingPrice.ToString("C")</p>
+            <p><span style="font-weight:bold">Quantity:</span>  @Model.Quantity</p>
+            <p><span style="font-weight:bold">Sizes:</span> @Model.SKU</p>
+            <p><span style="font-weight:bold">Department:</span> @Model.Department.Name</p>
+            <p><span style="font-weight:bold">Product Type:</span> @Model.ProductType.Name</p>
+            <br />
+            <p style="text-align:justify"><span style="font-weight:bold">Product Description:</span><br />@Model.Description</p>
+        </div>
+    </div>
+    <div class="mt-4 text-end">
+        @Html.ActionLink("Edit Product ", "Edit", null, new { id = Model.Id }, new { @class = "btn btn-outline-success" })
+        @Html.ActionLink("Back to List", "ProductList", null, new { @class = "btn btn-outline-info" })
+
+    </div>
+</div>
+

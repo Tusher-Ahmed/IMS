@@ -70,8 +70,9 @@ namespace IMS.Service
         #region Create Garments Product
         public void CreateGarmentsProduct(GarmentsProduct model)
         {
-            int prod = this.GetAllP().Count();
+            //int prod = this.GetAllP().Count();
             int highRank = Convert.ToInt32(_repository.GetAll().Max(u => u.Rank));
+            int prodCode= Convert.ToInt32(_repository.GetAll().Max(u => u.ProductCode));
             using (var transaction = _session.BeginTransaction())
             {
                 GarmentsProduct garmentsProduct = new GarmentsProduct
@@ -84,7 +85,7 @@ namespace IMS.Service
                     Description = model.Description,
                     ProductType = model.ProductType,
                     Department = model.Department,
-                    ProductCode = prod + 1,
+                    ProductCode = prodCode + 1,
                     CreatedBy = model.GarmentsId,
                     CreationDate = DateTime.Now,
                     Status = 1,

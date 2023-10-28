@@ -3,7 +3,7 @@
     ViewBag.Title = "ApproveProduct";
 }
 
-<h2 class="text-uppercase">Check Product And Approve</h2>
+<h2 class="text-uppercase">Approved Product</h2>
 <br />
 <table class="table table-striped table-hover" id="approveTable">
     <thead>
@@ -14,7 +14,7 @@
             <th>SKU</th>
             <th>Quantity</th>
             <th>Garments Name</th>
-            <th>Action</th>
+            <th>Approved By</th>
         </tr>
     </thead>
     <tbody>
@@ -28,20 +28,14 @@
                 <td>@item.Name</td>
                 <td>@item.SKU</td>
                 <td>@item.Quantity</td>
-                <td>@item.GarmentsId</td>
-                <td>
-                    <a href="@Url.Action("EditByStaff", "Product", new { id = item.Id })" class="btn btn-outline-primary">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                </td>
+                <td>@item.GarmentsId</td>               
+                <td>@item.ApprovedBy</td>               
             </tr>
         }
     </tbody>
 </table>
 @section Scripts {
-    <script>
-        $(document).ready(function () {
+    <script>$(document).ready(function () {
             $("#approveTable").DataTable();
-        })
-    </script>
+        })</script>
 }
