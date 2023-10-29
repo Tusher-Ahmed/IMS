@@ -11,6 +11,7 @@ using System.Web.Mvc;
 
 namespace IMS.Web.Controllers
 {
+    [Authorize(Roles = "Manager,Admin")]
     public class InventoryShoppingController : Controller
     {
         private readonly IGarmentsService _garmentsService;
@@ -24,6 +25,7 @@ namespace IMS.Web.Controllers
 
 
         #region Product details with add to cart
+        [AllowAnonymous]
         public ActionResult ProductDetails(long ProductId)
         {
             var garmentsProduct = _garmentsService.GetGarmentsProductById(ProductId);
@@ -41,6 +43,7 @@ namespace IMS.Web.Controllers
 
         }
         [HttpPost]
+        [Authorize(Roles = "Manager,Admin")]
         public ActionResult ProductDetails( InventoryOrderCart inventoryOrderCart)
         {
             if (ModelState.IsValid)
@@ -71,6 +74,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Inventory Cart
+        [Authorize(Roles = "Manager,Admin")]
         public ActionResult InventoryCart()
         {
             long userId= Convert.ToInt64(User.Identity.GetUserId());
@@ -89,6 +93,7 @@ namespace IMS.Web.Controllers
 
         #region Inventory Cart Operation
         [HttpPost]
+        
         public JsonResult IncrementCount(long id)
         {
             var cart = _inventoryShoppingService.GetproductById(id);

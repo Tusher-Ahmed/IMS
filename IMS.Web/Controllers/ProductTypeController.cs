@@ -10,6 +10,7 @@ using System.Web.Mvc;
 
 namespace IMS.Web.Controllers
 {
+    [Authorize(Roles ="Admin")]
     public class ProductTypeController : Controller
     {
         // GET: ProductType

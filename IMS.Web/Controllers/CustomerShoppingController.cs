@@ -11,6 +11,7 @@ using System.Web.Mvc;
 
 namespace IMS.Web.Controllers
 {
+    [Authorize(Roles = "Customer")]
     public class CustomerShoppingController : Controller
     {
         private readonly ICustomerShoppingService _customerShopping;
@@ -23,6 +24,7 @@ namespace IMS.Web.Controllers
         // GET: CustomerShopping
 
         #region Product Details with add to cart
+        [AllowAnonymous]
         public ActionResult ProductDetails(long ProductId)
         {
             var product=_productService.GetProductById(ProductId);
@@ -38,6 +40,7 @@ namespace IMS.Web.Controllers
             }
             return RedirectToAction("Index", "Product");
         }
+        
         [HttpPost]
         public ActionResult ProductDetails(ShoppingCart shoppingCart)
         {

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<IMS.Models.OrderHistory>
+﻿@*@model IEnumerable<IMS.Models.OrderHistory>*@
 @{
     ViewBag.Title = "Inventory Order History";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -9,7 +9,21 @@
         <h4 class="text-uppercase">Inventory Order History</h4>
     </div>
     <div class="col-6 text-end">
-        @Html.ActionLink("Back to Dashboard", "Index", "Home", new { area = "Admin", @class = "btn btn-outline-success" })
+        @Html.ActionLink("Back to Dashboard", "Index", "ManagerHome", new { area = "Manager", @class = "btn btn-outline-success" })
+    </div>
+</div>
+<div class="row pt-2 pb-4 mb-4">
+    <div class="col-3">
+        <input type="date" class="form-control" id="startDate" />     
+    </div>
+    <div class="col-3">
+        <input type="date" class="form-control" id="finalDate" />     
+    </div>
+    <div class="col-3">
+        <input type="text" class="form-control" id="search" placeholder="Write OrderId or Garments name... " />     
+    </div>
+    <div class="col-3 text-end">
+        <input type="submit" id="btnView" class="btn btn-primary w-100"  value="View"/>
     </div>
 </div>
 <table class="table table-striped table-hover pt-2 pb-4" id="historyOrder">
@@ -23,33 +37,40 @@
             <th class="border-top-0">Actions</th>
         </tr>
     </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td class="txt-oflo">@item.OrderId</td>
-                <td class="txt-oflo">@item.GarmentsId</td>
-                <td class="txt-oflo">@item.CreatedBy</td>
-                <td class="txt-oflo">@item.CreationDate</td>
-                <td class="txt-oflo">@item.TotalPrice.ToString("C")</td>
-                <td>
-                    <a href="@Url.Action("Invoice", "ManagerHome",new {area="Manager", orderId = item.OrderId })" class="btn btn-outline-warning">
-                        <i class="fa-regular fa-lightbulb"></i>
-                    </a>
-                    <a href="@Url.Action("ProductDetails", "ManagerHome",new {area="Manager", orderId = item.OrderId })" class="btn btn-outline-success">
-                        <i class="fas fa-info-circle"></i>
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
 </table>
 @section Scripts{
     <script>
         $(document).ready(function () {
-            $("#historyOrder").DataTable({
-                "order": [[0, "desc"]]
+            renderDataTable();
+            $(document).on('click', '#btnView', function () {
+                renderDataTable();
             });
+            
         });
+
+
+        function renderDataTable() {
+            let pageSize = 10;
+
+            $("#historyOrder").DataTable({
+                destroy: true,
+                "order": false,
+                searching: false,
+                "lengthChange": false,
+                "pageLength": pageSize,
+                "serverSide": true,
+                processing: true,
+                ajax: {
+                    type: 'POST',
+                    url: '@Url.Action("InventoryOrderDataTable", "ManagerHome")',
+                    data: function (d) {
+                        d.startDate = $('#startDate').val();
+                        d.finalDate = $('#finalDate').val();
+                        d.search = $('#search').val();
+                    }
+                }
+            });
+
+        }
     </script>
 }

@@ -18,7 +18,8 @@ using System.Web.Mvc;
 
 namespace IMS.Web.Areas.Admin.Controllers
 {
-
+    
+    [Authorize(Roles ="Admin")]
     public class HomeController : Controller
     {
         private readonly IProductService _product;
@@ -343,12 +344,78 @@ namespace IMS.Web.Areas.Admin.Controllers
         }
         #endregion
 
-        #region invoice
+        #region inventory Order
         public ActionResult InventoryOrder()
         {
-            var history = _inventoryOrderHistoryService.GetAll().GroupBy(u => u.OrderId).Select(u => u.First());
-            return View(history);
+            //var history = _inventoryOrderHistoryService.GetAll().GroupBy(u => u.OrderId).Select(u => u.First());
+            return View();
         }
+        public ActionResult InventoryOrderDataTable(int draw, int start, int length, DateTime? startDate, DateTime? finalDate, string search)
+        {
+            int recordsTotal = 0;
+            int recordsFiltered = 0;
+            var data = new List<object>();
+            var history = _inventoryOrderHistoryService.GetAll()
+                   .GroupBy(u => u.OrderId)
+                   .Select(u => u.First())
+                   .ToList();
+            if (startDate != null && finalDate != null)
+            {
+                history = history.Where(x => x.CreationDate >= startDate && x.CreationDate <= finalDate).ToList();
+            }
+            if (startDate != null)
+            {
+                history = history.Where(x => x.CreationDate >= startDate).ToList();
+            }
+
+            if (finalDate != null)
+            {
+                history = history.Where(x => x.CreationDate <= finalDate).ToList();
+            }
+            if (!string.IsNullOrEmpty(search))
+            {
+                history = history.Where(x => x.OrderId.ToString().Contains(search) || GetGarmentsNameByHistoryId(x.GarmentsId).Contains(search)).ToList();
+            }
+            recordsTotal = history.Count;
+            recordsFiltered = recordsTotal;
+
+            history = history.Skip(start).Take(length).ToList();
+
+
+
+            foreach (var item in history)
+            {
+                string GarmentsName = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                var invoiceUrl = Url.Action("Invoice", "Home", new { area = "Admin", orderId = item.OrderId });
+                var productDetailsUrl = Url.Action("ProductDetails", "Home", new { area = "Admin", orderId = item.OrderId });
+                var str = new List<string>()
+                {
+                    $"{item.OrderId}",
+                    $"{GarmentsName}",
+                    $"{item.CreatedBy}",
+                    $"{item.CreationDate}",
+                    $"{item.TotalPrice}",
+                    $@"<a href=""{invoiceUrl}"" class=""btn btn-outline-warning"">
+                        <i class=""fa-regular fa-lightbulb""></i>
+                    </a>
+                    <a href=""{productDetailsUrl}"" class=""btn btn-outline-success"">
+                        <i class=""fas fa-info-circle""></i>
+                    </a>"
+                };
+
+                data.Add(str);
+            }
+
+
+            return Json(new { draw, recordsTotal, recordsFiltered, start, length, data });
+        }
+        private string GetGarmentsNameByHistoryId(long garmentsId)
+        {
+            return _supplierService.GetSupplierByUserId(garmentsId)?.Name;
+        }
+        #endregion
+
+        #region Invoice
         public ActionResult Invoice(long orderId)
         {
             var context = new ApplicationDbContext();

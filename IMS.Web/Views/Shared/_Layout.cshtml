@@ -22,26 +22,26 @@
                 <ul class="navbar-nav flex-grow-1">
                     @*<li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>*@
                     <li>@Html.ActionLink("Product", "Index", "Product", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("Garments Product", "Index", "Garments", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Manage Product
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-dark">
-                            <li>@Html.ActionLink("Order History", "History", "Product", new { area = "" }, new { @class = "nav-link" })</li>
-                        </ul>
-                    </li>                    
-                   
-                    <li>
-                        <a href="@Url.Action("InventoryCart", "InventoryShopping")" class="nav-link">
-                            <i class="fas fa-shopping-cart"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="@Url.Action("ShoppingCart", "CustomerShopping")" class="nav-link">
-                            <i class="fas fa-shopping-cart text-danger"></i>
-                        </a>
-                    </li>
+
+                    @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
+                    {
+                        <li>@Html.ActionLink("Garments Product", "Index", "Garments", new { area = "" }, new { @class = "nav-link" })</li>
+
+                        <li>
+                            <a href="@Url.Action("InventoryCart", "InventoryShopping")" class="nav-link">
+                                <i class="fas fa-shopping-cart"></i>
+                            </a>
+                        </li>
+                    }
+                    @if (User.IsInRole("Customer"))
+                    {
+                        <li>
+                            <a href="@Url.Action("ShoppingCart", "CustomerShopping")" class="nav-link">
+                                <i class="fas fa-shopping-cart"></i>
+                            </a>
+                        </li>
+                    }
+
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>

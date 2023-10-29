@@ -246,7 +246,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Employee Registration by Admin
-        [AllowAnonymous]
+        [Authorize(Roles ="Admin")]
         public ActionResult ERegister()
         {
             var roles = new List<SelectListItem>
@@ -262,8 +262,9 @@ namespace IMS.Web.Controllers
         //
         // POST: /Account/Register
         [HttpPost]
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
+
         public async Task<ActionResult> ERegister(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -309,7 +310,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Staff Registration by Admin
-        [AllowAnonymous]
+        [Authorize(Roles = "Manager")]
         public ActionResult StaffRegister()
         {
             return View();
@@ -318,7 +319,7 @@ namespace IMS.Web.Controllers
         //
         // POST: /Account/Register
         [HttpPost]
-        [AllowAnonymous]
+        [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> StaffRegister(RegisterViewModel model)
         {

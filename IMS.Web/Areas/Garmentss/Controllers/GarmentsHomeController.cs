@@ -10,6 +10,7 @@ using System.Web.Mvc;
 
 namespace IMS.Web.Areas.Garmentss.Controllers
 {
+    [Authorize(Roles ="Supplier")]
     public class GarmentsHomeController : Controller
     {
         private readonly IGarmentsService _garmentsService;

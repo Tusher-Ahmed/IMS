@@ -33,6 +33,7 @@ namespace IMS.Web.Controllers
 
         #region Get All Product
         // GET: Product
+        [AllowAnonymous]
         public ActionResult Index(ProductViewModel product)
         {
             product = _product.GetProducts(product);
@@ -48,6 +49,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Product Details
+        [AllowAnonymous]
         public ActionResult ProductDetails(long ProductId)
         {
             var product=_product.GetProductById(ProductId);
@@ -60,6 +62,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Inventory Place Order and Add product
+        [Authorize(Roles ="Manager,Admin")]
         public ActionResult PlaceOrder()
         {
             long userId= Convert.ToInt64(User.Identity.GetUserId());
@@ -126,6 +129,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Product Order History
+        [Authorize(Roles = "Manager,Admin")]
         public ActionResult History()
         {
             var orderHistory = _inventoryOrderHistoryService.GetAll().OrderByDescending(u => u.Rank);
@@ -156,6 +160,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region History Details
+        [Authorize(Roles = "Manager,Admin")]
         public ActionResult HistoryDetails(long id,long orderId)
         {
             var orderHistory = _inventoryOrderHistoryService.GetAll().OrderByDescending(u => u.Rank);
@@ -192,12 +197,13 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Staff Product Approval
+        [Authorize(Roles = "Staff,Admin")]
         public ActionResult ApproveProduct()
         {
             var product=_product.GetAllProduct().Where(u=>u.Approved==null).ToList();
             return View(product);
         }
-
+        [Authorize(Roles = "Staff,Admin")]
         public ActionResult EditByStaff(long id)
         {
             var prod=_product.GetProductById(id);
@@ -205,6 +211,7 @@ namespace IMS.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Staff,Admin")]
         public ActionResult EditByStaff(long id, Product product)
         {
             var prod = _product.GetProductById(id);
@@ -221,12 +228,13 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Update Price and Status by Manager
+        [Authorize(Roles = "Manager,Admin")]
         public ActionResult ManagePrice()
         {
             var product=_product.GetAllProduct().Where(u=>u.Approved==true && u.IsPriceAdded==false && u.Status==0);
             return View(product);
         }
-
+        [Authorize(Roles = "Manager,Admin")]
         public ActionResult SetPrice(long id)
         {
             var prod = _product.GetProductById(id);
@@ -238,6 +246,7 @@ namespace IMS.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Manager,Admin")]
         public ActionResult SetPrice(long id,Product product)
         {
             var prod = _product.GetProductById(id);

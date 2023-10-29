@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace IMS.Web.Areas.Staff.Controllers
 {
+    [Authorize(Roles ="Staff")]
     public class StaffHomeController : Controller
     {
         private readonly IProductService _product;

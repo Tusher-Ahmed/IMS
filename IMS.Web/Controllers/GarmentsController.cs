@@ -12,6 +12,7 @@ using System.Web.Mvc;
 
 namespace IMS.Web.Controllers
 {
+    
     public class GarmentsController : Controller
     {
         private readonly IGarmentsService _garmentsService;
@@ -26,6 +27,7 @@ namespace IMS.Web.Controllers
         // GET: Garments
 
         #region Garments Product Page
+        [Authorize(Roles ="Admin,Manager,Supplier")]
         public ActionResult Index(int pageNumber = 1)
         {
             var viewModel = _garmentsService.GetAllProduct(pageNumber);
@@ -34,6 +36,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Create Product
+        [Authorize(Roles = "Supplier")]
         public ActionResult Create()
         {
             var departments = _departmentService.GetAllDept();
@@ -43,6 +46,7 @@ namespace IMS.Web.Controllers
             return View();
         }
         [HttpPost]
+        [Authorize(Roles = "Supplier")]
         public ActionResult Create([Bind(Exclude = "ImageFile")] GarmentsProduct model, HttpPostedFileBase ImageFile)
         {
 
@@ -82,9 +86,10 @@ namespace IMS.Web.Controllers
 
                 return View(model);
         }
-         #endregion
+        #endregion
 
         #region Product List
+        [Authorize(Roles = "Supplier")]
         public ActionResult ProductList()
         {
             long userId = Convert.ToInt64(User.Identity.GetUserId());
@@ -94,6 +99,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Product Details
+        [Authorize(Roles = "Supplier")]
         public ActionResult Details(long id)
         {
             var product = _garmentsService.GetGarmentsProductById(id);
@@ -102,6 +108,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Edit Product
+        [Authorize(Roles = "Supplier")]
         public ActionResult Edit(long id)
         {
             var product = _garmentsService.GetGarmentsProductById(id);
@@ -112,6 +119,7 @@ namespace IMS.Web.Controllers
             return View(product);
         }
         [HttpPost]
+        [Authorize(Roles = "Supplier")]
         public ActionResult Edit(long id, GarmentsProduct garmentsProduct)
         {
             var product = _garmentsService.GetGarmentsProductById(id);
@@ -133,6 +141,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Status & Deactivation
+        [Authorize(Roles = "Supplier")]
         public ActionResult Status(long id)
         {
             var product = _garmentsService.GetGarmentsProductById(id);
@@ -140,6 +149,7 @@ namespace IMS.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Supplier")]
         public ActionResult Status(long id,GarmentsProduct garmentsProduct)
         {
             var product=_garmentsService.GetGarmentsProductById(id);
@@ -154,6 +164,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Show deactivated Product List
+        [Authorize(Roles = "Supplier")]
         public ActionResult DeactivatedList()
         {
             long userId = Convert.ToInt64(User.Identity.GetUserId());
@@ -163,6 +174,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Activate Product from Deactivation
+        [Authorize(Roles = "Supplier")]
         public ActionResult ActiveStatus(long id)
         {
             var prod = _garmentsService.GetGarmentsProductById(id);
@@ -173,6 +185,7 @@ namespace IMS.Web.Controllers
             return RedirectToAction("DeactivatedList");
         }
         [HttpPost]
+        [Authorize(Roles = "Supplier")]
         public ActionResult ActiveStatus(long id,GarmentsProduct garmentsProduct)
         {
             var prod = _garmentsService.GetGarmentsProductById(id);

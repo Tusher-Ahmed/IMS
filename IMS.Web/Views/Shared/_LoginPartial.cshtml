@@ -1,59 +1,64 @@
 ﻿@using Microsoft.AspNet.Identity
 @if (Request.IsAuthenticated)
 {
-    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    using (Html.BeginForm("LogOff", "Account",new { area = "" }, FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
-    @Html.AntiForgeryToken()
+        @Html.AntiForgeryToken()
 
-<ul class="navbar-nav navbar-right">
-    @if (User.IsInRole("Admin"))
-    {
-        <li>
-            <a href="@Url.Action("Index", "Home", new {area="Admin"})" class="text-decoration-none text-white">
-                <i class="fa-solid fa-user-secret mt-2" style="font-size:18px;padding:0px 6px 0px 0px;"></i>
-            </a>
-        </li>
-    }
-    else if (User.IsInRole("Supplier"))
-    {
-        <li>
-            <a href="@Url.Action("Index", "GarmentsHome", new {area="Garmentss"})" class="text-decoration-none text-white">
-                <i class="fa-solid fa-user mt-2" style="font-size:18px;padding:0px 6px 0px 0px"></i>
-            </a>
-        </li>
-    }
-    else if (User.IsInRole("Manager"))
-    {
-        <li>
-            <a href="@Url.Action("Index", "ManagerHome", new {area="Manager"})" class="text-decoration-none text-white">
-                <i class="fa-solid fa-user mt-2" style="font-size:18px;padding:0px 6px 0px 0px"></i>
-            </a>
-        </li>
-    }
-    else if (User.IsInRole("Staff"))
-    {
-        <li>
-            <a href="@Url.Action("Index", "StaffHome", new {area="Staff"})" class="text-decoration-none text-white">
-                <i class="fa-solid fa-user mt-2" style="font-size:18px;padding:0px 6px 0px 0px"></i>
-            </a>
-        </li>
-    }
-    else
-    {
-        <li>
-            @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", new { area = "" }, htmlAttributes: new { @class = "nav-link" })
-        </li>
-    }
+        <ul class="navbar-nav navbar-right">
+            @if (User.IsInRole("Admin"))
+            {
+                <li>
+                    <a href="@Url.Action("Index", "Home", new {area="Admin"})" class="text-decoration-none text-white">
+                        <i class="fa-solid fa-user-secret mt-2" style="font-size:18px;padding:0px 6px 0px 0px;"></i>
+                    </a>
+                </li>
+            }
+            else if (User.IsInRole("Supplier"))
+            {
+                <li>
+                    <a href="@Url.Action("Index", "GarmentsHome", new {area="Garmentss"})" class="text-decoration-none text-white">
+                        <i class="fa-solid fa-user mt-2" style="font-size:18px;padding:0px 6px 0px 0px"></i>
+                    </a>
+                </li>
+            }
+            else if (User.IsInRole("Manager"))
+            {
+                <li>
+                    <a href="@Url.Action("Index", "ManagerHome", new {area="Manager"})" class="text-decoration-none text-white">
+                        <i class="fa-solid fa-user mt-2" style="font-size:18px;padding:0px 6px 0px 0px"></i>
+                    </a>
+                </li>
+            }
+            else if (User.IsInRole("Staff"))
+            {
+                <li>
+                    <a href="@Url.Action("Index", "StaffHome", new {area="Staff"})" class="text-decoration-none text-white">
+                        <i class="fa-solid fa-user mt-2" style="font-size:18px;padding:0px 6px 0px 0px"></i>
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li>
+                    @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", new { area = "" }, htmlAttributes: new { @class = "nav-link" })
+                </li>
+            }
 
-    <li><a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()">Logout</a></li>
-</ul>
+            <li>
+                <a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()">Logout</a>
+                @*<a class="nav-link" href="@Url.Action("LogOff", "Account", new {area=""})">
+                    Logout
+                </a>*@
+            </li>
+        </ul>
     }
 }
 else
 {
     <ul class="navbar-nav navbar-right">
-        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink", @class="nav-link" })</li>
-        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class="nav-link" })</li>
+        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink", @class = "nav-link" })</li>
+        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "nav-link" })</li>
     </ul>
 }
 
