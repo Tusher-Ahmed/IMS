@@ -320,6 +320,8 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
+    <Compile Include="Areas\Customer\Controllers\CustomerHomeController.cs" />
+    <Compile Include="Areas\Customer\CustomerAreaRegistration.cs" />
     <Compile Include="Areas\Garmentss\Controllers\GarmentsHomeController.cs" />
     <Compile Include="Areas\Garmentss\GarmentssAreaRegistration.cs" />
     <Compile Include="Areas\Manager\Controllers\ManagerHomeController.cs" />
@@ -429,6 +431,7 @@
     <Content Include="Areas\Staff\Views\Shared\_Layout.cshtml" />
     <Content Include="Areas\Staff\Views\StaffHome\Index.cshtml" />
     <Content Include="Areas\Staff\Views\StaffHome\ApprovedProducts.cshtml" />
+    <Content Include="Areas\Customer\Views\web.config" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -512,10 +515,14 @@
     <Content Include="Views\Account\GRegister.cshtml" />
     <Content Include="Views\Account\ERegister.cshtml" />
     <Content Include="Views\Account\StaffRegister.cshtml" />
+    <Content Include="Views\CustomerShopping\PlaceOrder.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="Areas\Customer\Data\" />
+    <Folder Include="Areas\Customer\Views\CustomerHome\" />
+    <Folder Include="Areas\Customer\Views\Shared\" />
     <Folder Include="Areas\Garmentss\Data\" />
     <Folder Include="Areas\Manager\Data\" />
     <Folder Include="Areas\Staff\Data\" />

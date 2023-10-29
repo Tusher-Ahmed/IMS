@@ -1,4 +1,5 @@
 ﻿using IMS.Web.Areas.Admin.Controllers;
+using IMS.Web.Areas.Customer.Controllers;
 using IMS.Web.Areas.Garmentss.Controllers;
 using IMS.Web.Areas.Manager.Controllers;
 using IMS.Web.Areas.Staff.Controllers;
@@ -72,6 +73,10 @@ namespace IMS.Web.ControllerFactory
                 else if (controllerType == typeof(StaffHomeController))
                 {
                     return new StaffHomeController(_session);
+                }
+                else if (controllerType == typeof(CustomerHomeController))
+                {
+                    return new CustomerHomeController(_session);
                 }
             }
             return base.GetControllerInstance(requestContext, controllerType);

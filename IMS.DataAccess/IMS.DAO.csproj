@@ -67,6 +67,8 @@
     <Compile Include="Mapping\EmployeeMap.cs" />
     <Compile Include="Mapping\GarmentsProductMap.cs" />
     <Compile Include="Mapping\InventoryOrderCartMap.cs" />
+    <Compile Include="Mapping\OrderDetailMap.cs" />
+    <Compile Include="Mapping\OrderHeaderMap.cs" />
     <Compile Include="Mapping\OrderHistoryMap.cs" />
     <Compile Include="Mapping\ProductMap.cs" />
     <Compile Include="Mapping\ProductTypeMap.cs" />

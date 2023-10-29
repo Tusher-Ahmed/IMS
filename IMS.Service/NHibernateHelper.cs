@@ -44,6 +44,10 @@ namespace IMS.Service
                                 .AddFromAssemblyOf<SupplierMap>();
                    m.FluentMappings
                                 .AddFromAssemblyOf<EmployeeMap>();
+                   m.FluentMappings
+                                .AddFromAssemblyOf<OrderHeaderMap>();
+                   m.FluentMappings
+                                .AddFromAssemblyOf<OrderDetailMap>();
 
                })
                 .ExposeConfiguration(cfg => new SchemaExport(cfg)

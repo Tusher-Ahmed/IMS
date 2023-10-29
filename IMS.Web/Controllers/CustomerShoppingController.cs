@@ -16,10 +16,14 @@ namespace IMS.Web.Controllers
     {
         private readonly ICustomerShoppingService _customerShopping;
         private readonly IProductService _productService;
+        private readonly IOrderHeaderService _orderHeaderService;
+        private readonly IOrderDetailService _orderDetailService;
         public CustomerShoppingController(ISession session)
         {
             _customerShopping=new CustomerShoppingService { Session=session };
             _productService=new ProductService { Session=session};
+            _orderHeaderService=new OrderHeaderService { Session= session };
+            _orderHeaderService=new OrderHeaderService { Session= session };
         }
         // GET: CustomerShopping
 
@@ -84,6 +88,13 @@ namespace IMS.Web.Controllers
             }
 
             return View(shoppingCartViewModel);
+        }
+        #endregion
+
+        #region PlaceOrder
+        public ActionResult PlaceOrder()
+        {
+            return View();
         }
         #endregion
         [HttpPost]

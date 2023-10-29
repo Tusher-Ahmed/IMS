@@ -93,6 +93,8 @@
     <Compile Include="Employee.cs" />
     <Compile Include="GarmentsProduct.cs" />
     <Compile Include="InventoryOrderCart.cs" />
+    <Compile Include="OrderDetail.cs" />
+    <Compile Include="OrderHeader.cs" />
     <Compile Include="OrderHistory.cs" />
     <Compile Include="Product.cs" />
     <Compile Include="ProductType.cs" />
