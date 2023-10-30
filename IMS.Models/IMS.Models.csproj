@@ -102,6 +102,7 @@
     <Compile Include="ShoppingCart.cs" />
     <Compile Include="Supplier.cs" />
     <Compile Include="ViewModel\AdminDashboardViewModel.cs" />
+    <Compile Include="ViewModel\CustomerInvoiceViewModel.cs" />
     <Compile Include="ViewModel\CustomerShoppingCartViewModel.cs" />
     <Compile Include="ViewModel\GarmentsDashboardViewModel.cs" />
     <Compile Include="ViewModel\GarmentsProductViewModel.cs" />

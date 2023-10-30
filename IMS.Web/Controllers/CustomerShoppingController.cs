@@ -212,6 +212,7 @@ namespace IMS.Web.Controllers
         {
             OrderHeader orderheader = _orderHeaderService.GetOrderHeaderById(id);
             long userId = Convert.ToInt64(User.Identity.GetUserId());
+            var customer = _customerService.GetCustomerByUserId(userId);
             var service = new SessionService();
             Session session = service.Get(orderheader.SessionId);
             if (session.PaymentStatus.ToLower() == "paid")
@@ -224,7 +225,23 @@ namespace IMS.Web.Controllers
             {
                 _customerShopping.RemoveProduct(cart);
             }
-            return View(id);
+
+            var OrderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeaderId == id);
+            List<IMS.Models.Product> products = new List<IMS.Models.Product>();
+
+            foreach (var orderDetail in OrderDetails)
+            {
+                var product = _productService.GetProductById(orderDetail.ProductId);
+                products.Add(product);
+            }
+            CustomerInvoiceViewModel customerInvoiceViewModel = new CustomerInvoiceViewModel()
+            {
+                OrderHeader = orderheader,
+                OrderDetails= OrderDetails,
+                ShopName =customer.Name,
+                Products= products
+            };
+            return View(customerInvoiceViewModel);
             
         }
 

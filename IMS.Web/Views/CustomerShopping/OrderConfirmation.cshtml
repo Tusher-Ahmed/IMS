@@ -1,7 +1,150 @@
-﻿
-@{
-    ViewBag.Title = "OrderConfirmation";
-}
+﻿@model IMS.Models.ViewModel.CustomerInvoiceViewModel
 
-<h2>OrderConfirmation</h2>
+<a href="@Url.Action("CustomerOrders", "CustomerHome", new {area="Customer"})" class="dont-show mt-2 btn btn-outline-info">
+    <i class="fa-solid fa-circle-left"></i>
+</a>
+<div class="row">
+    <div class="col-10 pb-4 mb-4 offset-1">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 text-center pb-4 mb-5 pt-2">
+                        <h4>IMS</h4>
+                    </div>
+                    <div class="col-6 pb-2">
+                        <h5>Order By</h5>
+                        <p>@Model.ShopName</p>
+                    </div>
+                    <div class="col-6 pb-2">
+                        <h5>Invoice No.</h5>
+                        <p>@Model.OrderHeader.Id</p>
+                    </div>
+                    <div class="col-6 pb-2">
+                        <h5>Order Date</h5>
+                        <p>@Model.OrderHeader.OrderDate.ToString().AsDateTime().ToShortDateString()</p>
+                    </div>
+                    <div class="col-6 pb-2">
+                        <h5>
+                            Shipping Date
+                        </h5>
+                        @{
+                            var creationDate = DateTime.Parse(Model.OrderHeader.OrderDate.ToString().AsDateTime().ToShortDateString());
+                            var newDate = creationDate.AddDays(7);
+                        }
+                        <p>@newDate.ToShortDateString()</p>
+
+                    </div>
+                    <div class="col-6 pb-2">
+                        <h5>City</h5>
+                        <p>@Model.OrderHeader.City</p>
+                    </div>
+                    <div class="col-6 pb-2">
+                        <h5>Thana</h5>
+                        <p>@Model.OrderHeader.Thana</p>
+                    </div>
+                    <div class="col-6 pb-2">
+                        <h5>Postal Code</h5>
+                        <p>@Model.OrderHeader.PostalCode</p>
+                    </div>
+                    <div class="col-6 pb-2">
+                        <h5>
+                            Address
+                        </h5>
+                        <p>@Model.OrderHeader.StreetAddress</p>
+
+                    </div>
+                    <div class="col-6 pb-2">
+                        <h5>
+                            Order Status
+                        </h5>
+                        <p>@Model.OrderHeader.OrderStatus</p>
+                    </div>
+                    <div class="col-6 pb-2">
+                        <h5>
+                            Payment Status
+                        </h5>
+                        <p>@Model.OrderHeader.PaymentStatus</p>
+                    </div>
+                    <div class="col-6 pb-2">
+                        <img src="~/Images/happyShopping.jpg" width="200" alt="" />
+                    </div>
+
+                    <div class="col-12">
+                        <h5>Clothing Products</h5>
+                        <br />
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Image</th>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int i = 1;
+                                }
+                                @foreach (var item in Model.OrderDetails)
+                                {
+                                    <tr>
+                                        <td>@i</td>
+                                        <td><img src="@Url.Content("~/Images/" + item.Product.Image)" width="30" alt="img" /></td>
+                                        <td>@item.Product.Name</td>
+                                        <td>@item.Count</td>
+                                        <td>@item.Price.ToString("C")</td>
+                                        <td>$@(item.Count * item.Price)</td>
+                                    </tr>
+                                    i++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-6 pt-2">
+                        <h5>Payment Method</h5>
+                        <p>Credit Card</p>
+                    </div>
+                    <div class="col-6 text-end pt-2">
+                        <h5>Total</h5>
+
+                        <p class="fw-bold">@Model.OrderHeader.OrderTotal.ToString("C")</p>
+
+                    </div>
+                    <div class="col-12 text-end pt-3 pb-3 no-print">
+                        <button class="btn btn-primary" onclick="window.print();">Print Invoice</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        window.onbeforeprint = function () {
+            var btn = document.querySelectorAll(".dont-show");
+            var elementsToHide = document.querySelectorAll('.no-print');
+            for (var i = 0; i < elementsToHide.length; i++) {
+                elementsToHide[i].style.display = 'none';
+            }
+            for (var i = 0; i < btn.length; i++) {
+                btn[i].style.display = 'none';
+            }
+        }
+
+        window.onafterprint = function () {
+            var btn = document.querySelectorAll(".dont-show");
+            var elementsToHide = document.querySelectorAll('.no-print');
+            for (var i = 0; i < elementsToHide.length; i++) {
+                elementsToHide[i].style.display = '';
+            }
+            for (var i = 0; i < btn.length; i++) {
+                btn[i].style.display = 'none';
+            }
+        }
+    </script>
+
+}
 

@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace IMS.Models.ViewModel
 {
-    public class CustomerShoppingCartViewModel
+    public class CustomerInvoiceViewModel
     {
-        public IEnumerable<ShoppingCart> shoppingCarts { get; set; }
         public OrderHeader OrderHeader { get; set; }
-        
+        public IEnumerable<OrderDetail> OrderDetails { get; set; }
+        public string ShopName {  get; set; }
+        public List<Product> Products { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace IMS.Service
     public interface IOrderDetailService
     {
         void Add(OrderDetail orderDetail);
+        IEnumerable<OrderDetail> getAllOrderDetails();
     }
     public class OrderDetailService:IOrderDetailService
     {
@@ -46,6 +47,11 @@ namespace IMS.Service
                     throw;
                 }
             }
+        }
+
+        public IEnumerable<OrderDetail> getAllOrderDetails()
+        {
+            return _repository.GetAll();
         }
     }
 }
