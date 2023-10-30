@@ -515,7 +515,7 @@
     <Content Include="Views\Account\GRegister.cshtml" />
     <Content Include="Views\Account\ERegister.cshtml" />
     <Content Include="Views\Account\StaffRegister.cshtml" />
-    <Content Include="Views\CustomerShopping\PlaceOrder.cshtml" />
+    <Content Include="Views\CustomerShopping\Summary.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -566,6 +566,10 @@
     <ProjectReference Include="..\IMS.Service\IMS.Service.csproj">
       <Project>{0AC195A2-DED4-4F3E-8D74-904FF2E63A7D}</Project>
       <Name>IMS.Service</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IMS.Utility\IMS.Utility.csproj">
+      <Project>{a7ea71a9-0a1b-4320-9597-b301a513c891}</Project>
+      <Name>IMS.Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

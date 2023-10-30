@@ -346,8 +346,7 @@ namespace IMS.Web.Areas.Admin.Controllers
 
         #region inventory Order
         public ActionResult InventoryOrder()
-        {
-            //var history = _inventoryOrderHistoryService.GetAll().GroupBy(u => u.OrderId).Select(u => u.First());
+        {            
             return View();
         }
         public ActionResult InventoryOrderDataTable(int draw, int start, int length, DateTime? startDate, DateTime? finalDate, string search)

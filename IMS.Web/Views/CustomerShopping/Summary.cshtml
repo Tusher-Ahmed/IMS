@@ -1,0 +1,129 @@
+﻿@model IMS.Models.ViewModel.CustomerShoppingCartViewModel
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary("", new { @class = "text-danger" });
+    <div class="container">
+        <div class="card shadow border-0">
+            <div class="card-header bg-dark bg-gradient text-light ml-0 py-4">
+                <div class="row px-4">
+                    <div class="col-6">
+                        <h5 class="pt-2 text-white text-uppercase">
+                            Shopping Summary
+                        </h5>
+                    </div>
+                    <div class="col-6 text-end">
+                        <a href="@Url.Action("ShoppingCart", "CustomerShopping", new {area=""})" class="btn btn-outline-warning btn-sm">Back to Cart</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="container rounded p-2">
+                    <div class="row">
+                        <div class="col-12 col-lg-6 pb-4">
+                            <div class="row">
+                                <h5 class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="text-dark text-uppercase">Shipping Details:</span>
+                                </h5>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">
+                                    <label>Shop Name</label>
+                                </div>
+                                <div class="col-9">
+                                    @Html.EditorFor(model => model.OrderHeader.Name, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.OrderHeader.Name, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">
+                                    <label>Phone</label>
+                                </div>
+                                <div class="col-9">
+                                    @Html.EditorFor(model => model.OrderHeader.PhoneNumber, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.OrderHeader.PhoneNumber, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">
+                                    <label>Street Address</label>
+                                </div>
+                                <div class="col-9">
+                                    @Html.EditorFor(model => model.OrderHeader.StreetAddress, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.OrderHeader.StreetAddress, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">
+                                    <label>City</label>
+                                </div>
+                                <div class="col-9">
+                                    @Html.EditorFor(model => model.OrderHeader.City, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.OrderHeader.City, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">
+                                    <label>Thana</label>
+                                </div>
+                                <div class="col-9">
+                                    @Html.EditorFor(model => model.OrderHeader.Thana, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.OrderHeader.Thana, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">
+                                    <label>Postal Code</label>
+                                </div>
+                                <div class="col-9">
+                                    @Html.EditorFor(model => model.OrderHeader.PostalCode, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.OrderHeader.PostalCode, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-5 offset-lg-1">
+                            <h5 class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-dark text-uppercase">Order Summary:</span>
+                            </h5>
+                            <ul class="list-group mb-3">
+                                @foreach (var item in Model.shoppingCarts)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="my-0">@item.Product.Name</h6>
+                                            <small class="text-muted">Quantity: @item.Count</small>
+                                        </div>
+                                        <span class="text-muted">@((item.Count*item.Product.Price).ToString("C")) </span>
+                                    </li>
+                                }
+
+                                <li class="list-group-item d-flex justify-content-between bg-light">
+                                    <small class="text-dark fw-bold">Total (USD)</small>
+                                    <strong class="text-dark fw-bold">@Model.OrderHeader.OrderTotal.ToString("C")</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-12 col-md-8 pt-2">
+                        <p style="color:maroon; font-size:14px;">
+                            Estimate Arrival Date: @DateTime.Now.AddDays(2).ToShortDateString() - @DateTime.Now.AddDays(7).ToShortDateString()
+
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        @if (Model.shoppingCarts.Count() > 0)
+                        {
+                            <button type="submit" value="Place Order" class="btn btn-success form-control">Place Order</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+

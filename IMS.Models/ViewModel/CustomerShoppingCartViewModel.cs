@@ -9,6 +9,6 @@ namespace IMS.Models.ViewModel
     public class CustomerShoppingCartViewModel
     {
         public IEnumerable<ShoppingCart> shoppingCarts { get; set; }
-        public decimal TotalPrice { get; set; }
+        public OrderHeader OrderHeader { get; set; }
     }
 }

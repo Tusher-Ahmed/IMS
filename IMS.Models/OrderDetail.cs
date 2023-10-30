@@ -17,7 +17,7 @@ namespace IMS.Models
         public virtual decimal Price {  get; set; }
         public virtual int Rank { get; set;}
         public virtual long ModifyBy { get; set;}
-        public virtual DateTime ModificationDate { get; set;}
+        public virtual DateTime? ModificationDate { get; set;}
         public virtual string BusinessId { get; set; }
     }
 }

@@ -16,6 +16,7 @@ namespace IMS.DataAccess.Mapping
 
             Id(x => x.Id);
             Map(x => x.CustomerId);
+            Map(x => x.OrderDate);
             Map(x => x.ShippingDate);
             Map(x => x.OrderTotal);
             Map(x => x.OrderStatus);
@@ -31,6 +32,7 @@ namespace IMS.DataAccess.Mapping
             Map(x => x.VersionNumber);
             Map(x => x.BusinessId);
             Map(x => x.Name);
+            Map(x => x.PhoneNumber);
             Map(x => x.City);
             Map(x => x.StreetAddress);
             Map(x => x.Thana);
