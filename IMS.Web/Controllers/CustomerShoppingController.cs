@@ -5,7 +5,10 @@ using IMS.Utility;
 using IMS.Web.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.Extensions.Options;
 using NHibernate;
+using Stripe;
+using Stripe.Checkout;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,11 +27,11 @@ namespace IMS.Web.Controllers
         private readonly ICustomerService _customerService;
         public CustomerShoppingController(ISession session)
         {
-            _customerShopping=new CustomerShoppingService { Session=session };
-            _productService=new ProductService { Session=session};
-            _orderHeaderService=new OrderHeaderService { Session= session };
-            _orderDetailService = new OrderDetailService { Session= session };
-            _customerService= new CustomerService { Session= session };
+            _customerShopping = new CustomerShoppingService { Session = session };
+            _productService = new IMS.Service.ProductService { Session = session };
+            _orderHeaderService = new OrderHeaderService { Session = session };
+            _orderDetailService = new OrderDetailService { Session = session };
+            _customerService = new IMS.Service.CustomerService { Session = session };
         }
         // GET: CustomerShopping
 
@@ -36,8 +39,8 @@ namespace IMS.Web.Controllers
         [AllowAnonymous]
         public ActionResult ProductDetails(long ProductId)
         {
-            var product=_productService.GetProductById(ProductId);
-            if(product != null)
+            var product = _productService.GetProductById(ProductId);
+            if (product != null)
             {
                 ShoppingCart shoppingCart = new ShoppingCart
                 {
@@ -49,7 +52,7 @@ namespace IMS.Web.Controllers
             }
             return RedirectToAction("Index", "Product");
         }
-        
+
         [HttpPost]
         public ActionResult ProductDetails(ShoppingCart shoppingCart)
         {
@@ -82,7 +85,7 @@ namespace IMS.Web.Controllers
         #region Shopping Cart
         public ActionResult ShoppingCart()
         {
-            long userId= Convert.ToInt64(User.Identity.GetUserId());
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
             CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
             {
                 shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList(),
@@ -99,34 +102,6 @@ namespace IMS.Web.Controllers
 
         #region Order Summary
         public ActionResult Summary()
-        {
-            var context = new ApplicationDbContext();
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-            var user = userManager.FindById(userId);
-            var customer= _customerService.GetCustomerByUserId(userId);
-
-            CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
-            {
-                shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList(),
-                OrderHeader = new OrderHeader()
-            };
-            foreach (var cart in shoppingCartViewModel.shoppingCarts)
-            {
-                shoppingCartViewModel.OrderHeader.OrderTotal += (cart.Product.Price * cart.Count);
-            }
-            shoppingCartViewModel.OrderHeader.Name = customer.Name;
-            shoppingCartViewModel.OrderHeader.PhoneNumber = user.PhoneNumber;
-            shoppingCartViewModel.OrderHeader.StreetAddress = customer.StreetAddress;
-            shoppingCartViewModel.OrderHeader.City= customer.City;
-            shoppingCartViewModel.OrderHeader.Thana = customer.Thana;
-            shoppingCartViewModel.OrderHeader.PostalCode= customer.PostalCode;
-
-            return View(shoppingCartViewModel);
-        }
-
-        [HttpPost]
-        public ActionResult Summary(CustomerShoppingCartViewModel customerShoppingCartViewModel)
         {
             var context = new ApplicationDbContext();
             long userId = Convert.ToInt64(User.Identity.GetUserId());
@@ -149,33 +124,110 @@ namespace IMS.Web.Controllers
             shoppingCartViewModel.OrderHeader.City = customer.City;
             shoppingCartViewModel.OrderHeader.Thana = customer.Thana;
             shoppingCartViewModel.OrderHeader.PostalCode = customer.PostalCode;
+
+            return View(shoppingCartViewModel);
+        }
+
+        [HttpPost]
+        public ActionResult Summary(CustomerShoppingCartViewModel customerShoppingCartViewModel)
+        {
+            var context = new ApplicationDbContext();
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
+            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+            var user = userManager.FindById(userId);
+            var customer = _customerService.GetCustomerByUserId(userId);
+
+            CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
+            {
+                shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList(),
+                OrderHeader = new OrderHeader()
+            };
+            foreach (var cart in shoppingCartViewModel.shoppingCarts)
+            {
+                shoppingCartViewModel.OrderHeader.OrderTotal += (cart.Product.Price * cart.Count);
+            }
+            shoppingCartViewModel.OrderHeader.Name = customerShoppingCartViewModel.OrderHeader.Name;
+            shoppingCartViewModel.OrderHeader.PhoneNumber = customerShoppingCartViewModel.OrderHeader.PhoneNumber;
+            shoppingCartViewModel.OrderHeader.StreetAddress = customerShoppingCartViewModel.OrderHeader.StreetAddress;
+            shoppingCartViewModel.OrderHeader.City = customerShoppingCartViewModel.OrderHeader.City;
+            shoppingCartViewModel.OrderHeader.Thana = customerShoppingCartViewModel.OrderHeader.Thana;
+            shoppingCartViewModel.OrderHeader.PostalCode = customerShoppingCartViewModel.OrderHeader.PostalCode;
             shoppingCartViewModel.OrderHeader.PaymentStatus = ShoppingHelper.PaymentStatusPending;
             shoppingCartViewModel.OrderHeader.OrderStatus = ShoppingHelper.StatusPending;
-            shoppingCartViewModel.OrderHeader.OrderDate=DateTime.Now;
+            shoppingCartViewModel.OrderHeader.OrderDate = DateTime.Now;
             shoppingCartViewModel.OrderHeader.CustomerId = userId;
             _orderHeaderService.AddOrderHeader(shoppingCartViewModel.OrderHeader);
 
-            foreach(var cart in shoppingCartViewModel.shoppingCarts)
+            foreach (var cart in shoppingCartViewModel.shoppingCarts)
             {
                 OrderDetail orderDetail = new OrderDetail
                 {
                     ProductId = cart.Product.Id,
-                    Product= cart.Product,
+                    Product = cart.Product,
                     OrderHeaderId = shoppingCartViewModel.OrderHeader.Id,
-                    OrderHeader=shoppingCartViewModel.OrderHeader,
+                    OrderHeader = shoppingCartViewModel.OrderHeader,
                     Price = cart.Product.Price,
                     Count = cart.Count
                 };
                 _orderDetailService.Add(orderDetail);
 
             }
-            foreach(var cart in shoppingCartViewModel.shoppingCarts)
+
+            var domain = "https://localhost:44369/";
+            var options = new SessionCreateOptions
+               {
+                   LineItems = new List<SessionLineItemOptions>(),                    
+                   Mode = "payment",
+                   SuccessUrl =domain+ $"CustomerShopping/OrderConfirmation?id={shoppingCartViewModel.OrderHeader.Id}",
+                   CancelUrl = domain+$"CustomerShopping/Summary",
+                   PaymentMethodTypes = new List<string> { "card" },                
+            };
+            foreach(var item in shoppingCartViewModel.shoppingCarts)
+            {
+                var sessionLineItem = new SessionLineItemOptions
+                {
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        UnitAmount =(long) (item.Product.Price*100),
+                        Currency = "usd",
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = item.Product.Name,
+                        },
+                    },
+                    Quantity = item.Count,
+                };
+                options.LineItems.Add(sessionLineItem);
+            }
+
+            var service = new SessionService();
+            Session session = service.Create(options);            
+            _orderHeaderService.UpdateStripeSessionAndIntent(shoppingCartViewModel.OrderHeader.Id, session.Id);
+            return Redirect(session.Url);
+  
+        }
+        #endregion
+
+        public ActionResult OrderConfirmation(long id)
+        {
+            OrderHeader orderheader = _orderHeaderService.GetOrderHeaderById(id);
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
+            var service = new SessionService();
+            Session session = service.Get(orderheader.SessionId);
+            if (session.PaymentStatus.ToLower() == "paid")
+            {
+                _orderHeaderService.UpdateStatus(id, ShoppingHelper.StatusApproved, ShoppingHelper.PaymentStatusApproved);
+            }
+
+            List<ShoppingCart> shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList();
+            foreach (var cart in shoppingCarts)
             {
                 _customerShopping.RemoveProduct(cart);
             }
-            return RedirectToAction("Index", "Product", new {area=""});
+            return View(id);
+            
         }
-        #endregion
+
         [HttpPost]
         public JsonResult IncrementCount(long id)
         {
@@ -204,7 +256,7 @@ namespace IMS.Web.Controllers
         }
         private decimal CalculateTotalPrice()
         {
-            long userId= Convert.ToInt64(User.Identity.GetUserId());
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
             var orderCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList();
             decimal total = orderCarts.Sum(cart => cart.Product.Price * cart.Count);
             return total;

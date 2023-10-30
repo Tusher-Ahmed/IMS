@@ -11,9 +11,11 @@ namespace IMS.Service
 {
     public interface IOrderHeaderService
     {
+        OrderHeader GetOrderHeaderById(long id);
         void AddOrderHeader(OrderHeader orderHeader);
         void Update(OrderHeader orderHeader);
         void UpdateStatus(long id, string orderStatus, string PaymentStatus=null);
+        void UpdateStripeSessionAndIntent(long id, string sessionId);
     }
     public class OrderHeaderService:IOrderHeaderService
     {
@@ -91,6 +93,34 @@ namespace IMS.Service
                     throw;
                 }
             }
+        }
+
+        public void UpdateStripeSessionAndIntent(long id, string sessionId)
+        {
+            var orderFromDb = _repository.GetById(id);
+            if (orderFromDb != null)
+            {
+                orderFromDb.SessionId = sessionId;
+                using (var transaction = _session.BeginTransaction())
+                {
+                    try
+                    {
+                        _repository.Update(orderFromDb);
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+           
+        }
+
+        public OrderHeader GetOrderHeaderById(long id)
+        {
+            return _repository.GetById(id);
         }
     }
 }
