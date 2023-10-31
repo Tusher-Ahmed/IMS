@@ -12,6 +12,7 @@ namespace IMS.Service
     public interface IOrderHeaderService
     {
         OrderHeader GetOrderHeaderById(long id);
+        IEnumerable<OrderHeader> GetAllOrderHeaders();
         void AddOrderHeader(OrderHeader orderHeader);
         void Update(OrderHeader orderHeader);
         void UpdateStatus(long id, string orderStatus, string PaymentStatus=null);
@@ -121,6 +122,11 @@ namespace IMS.Service
         public OrderHeader GetOrderHeaderById(long id)
         {
             return _repository.GetById(id);
+        }
+
+        public IEnumerable<OrderHeader> GetAllOrderHeaders()
+        {
+            return _repository.GetAll();
         }
     }
 }

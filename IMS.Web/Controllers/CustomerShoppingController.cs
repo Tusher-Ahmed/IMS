@@ -100,7 +100,7 @@ namespace IMS.Web.Controllers
         }
         #endregion
 
-        #region Order Summary
+        #region Order Summary with stripe
         public ActionResult Summary()
         {
             var context = new ApplicationDbContext();
@@ -201,18 +201,21 @@ namespace IMS.Web.Controllers
             }
 
             var service = new SessionService();
-            Session session = service.Create(options);            
+            Session session = service.Create(options);
+            shoppingCartViewModel.OrderHeader.PaymentDate = DateTime.Now;
+            _orderHeaderService.Update(shoppingCartViewModel.OrderHeader);
             _orderHeaderService.UpdateStripeSessionAndIntent(shoppingCartViewModel.OrderHeader.Id, session.Id);
             return Redirect(session.Url);
   
         }
         #endregion
 
+        #region Order Confirmation with instant invoice
         public ActionResult OrderConfirmation(long id)
         {
             OrderHeader orderheader = _orderHeaderService.GetOrderHeaderById(id);
             long userId = Convert.ToInt64(User.Identity.GetUserId());
-            var customer = _customerService.GetCustomerByUserId(userId);
+           // var customer = _customerService.GetCustomerByUserId(userId);
             var service = new SessionService();
             Session session = service.Get(orderheader.SessionId);
             if (session.PaymentStatus.ToLower() == "paid")
@@ -238,12 +241,14 @@ namespace IMS.Web.Controllers
             {
                 OrderHeader = orderheader,
                 OrderDetails= OrderDetails,
-                ShopName =customer.Name,
                 Products= products
             };
             return View(customerInvoiceViewModel);
             
         }
+        #endregion
+
+        #region Cart's basic operations
 
         [HttpPost]
         public JsonResult IncrementCount(long id)
@@ -278,5 +283,6 @@ namespace IMS.Web.Controllers
             decimal total = orderCarts.Sum(cart => cart.Product.Price * cart.Count);
             return total;
         }
+        #endregion
     }
 }

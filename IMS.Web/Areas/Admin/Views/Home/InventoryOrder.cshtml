@@ -30,7 +30,7 @@
 <table class="table table-striped table-hover pt-2 pb-4" id="historyOrder">
     <thead>
         <tr>
-            <th class="border-top-0">Order Id</th>
+            <th class="border-top-0" data-sortable="true">Order Id</th>
             <th class="border-top-0">Garments Name</th>
             <th class="border-top-0">Order By</th>
             <th class="border-top-0">ORDER DATE</th>
@@ -56,7 +56,7 @@
 
             $("#historyOrder").DataTable({
                 destroy: true,
-                "order": false,
+                order: flase,
                 searching: false,
                 "lengthChange": false,
                 "pageLength": pageSize,

@@ -10,7 +10,7 @@ namespace IMS.Models.ViewModel
     {
         public OrderHeader OrderHeader { get; set; }
         public IEnumerable<OrderDetail> OrderDetails { get; set; }
-        public string ShopName {  get; set; }
+        public string Email {  get; set; }
         public List<Product> Products { get; set; }
     }
 }

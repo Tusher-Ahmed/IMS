@@ -20,12 +20,14 @@ namespace IMS.Web.Areas.Manager.Controllers
         private readonly IInventoryOrderHistoryService _inventoryOrderHistoryService;
         private readonly IEmployeeService _employeeService;
         private readonly ISupplierService _supplierService;
+        private readonly IOrderHeaderService _orderHeaderService;
         public ManagerHomeController(ISession session)
         {
             _product = new ProductService { Session = session };
             _inventoryOrderHistoryService = new InventoryOrderHistoryService { Session = session };
             _employeeService=new EmployeeService { Session = session };
             _supplierService = new SupplierService { Session = session };
+            _orderHeaderService = new OrderHeaderService { Session = session };
         }
         // GET: Manager/ManagerHome
         public ActionResult Index()
@@ -34,7 +36,9 @@ namespace IMS.Web.Areas.Manager.Controllers
             {
                 TotalProducts = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true).Count(),
                 TotalStaff = GetAllStaff(),
-                NewArrival= _product.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).Count()
+                NewArrival= _product.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).Count(),
+                OrderHeaders=_orderHeaderService.GetAllOrderHeaders().OrderByDescending(u=>u.Id).Take(5).ToList(),
+                NewOrder= _orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus=="Approved").Count()
             };
             
             return View(managerDashboardView);

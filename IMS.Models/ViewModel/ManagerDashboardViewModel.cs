@@ -9,10 +9,11 @@ namespace IMS.Models.ViewModel
     public class ManagerDashboardViewModel
     {
         public IEnumerable<Product> Products { get; set; }
+        public IEnumerable<OrderHeader> OrderHeaders { get; set; }
         public int TotalProducts { get; set; }
         public int NewArrival {  get; set; }
-        public int PendingOrder {  get; set; }
         public int TotalStaff {  get; set; }
+        public int NewOrder { get; set; }
         
     }
 }

@@ -332,6 +332,7 @@
     <Compile Include="Areas\Customer\CustomerAreaRegistration.cs" />
     <Compile Include="Areas\Garmentss\Controllers\GarmentsHomeController.cs" />
     <Compile Include="Areas\Garmentss\GarmentssAreaRegistration.cs" />
+    <Compile Include="Areas\Manager\Controllers\CustomerOrderController.cs" />
     <Compile Include="Areas\Manager\Controllers\ManagerHomeController.cs" />
     <Compile Include="Areas\Manager\ManagerAreaRegistration.cs" />
     <Compile Include="Areas\Staff\Controllers\StaffHomeController.cs" />
@@ -440,6 +441,9 @@
     <Content Include="Areas\Staff\Views\StaffHome\Index.cshtml" />
     <Content Include="Areas\Staff\Views\StaffHome\ApprovedProducts.cshtml" />
     <Content Include="Areas\Customer\Views\web.config" />
+    <Content Include="Areas\Manager\Views\CustomerOrder\Index.cshtml" />
+    <Content Include="Areas\Manager\Views\CustomerOrder\Details.cshtml" />
+    <Content Include="Areas\Manager\Views\CustomerOrder\Edit.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />

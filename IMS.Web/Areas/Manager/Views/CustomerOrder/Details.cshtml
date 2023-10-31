@@ -1,0 +1,63 @@
+﻿@model IMS.Models.ViewModel.CustomerInvoiceViewModel
+@{
+    ViewBag.Title = "Details";
+}
+
+
+<div class="row">
+    <h4 class="text-uppercase pt-4 pb-4">Order Information</h4>
+    <div class="col-12 pt-2 pb-4">
+        <span class="fw-bold p-2">Order By:</span>@Model.Email,
+        <span class="fw-bold p-2">Shop Name:</span>@Model.OrderHeader.Name,
+        <span class="fw-bold p-2">Phone Number:</span>@Model.OrderHeader.PhoneNumber,
+        <span class="fw-bold p-2">Order Date:</span>@Model.OrderHeader.OrderDate,
+        <span class="fw-bold p-2">Shipping Date:</span>@Model.OrderHeader.ShippingDate,
+        <span class="fw-bold p-2">City:</span>@Model.OrderHeader.City,
+        <span class="fw-bold p-2">Thana:</span>@Model.OrderHeader.Thana,
+        <span class="fw-bold p-2">Postal Code:</span>@Model.OrderHeader.PostalCode
+    </div>
+    <div class="col-md-6 pb-4">
+        <span class="fw-bold p-2">Payment Status:</span>@Model.OrderHeader.PaymentStatus,
+        <span class="fw-bold p-2">Order Status:</span>@Model.OrderHeader.OrderStatus,
+        
+    </div>
+    <div class="col-md-6 pb-4 text-end">
+        <span class="fw-bold p-2">Tracking Number:</span>@Model.OrderHeader.TrackingNumber,
+        <span class="fw-bold p-2">Carrier:</span>@Model.OrderHeader.Carrier
+    </div>
+    <div class="col-12 pt-4">
+        <table class="table table-striped table-hover pt-4">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Image</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int i = 1;
+                }
+                @foreach (var item in Model.Products)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td><img src="@Url.Content("~/Images/" + item.Image)" width="40" alt="img" /></td>
+                        <td>@item.Name</td>
+                        <td>@Model.OrderDetails.ElementAt(i - 1).Count</td>
+                        <td>@((Model.OrderDetails.ElementAt(i-1).Count * Model.OrderDetails.ElementAt(i - 1).Price).ToString("C"))</td>
+                    </tr>
+                    i++;
+                }
+                <tr>
+                    <td><h5>Payment by:</h5><br/>Credit Card</td>
+                    <td colspan="3"></td>
+                    <td><h5>Total Amount</h5><br/>@Model.OrderHeader.OrderTotal.ToString("C")</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

@@ -24,7 +24,6 @@ namespace IMS.DataAccess.Mapping
             Map(x => x.TrackingNumber);
             Map(x => x.Carrier);
             Map(x => x.PaymentDate);
-            Map(x => x.PaymentDueDate);
             Map(x => x.SessionId);
             Map(x => x.ModifyBy);
             Map(x => x.ModificationDate);

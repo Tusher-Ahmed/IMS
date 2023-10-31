@@ -1,0 +1,111 @@
+﻿@model IEnumerable<IMS.Models.OrderHeader>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    var status = Context.Request.QueryString["status"];
+    var inprocess = "";
+    var shipped = "";
+    var all = "";
+    var approved = "";
+
+    switch (status)
+    {
+        case "Approved":
+            approved = "active text-white";
+            break;
+        case "InProcess":
+            inprocess = "active text-white";
+            break;
+        case "Shipped":
+            shipped = "active text-white";
+            break;
+        default:
+            all = "active text-white";
+            break;
+    }
+}
+<div class="row pb-4 pt-2 mb-4">
+    <div class="col-md-4">
+        <h4 class="text-uppercase">Customer Order List</h4>
+    </div>
+    <div class="col-md-8 text-end">
+        <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "Approved" })" class="btn btn-outline-secondary @approved rounded-0">
+            Approved
+        </a>
+        <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "InProcess" })" class="btn btn-outline-secondary @inprocess rounded-0">
+            In Process
+        </a>
+        <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "Shipped" })" class="btn btn-outline-secondary @shipped rounded-0">
+            Shipped
+        </a>
+        <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "All" })" class="btn btn-outline-secondary @all rounded-0">
+            All
+        </a>
+    </div>
+</div>
+
+<table id="customerOrderTable" class="table table-hover table-striped">
+    <thead>
+        <tr>
+            <th>Order Id</th>
+            <th>Shop Name</th>
+            <th>Order Total</th>
+            <th>Order Status</th>
+            <th>Payment Status</th>
+            <th>Order Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.Id
+                </td>
+                <td>@item.Name</td>
+                <td>@item.OrderTotal.ToString("C")</td>
+                <td>
+
+                    @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
+                    {
+                        <span class="badge bg-danger">@item.OrderStatus</span>
+                    }
+                    else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusInProces)
+                    {
+                        <span class="badge bg-warning text-dark">@item.OrderStatus</span>
+                    }
+                    else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
+                    {
+                        <span class="badge bg-success">@item.OrderStatus</span>
+                    }
+
+                </td>
+                <td><span class="badge bg-success">@item.PaymentStatus</span></td>
+                <td>@item.OrderDate.ToString().AsDateTime().ToShortDateString()</td>
+                <td class="text-end">
+                    <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    <a href="@Url.Action("Details", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-secondary">
+                        <i class="fas fa-info-circle"></i>
+                    </a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#customerOrderTable").DataTable({
+                order: [[0, 'desc']]
+            });
+        })</script>
+}
