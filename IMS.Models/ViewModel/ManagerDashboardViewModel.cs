@@ -12,6 +12,8 @@ namespace IMS.Models.ViewModel
         public IEnumerable<OrderHeader> OrderHeaders { get; set; }
         public int TotalProducts { get; set; }
         public int NewArrival {  get; set; }
+        public int Processing {  get; set; }
+        public int TotalCancel {  get; set; }
         public int TotalStaff {  get; set; }
         public int NewOrder { get; set; }
         

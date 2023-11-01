@@ -12,6 +12,8 @@ namespace IMS.Service
     public interface IOrderDetailService
     {
         void Add(OrderDetail orderDetail);
+        OrderDetail GetOrderDetailById(int id);
+        OrderDetail GetOrderDetailByOrderHeaderId(long id);
         IEnumerable<OrderDetail> getAllOrderDetails();
     }
     public class OrderDetailService:IOrderDetailService
@@ -52,6 +54,16 @@ namespace IMS.Service
         public IEnumerable<OrderDetail> getAllOrderDetails()
         {
             return _repository.GetAll();
+        }
+
+        public OrderDetail GetOrderDetailById(int id)
+        {
+           return _repository.GetById(id);
+        }
+
+        public OrderDetail GetOrderDetailByOrderHeaderId(long id)
+        {
+            return _session.Query<OrderDetail>().Where(u=>u.OrderHeader.Id==id).FirstOrDefault();
         }
     }
 }

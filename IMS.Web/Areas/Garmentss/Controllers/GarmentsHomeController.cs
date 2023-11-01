@@ -46,5 +46,7 @@ namespace IMS.Web.Areas.Garmentss.Controllers
             var HProd= _inventoryOrderHistoryService.GetByOrderId(orderId);
             return View(HProd);
         }
+
+        
     }
 }

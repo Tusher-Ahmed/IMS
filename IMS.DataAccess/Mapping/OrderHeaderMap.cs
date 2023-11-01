@@ -25,6 +25,7 @@ namespace IMS.DataAccess.Mapping
             Map(x => x.Carrier);
             Map(x => x.PaymentDate);
             Map(x => x.SessionId);
+            Map(x => x.PaymentIntentId);
             Map(x => x.ModifyBy);
             Map(x => x.ModificationDate);
             Map(x => x.VersionNumber);

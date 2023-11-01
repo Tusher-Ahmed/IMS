@@ -1,21 +1,32 @@
 ﻿@model IMS.Models.ViewModel.CustomerInvoiceViewModel
 @{
     ViewBag.Title = "Summary";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @using (Html.BeginForm("Update", "CustomerOrder", new { area = "Manager" }, FormMethod.Post))
 {
     @Html.HiddenFor(model => model.OrderHeader.Id)
-    <br />
-    <div class="container  pb-5">
+    <br /><div class="container  pb-5">
         <div class="card">
             <div class="card-header bg-dark text-light ml-0 p-3">
                 <div class="container row">
-                    <div class="col-md-10 pb-2"> 
+                    <div class="col-md-10 pb-2">
                         <i class="fas fa-shopping-cart"></i> &nbsp; Order Summary
                     </div>
                     <div class="col-md-2 text-end">
-                        <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
+                        @if (User.IsInRole("Manager"))
+                        {
+                            <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
+                        }
+                        else if (User.IsInRole("Customer"))
+                        {
+                            <a href="@Url.Action("Index", "CustomerHome", new {area="Customer"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
+                        }
+                        else if (User.IsInRole("Admin"))
+                        {
+                            <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
+                        }
                     </div>
                 </div>
             </div>
@@ -127,14 +138,14 @@
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.OrderDate)</div>
-                                <div class="col-9">
-                                    @Html.TextBoxFor(model => model.OrderHeader.OrderDate, new { @class = "form-control", @disabled = "disabled" })
+                                <div class="col-9">                             
+                                    <input type="text" value="@Model.OrderHeader.OrderDate.ToString().AsDateTime().ToShortDateString()" class="form-control" disabled />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.PaymentDate)</div>
                                 <div class="col-9">
-                                    @Html.TextBoxFor(model => model.OrderHeader.PaymentDate, new { @class = "form-control", @disabled = "disabled" })
+                                    <input type="text" value="@Model.OrderHeader.PaymentDate.ToString().AsDateTime().ToShortDateString()" class="form-control" disabled />
                                 </div>
                             </div>
                             <div class="row my-1">
@@ -153,16 +164,25 @@
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.TrackingNumber)</div>
-                                <div class="col-9">                                   
-                                        @Html.TextBoxFor(model => model.OrderHeader.TrackingNumber, new { @class = "form-control", @disabled = "disabled" })
+                                <div class="col-9">
+                                    @Html.TextBoxFor(model => model.OrderHeader.TrackingNumber, new { @class = "form-control", @disabled = "disabled" })
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.ShippingDate)</div>
-                                <div class="col-9">                                    
-                                        @Html.TextBoxFor(model => model.OrderHeader.ShippingDate, new { @class = "form-control", @disabled = "disabled" })
+                                <div class="col-9">                      
+                                    <input type="text" value="@Model.OrderHeader.ShippingDate.ToString().AsDateTime().ToShortDateString()" class="form-control" disabled />
                                 </div>
                             </div>
+                            @if (User.IsInRole("Customer") && Model.OrderHeader.OrderStatus==IMS.Utility.ShoppingHelper.StatusShipped)
+                            {
+                                <div class="row my-1">
+                                    <div class="col-3">Arrival Date</div>
+                                    <div class="col-9">        
+                                        <input type="text" value="@Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(5).ToShortDateString()" class="form-control" disabled/>
+                                    </div>
+                                </div>
+                            }
                             @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                             {
                                 <div class="row my-1">
@@ -179,15 +199,28 @@
                                     @Html.TextBoxFor(model => model.OrderHeader.PaymentStatus, new { @class = "form-control", @disabled = "disabled" })
                                 </div>
                             </div>
-                           
-                            <input type="submit" class="btn btn-warning text-uppercase form-control my-1" value="Update Order Details" formaction="@Url.Action("UpdateOrderDetail", "CustomerOrder", new { area = "Manager" })" />
+                            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                            {
+                                if (Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
+                                {
+                                    <input type="submit" class="btn btn-warning text-uppercase form-control my-1" value="Update Order Details" formaction="@Url.Action("UpdateOrderDetail", "CustomerOrder", new { area = "Manager" })" />
+
+                                }
+                            }
 
                         </div>
                         <div class="col-12 col-lg-5 offset-lg-1">
                             <h4 class="d-flex justify-content-between align-items-center mb-3">
                                 <span class="text-dark text-uppercase">Order Summary</span>
                             </h4>
-                            <label class="btn btn-outline-dark form-control my-2">Order Status - @Model.OrderHeader.OrderStatus</label>
+                            @if (Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
+                            {
+                                <label class="btn btn-outline-dark form-control my-2" >Order Status - @Model.OrderHeader.OrderStatus</label>
+                            }
+                            else
+                            {
+                                <label class="btn btn-danger form-control my-2" >Order Status - @Model.OrderHeader.OrderStatus</label>
+                            }
 
                             <ul class="list-group mb-3">
                                 @{ int i = 0;}
@@ -225,18 +258,27 @@
                             {
                                 if (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
                                 {
-                                    <input type="submit" class="btn btn-success form-control my-1 text-uppercase" value="Start Processing" formaction="@Url.Action("StartProcessing", "CustomerOrder", new { area = "Manager" })"/>
+                                    <input type="submit" class="btn btn-success form-control my-1 text-uppercase" value="Start Processing" formaction="@Url.Action("StartProcessing", "CustomerOrder", new { area = "Manager" })" />
                                 }
                                 else if (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusInProces)
                                 {
-                                    <input type="submit" class="btn btn-primary form-control my-1 text-uppercase" value="Ship Order"  formaction="@Url.Action("ShipOrder", "CustomerOrder", new { area = "Manager" })"onclick="return validateCarrierNumber();" />
+                                    <input type="submit" class="btn btn-primary form-control my-1 text-uppercase" value="Ship Order" formaction="@Url.Action("ShipOrder", "CustomerOrder", new { area = "Manager" })" onclick="return validateCarrierNumber();" />
                                 }
                             }
-                            @if (Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusRefunded ||
-                                Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled ||
-                                Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusShipped)
+
+                            @if (Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusRefunded &&
+                                Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
                             {
-                                <input type="submit" class="btn btn-danger form-control my-1 text-uppercase" value="Cancel Order" />
+
+                                if (Model.OrderHeader.ShippingDate == null || User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                {
+                                    <input type="submit" class="btn btn-danger form-control my-1 text-uppercase" formaction="@Url.Action("CancelOrder", "CustomerOrder", new { area = "Manager" })" value="Cancel Order" />
+                                }
+                                else if (Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(7) > DateTime.Now && User.IsInRole("Customer") && Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
+                                {
+                                    <input type="submit" class="btn btn-danger form-control my-1 text-uppercase" formaction="@Url.Action("CancelOrder", "CustomerOrder", new { area = "Manager" })" value="Return Order" />
+                                }
+
                             }
 
                         </div>
@@ -249,14 +291,14 @@
 @section Scripts{
     <script>
         function validateCarrierNumber() {
-            
+
             var carrierField = document.getElementById("carrier");
             if (carrierField.value.trim() === "") {
                 alert("Carrier Number is required.");
                 return false; // Prevent form submission
             }
-           
+
             return true; // Allow form submission
         }
     </script>
-    }
+}

@@ -13,7 +13,7 @@
             <a href="@Url.Action("ProductList", "Home")" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-store"></i>&nbsp; Manage Product</a>
             <a href="@Url.Action("Index", "Department", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-table"></i>&nbsp; Manage Department</a>
             <a href="@Url.Action("Index", "ProductType", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-shirt"></i>&nbsp; Manage Product Type</a>
-            <a href="@Url.Action("InventoryOrder", "Home")" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-cart-flatbed-suitcase"></i>&nbsp; Inventory Order History</a>
+            <a href="@Url.Action("InventoryOrder", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-cart-flatbed-suitcase"></i>&nbsp; Inventory Order History</a>
             <a href="@Url.Action("Index", "Manage", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-gear"></i>&nbsp; Setting</a>
         </div>
         <div class="col-md-9" id="result-container">
@@ -31,7 +31,7 @@
                 <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
                     <a href="@Url.Action("Employees", "Home")" id="totalProduct" style="text-decoration:none;">
                         <div class="box bg-warning text-center text-light p-3">
-                            <i class="fa-solid fa-user font-16"></i>
+                            <i class="fa-solid fa-users font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalEmployee</h5>
                             <small class="font-light">Total Employee</small>
                         </div>
@@ -49,31 +49,31 @@
                 </div>
                 <br />
                 <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a href="@Url.Action("InventoryCart", "InventoryShopping")" id="totalProduct" style="text-decoration:none;">
+                    <a  href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Shipped"})" id="totalProduct" style="text-decoration:none;">
                         <div class="box bg-secondary text-center text-light p-3">
                             <i class="fa-solid fa-bag-shopping font-16"></i>
-                            <h5 class="mb-0 mt-1">656</h5>
+                            <h5 class="mb-0 mt-1">@Model.TotalOrders</h5>
                             <small class="font-light">Total Order</small>
                         </div>
                     </a>
                 </div>
                 <br />
                 <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a href="@Url.Action("InventoryCart", "InventoryShopping")" id="totalProduct" style="text-decoration:none;">
+                    <a  href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="All"})" id="totalProduct" style="text-decoration:none;">
                         <div class="box bg-info text-center text-light p-3">
                             <i class="fa-solid fa-table font-16"></i>
-                            <h5 class="mb-0 mt-1">656</h5>
-                            <small class="font-light">Pending Orders</small>
+                            <h5 class="mb-0 mt-1">@Model.TotalNewOrders</h5>
+                            <small class="font-light">New Orders</small>
                         </div>
                     </a>
                 </div>
                 <br />
                 <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a href="@Url.Action("InventoryCart", "InventoryShopping")" id="totalProduct" style="text-decoration:none;">
+                    <a  href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Cancelled"})" id="totalProduct" style="text-decoration:none;">
                         <div class="box bg-danger text-center text-light p-3">
                             <i class="fa-solid fa-circle-left font-16"></i>
-                            <h5 class="mb-0 mt-1">656</h5>
-                            <small class="font-light">Return Orders</small>
+                            <h5 class="mb-0 mt-1">@Model.TotalCancelOrder</h5>
+                            <small class="font-light">Cancelled Orders</small>
                         </div>
                     </a>
                 </div>
@@ -92,59 +92,94 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th class="border-top-0">SHOP NAME</th>
-                                        <th class="border-top-0">NAME</th>
-                                        <th class="border-top-0">STATUS</th>
-                                        <th class="border-top-0">DATE</th>
-                                        <th class="border-top-0">PRICE</th>
+                                        <th>Order Id</th>
+                                        <th>Shop Name</th>
+                                        <th>Order Total</th>
+                                        <th>Order Status</th>
+                                        <th>Payment Status</th>
+                                        <th>Order Date</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td class="txt-oflo">Arose Dress</td>
-                                        <td class="txt-oflo">Believers Hoodie</td>
-                                        <td><span class="label label-info label-rounded">PROCESSING</span></td>
-                                        <td class="txt-oflo">September 18, 2023</td>
-                                        <td><span class="font-medium">$240</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="txt-oflo">Online Dress Collection</td>
-                                        <td class="txt-oflo">Levi’s Jeans</td>
-                                        <td><span class="label label-info label-rounded">PROCESSING</span></td>
-                                        <td class="txt-oflo">September 19, 2023</td>
-                                        <td><span class="font-medium">$1250</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="txt-oflo">Nabila</td>
-                                        <td class="txt-oflo">Louis Philippe Shirt</td>
-                                        <td><span class="label label-purple label-rounded">PENDING</span></td>
-                                        <td class="txt-oflo">September 18, 2023</td>
-                                        <td><span class="font-medium">$1250</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="txt-oflo">Dress Line Bangladesh</td>
-                                        <td class="txt-oflo">Monte Carlo Sweater</td>
-                                        <td><span class="label label-info label-rounded">PROCESSING</span></td>
-                                        <td class="txt-oflo">September 18, 2023</td>
-                                        <td><span class="font-medium">$424</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="txt-oflo">Dhrupodi Fashios</td>
-                                        <td class="txt-oflo">Mufti CLUB Wear</td>
-                                        <td><span class="label label-info label-rounded">PROCESSING</span></td>
-                                        <td class="txt-oflo">September 19, 2023</td>
-                                        <td><span class="font-medium">$724</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="txt-oflo">Taash Clothing</td>
-                                        <td class="txt-oflo">Pepe Jeans</td>
-                                        <td><span class="label label-info label-rounded">PROCESSING</span></td>
-                                        <td class="txt-oflo">September 19, 2023</td>
-                                        <td><span class="font-medium">$1040</span></td>
-                                    </tr>
+                                    @foreach (var item in Model.orderHeaders)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @item.Id
+                                            </td>
+                                            <td>@item.Name</td>
+                                            <td>@item.OrderTotal.ToString("C")</td>
+                                            <td>
+
+                                                @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
+                                                {
+                                                    <span class="badge bg-info">@item.OrderStatus</span>
+                                                }
+                                                else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusInProces)
+                                                {
+                                                    <span class="badge bg-warning text-dark">@item.OrderStatus</span>
+                                                }
+                                                else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
+                                                {
+                                                    <span class="badge bg-success">@item.OrderStatus</span>
+                                                }
+                                                else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
+                                                {
+                                                    <span class="badge bg-danger">@item.OrderStatus</span>
+                                                }
+
+                                            </td>
+                                            <td>
+                                                @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
+                                                {
+                                                    <span class="badge bg-danger">@item.PaymentStatus</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">@item.PaymentStatus</span>
+                                                }
+
+                                            </td>
+                                            <td>@item.OrderDate.ToString().AsDateTime().ToShortDateString()</td>
+                                            <td class="text-end">
+                                                @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
+                                                {
+                                                    <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id,area="Manager" })" class="btn btn-outline-info">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                }
+                                                else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusInProces)
+                                                {
+                                                    <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id ,area="Manager"})" class="btn btn-outline-warning">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                }
+                                                else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
+                                                {
+                                                    <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id,area="Manager" })" class="btn btn-outline-success">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                }
+                                                else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
+                                                {
+                                                    <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id ,area="Manager"})" class="btn btn-outline-danger">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                }
+
+
+                                            </td>
+                                        </tr>
+                                    }
+
+
                                 </tbody>
                             </table>
-                            <div class="text-end p-2"><input type="submit" value="Show More" class="btn btn-success text-light" /></div>
+                            @if (Model.orderHeaders.Count() > 5)
+                            {
+                                @Html.ActionLink("Show More", "Index", "CustomerOrder", new { area = "Manager" }, new { @class = "btn btn-outline-success" })
+                            }
 
                         </div>
                     </div>

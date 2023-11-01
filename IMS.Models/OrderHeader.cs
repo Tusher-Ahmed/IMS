@@ -20,6 +20,7 @@ namespace IMS.Models
         public virtual string Carrier { get; set; }
         public virtual DateTime? PaymentDate { get; set; }
         public virtual string SessionId { get; set; }
+        public virtual string PaymentIntentId { get; set; }
         public virtual long ModifyBy { get; set; }
         public virtual DateTime? ModificationDate { get; set;}
         public virtual int VersionNumber { get;set; }

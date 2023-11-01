@@ -10,10 +10,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.WebPages;
 
 namespace IMS.Web.Areas.Manager.Controllers
 {
-    [Authorize(Roles ="Manager")]
+    
     public class ManagerHomeController : Controller
     {
         private readonly IProductService _product;
@@ -30,6 +31,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             _orderHeaderService = new OrderHeaderService { Session = session };
         }
         // GET: Manager/ManagerHome
+        [Authorize(Roles = "Manager")]
         public ActionResult Index()
         {
             ManagerDashboardViewModel managerDashboardView = new ManagerDashboardViewModel
@@ -38,11 +40,14 @@ namespace IMS.Web.Areas.Manager.Controllers
                 TotalStaff = GetAllStaff(),
                 NewArrival= _product.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).Count(),
                 OrderHeaders=_orderHeaderService.GetAllOrderHeaders().OrderByDescending(u=>u.Id).Take(5).ToList(),
-                NewOrder= _orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus=="Approved").Count()
+                NewOrder= _orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus=="Approved").Count(),
+                Processing= _orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus=="InProcess").Count(),
+                TotalCancel= _orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus=="Cancelled").Count(),
             };
             
             return View(managerDashboardView);
         }
+        [Authorize(Roles = "Manager")]
         public ActionResult ProductList()
         {
             var product = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true);
@@ -50,6 +55,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         }
 
         #region Edit
+        [Authorize(Roles = "Manager")]
         public ActionResult Edit(long id)
         {
             var prod = _product.GetProductById(id);
@@ -60,6 +66,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             return RedirectToAction("ProductList");
         }
         [HttpPost]
+        [Authorize(Roles = "Manager")]
         public ActionResult Edit(long id, Product product)
         {
             var prod = _product.GetProductById(id);
@@ -81,6 +88,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         #endregion
 
         #region Status
+        [Authorize(Roles = "Manager")]
         public ActionResult Status(long id)
         {
             if (id == 0)
@@ -96,6 +104,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Manager")]
         public ActionResult Status(long id, Product product)
         {
             var prod = _product.GetProductById(id);
@@ -112,6 +121,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         #endregion
 
         #region Details
+        [Authorize(Roles = "Manager")]
         public ActionResult Details(long id)
         {
             if (id != 0)
@@ -124,6 +134,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         #endregion
 
         #region Deactivated List
+        [Authorize(Roles = "Manager")]
         public ActionResult DeactivatedList()
         {
             var prod = _product.GetAllProduct().Where(u => u.Status == 0 && u.Approved == true && u.IsPriceAdded == true);
@@ -137,6 +148,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         #endregion
 
         #region Change Status
+        [Authorize(Roles = "Manager")]
         public ActionResult ChangeStatus(long id)
         {
             if (id == 0)
@@ -150,6 +162,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             }
             return RedirectToAction("ProductList");
         }
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public ActionResult ChangeStatus(long id, Product product)
         {
@@ -167,6 +180,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         #endregion
 
         #region get Total staff (number)
+        [Authorize(Roles = "Manager")]
         public int GetAllStaff()
         {
             var context = new ApplicationDbContext();
@@ -196,6 +210,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         #endregion
 
         #region get staff details
+        [Authorize(Roles = "Manager")]
         public ActionResult TotalStaff()
         {
             var context = new ApplicationDbContext();
@@ -235,13 +250,14 @@ namespace IMS.Web.Areas.Manager.Controllers
         #endregion
 
         #region Inventory Order
+        [Authorize(Roles = "Manager,Admin")]
         public ActionResult InventoryOrder()
         {
             //var history = _inventoryOrderHistoryService.GetAll().GroupBy(u => u.OrderId).Select(u => u.First());
             //return View(history);
             return View();
         }
-
+        [Authorize(Roles = "Manager,Admin")]
         public ActionResult InventoryOrderDataTable(int draw, int start, int length, DateTime? startDate,DateTime? finalDate,string search)
         {
             int recordsTotal = 0;
@@ -285,8 +301,8 @@ namespace IMS.Web.Areas.Manager.Controllers
                     $"{item.OrderId}",
                     $"{GarmentsName}",
                     $"{item.CreatedBy}",
-                    $"{item.CreationDate}",
-                    $"{item.TotalPrice}",
+                    $"{item.CreationDate.ToString().AsDateTime().ToShortDateString()}",
+                    $"{item.TotalPrice.ToString("C")}",
                     $@"<a href=""{invoiceUrl}"" class=""btn btn-outline-warning"">
                         <i class=""fa-regular fa-lightbulb""></i>
                     </a>
@@ -301,6 +317,7 @@ namespace IMS.Web.Areas.Manager.Controllers
 
             return Json(new {draw, recordsTotal, recordsFiltered, start, length, data});
         }
+        
         private string GetGarmentsNameByHistoryId(long garmentsId)
         {
             return _supplierService.GetSupplierByUserId(garmentsId)?.Name;
@@ -308,6 +325,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         #endregion
 
         #region Invoice
+        [Authorize(Roles = "Manager,Admin")]
         public ActionResult Invoice(long orderId)
         {
             var context = new ApplicationDbContext();
@@ -338,6 +356,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         #endregion
 
         #region Order History Product Details
+        [Authorize(Roles = "Manager,Admin")]
 
         public ActionResult ProductDetails(long orderId)
         {

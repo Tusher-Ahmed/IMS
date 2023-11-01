@@ -12,12 +12,13 @@ namespace IMS.Models.ViewModel
 
         public IEnumerable<Product> Products { get; set; }
         public IEnumerable<OrderHistoryViewModel> History { get; set; }
+        public IEnumerable<OrderHeader> orderHeaders { get; set; }
         public int TotalProduct {  get; set; }
         public int TotalEmployee {  get; set; }
         public int TotalOrders { get; set; }
         public int TotalShop {  get; set; }
-        public int TotalPendingOrders {  get; set; }
-        public int ReturnOrders { get; set; }
+        public int TotalNewOrders {  get; set; }
+        public int TotalCancelOrder { get; set; }
 
 
     }

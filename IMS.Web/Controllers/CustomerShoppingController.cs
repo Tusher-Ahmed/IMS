@@ -202,9 +202,11 @@ namespace IMS.Web.Controllers
 
             var service = new SessionService();
             Session session = service.Create(options);
+            shoppingCartViewModel.OrderHeader.PaymentIntentId = session.PaymentIntentId;
+            shoppingCartViewModel.OrderHeader.SessionId = session.Id;
             shoppingCartViewModel.OrderHeader.PaymentDate = DateTime.Now;
             _orderHeaderService.Update(shoppingCartViewModel.OrderHeader);
-            _orderHeaderService.UpdateStripeSessionAndIntent(shoppingCartViewModel.OrderHeader.Id, session.Id);
+            
             return Redirect(session.Url);
   
         }
@@ -215,9 +217,12 @@ namespace IMS.Web.Controllers
         {
             OrderHeader orderheader = _orderHeaderService.GetOrderHeaderById(id);
             long userId = Convert.ToInt64(User.Identity.GetUserId());
-           // var customer = _customerService.GetCustomerByUserId(userId);
+
+            // var customer = _customerService.GetCustomerByUserId(userId);
+            
             var service = new SessionService();
             Session session = service.Get(orderheader.SessionId);
+            _orderHeaderService.UpdateStripeSessionAndIntent(orderheader.Id, session.Id, session.PaymentIntentId);
             if (session.PaymentStatus.ToLower() == "paid")
             {
                 _orderHeaderService.UpdateStatus(id, ShoppingHelper.StatusApproved, ShoppingHelper.PaymentStatusApproved);

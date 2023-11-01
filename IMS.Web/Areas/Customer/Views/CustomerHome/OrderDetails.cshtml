@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<IMS.Models.OrderHeader>
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Order Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -36,19 +36,19 @@
         <h4 class="text-uppercase">Customer Order List</h4>
     </div>
     <div class="col-md-8 text-end">
-        <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "Approved" })" class="btn btn-outline-secondary @approved rounded-0">
+        <a href="@Url.Action("OrderDetails", "CustomerHome", new { area = "Customer", status = "Approved" })" class="btn btn-outline-secondary @approved rounded-0">
             Approved
         </a>
-        <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "InProcess" })" class="btn btn-outline-secondary @inprocess rounded-0">
+        <a href="@Url.Action("OrderDetails", "CustomerHome", new { area = "Customer", status = "InProcess" })" class="btn btn-outline-secondary @inprocess rounded-0">
             In Process
         </a>
-        <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "Shipped" })" class="btn btn-outline-secondary @shipped rounded-0">
+        <a href="@Url.Action("OrderDetails", "CustomerHome", new { area = "Customer", status = "Shipped" })" class="btn btn-outline-secondary @shipped rounded-0">
             Shipped
         </a>
-        <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "Cancelled" })" class="btn btn-outline-secondary @cancelled rounded-0">
+        <a href="@Url.Action("OrderDetails", "CustomerHome", new { area = "Customer", status = "Cancelled" })" class="btn btn-outline-secondary @cancelled rounded-0">
             Cancelled
         </a>
-        <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "All" })" class="btn btn-outline-secondary @all rounded-0">
+        <a href="@Url.Action("OrderDetails", "CustomerHome", new { area = "Customer", status = "All" })" class="btn btn-outline-secondary @all rounded-0">
             All
         </a>
     </div>
@@ -67,7 +67,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.OrderByDescending(u=>u.Id))
         {
             <tr>
                 <td>
@@ -107,33 +107,31 @@
                 </td>
                 <td>@item.OrderDate.ToString().AsDateTime().ToShortDateString()</td>
                 <td class="text-end">
-                    @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
-                        {
-                            <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-info">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        }
-                        else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusInProces)
-                        {
-                            <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-warning">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        }
-                        else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
-                        {
-                            <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-success">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        }
-                        else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
-                        {
-                            <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-danger">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        }
-                    
-                    
 
+                    @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
+                    {
+                        <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id,area="Manager" })" class="btn btn-outline-info">
+                            <i class="fa-regular fa-lightbulb"></i>
+                        </a>
+                    }
+                    else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusInProces)
+                    {
+                        <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id,area="Manager" })" class="btn btn-outline-warning">
+                            <i class="fa-regular fa-lightbulb"></i>
+                        </a>
+                    }
+                    else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
+                    {
+                        <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id ,area="Manager"})" class="btn btn-outline-success">
+                            <i class="fa-regular fa-lightbulb"></i>
+                        </a>
+                    }
+                    else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
+                    {
+                        <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id ,area="Manager"})" class="btn btn-outline-danger">
+                            <i class="fa-regular fa-lightbulb"></i>
+                        </a>
+                    }
                 </td>
             </tr>
         }

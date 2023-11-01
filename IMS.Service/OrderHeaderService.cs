@@ -16,7 +16,7 @@ namespace IMS.Service
         void AddOrderHeader(OrderHeader orderHeader);
         void Update(OrderHeader orderHeader);
         void UpdateStatus(long id, string orderStatus, string PaymentStatus=null);
-        void UpdateStripeSessionAndIntent(long id, string sessionId);
+        void UpdateStripeSessionAndIntent(long id, string sessionId,string paymentIntentId);
     }
     public class OrderHeaderService:IOrderHeaderService
     {
@@ -96,12 +96,13 @@ namespace IMS.Service
             }
         }
 
-        public void UpdateStripeSessionAndIntent(long id, string sessionId)
+        public void UpdateStripeSessionAndIntent(long id, string sessionId, string paymentIntentId)
         {
             var orderFromDb = _repository.GetById(id);
             if (orderFromDb != null)
             {
                 orderFromDb.SessionId = sessionId;
+                orderFromDb.PaymentIntentId= paymentIntentId;
                 using (var transaction = _session.BeginTransaction())
                 {
                     try

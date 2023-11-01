@@ -30,8 +30,8 @@
                 <br />
                 <div class="col-md-6 col-lg-6 col-xlg-6 pb-2">
                     <a href="@Url.Action("OrderHistory", "GarmentsHome", new {area="Garmentss"})" id="totalProduct" style="text-decoration:none;">
-                        <div class="box bg-warning text-center text-light p-3">
-                            <i class="fa-solid fa-user font-16"></i>
+                        <div class="box bg-success text-center text-light p-3">
+                            <i class="fa-solid fa-tag font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalHistory</h5>
                             <small class="font-light">Order</small>
                         </div>
@@ -54,6 +54,7 @@
                                         <th class="border-top-0">Order Id</th>
                                         <th class="border-top-0">ORDER DATE</th>
                                         <th class="border-top-0">TOTAL PRICE</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -63,14 +64,22 @@
                                             <td class="txt-oflo">@item.OrderId</td>
                                             <td class="txt-oflo">@item.CreationDate</td>
                                             <td class="txt-oflo">@item.TotalPrice.ToString("C")</td>
+                                            <td>
+                                                <a href="@Url.Action("Details", "GarmentsHome",new {area="Garmentss", orderId = item.OrderId })" class="btn btn-outline-warning">
+                                                    <i class="fa-regular fa-lightbulb"></i>
+                                                </a>
+
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                             <div class="text-end p-2">
-                                
+                                @if (Model.History.Count() > 5)
+                                {
                                     @Html.ActionLink("Show More", "OrderHistory", "GarmentsHome", new { area = "Garmentss" }, new { @class = "btn btn-outline-success" })
-                                
+                                }
+
                             </div>
                         </div>
                     </div>

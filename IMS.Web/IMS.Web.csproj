@@ -442,8 +442,11 @@
     <Content Include="Areas\Staff\Views\StaffHome\ApprovedProducts.cshtml" />
     <Content Include="Areas\Customer\Views\web.config" />
     <Content Include="Areas\Manager\Views\CustomerOrder\Index.cshtml" />
-    <Content Include="Areas\Manager\Views\CustomerOrder\Details.cshtml" />
     <Content Include="Areas\Manager\Views\CustomerOrder\Edit.cshtml" />
+    <Content Include="Areas\Customer\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Customer\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Customer\Views\CustomerHome\Index.cshtml" />
+    <Content Include="Areas\Customer\Views\CustomerHome\OrderDetails.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -534,8 +537,6 @@
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Customer\Data\" />
-    <Folder Include="Areas\Customer\Views\CustomerHome\" />
-    <Folder Include="Areas\Customer\Views\Shared\" />
     <Folder Include="Areas\Garmentss\Data\" />
     <Folder Include="Areas\Manager\Data\" />
     <Folder Include="Areas\Staff\Data\" />

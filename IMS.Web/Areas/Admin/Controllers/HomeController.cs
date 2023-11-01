@@ -1,6 +1,7 @@
 ﻿using IMS.Models;
 using IMS.Models.ViewModel;
 using IMS.Service;
+using IMS.Utility;
 using IMS.Web.App_Start;
 using IMS.Web.Models;
 using Microsoft.AspNet.Identity;
@@ -31,6 +32,7 @@ namespace IMS.Web.Areas.Admin.Controllers
         private readonly IEmployeeService _employeeService;
         private readonly ISupplierService _supplierService;
         private readonly ICustomerService _customerService;
+        private readonly IOrderHeaderService _orderHeaderService;
         private ApplicationUserManager _userManager;
 
         // GET: Admin/Home
@@ -45,6 +47,7 @@ namespace IMS.Web.Areas.Admin.Controllers
             _employeeService = new EmployeeService { Session = session };
             _supplierService = new SupplierService { Session = session };
             _customerService = new CustomerService { Session = session };
+            _orderHeaderService=new OrderHeaderService { Session = session };
         }
         public HomeController(ApplicationUserManager userManager)
         {
@@ -61,7 +64,7 @@ namespace IMS.Web.Areas.Admin.Controllers
                 _userManager = value;
             }
         }
-        #region ProductList
+        #region Dashboard View
         public ActionResult Index()
         {
 
@@ -70,7 +73,12 @@ namespace IMS.Web.Areas.Admin.Controllers
                 Products = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true),
                 TotalProduct = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true).Count(),
                 TotalEmployee = GetEmployeeWithRoles(),
-                TotalShop = GetShopsWithRoles()
+                TotalShop = GetShopsWithRoles(),
+                orderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).Take(5).ToList(),
+                TotalOrders =_orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus==ShoppingHelper.StatusShipped).Count(),
+                TotalNewOrders= _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus != ShoppingHelper.StatusCancelled &&
+                    u.OrderStatus != ShoppingHelper.StatusRefunded && u.OrderStatus != ShoppingHelper.StatusShipped).Count(),
+                TotalCancelOrder= _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled).Count()
 
             };
             return View(prod);
@@ -341,106 +349,6 @@ namespace IMS.Web.Areas.Admin.Controllers
             }
 
             return View(usersDetails);
-        }
-        #endregion
-
-        #region inventory Order
-        public ActionResult InventoryOrder()
-        {            
-            return View();
-        }
-        public ActionResult InventoryOrderDataTable(int draw, int start, int length, DateTime? startDate, DateTime? finalDate, string search)
-        {
-            int recordsTotal = 0;
-            int recordsFiltered = 0;
-            var data = new List<object>();
-            var history = _inventoryOrderHistoryService.GetAll()
-                   .GroupBy(u => u.OrderId)
-                   .Select(u => u.First())
-                   .ToList();
-            if (startDate != null && finalDate != null)
-            {
-                history = history.Where(x => x.CreationDate >= startDate && x.CreationDate <= finalDate).ToList();
-            }
-            if (startDate != null)
-            {
-                history = history.Where(x => x.CreationDate >= startDate).ToList();
-            }
-
-            if (finalDate != null)
-            {
-                history = history.Where(x => x.CreationDate <= finalDate).ToList();
-            }
-            if (!string.IsNullOrEmpty(search))
-            {
-                history = history.Where(x => x.OrderId.ToString().Contains(search) || GetGarmentsNameByHistoryId(x.GarmentsId).Contains(search)).ToList();
-            }
-            recordsTotal = history.Count;
-            recordsFiltered = recordsTotal;
-
-            history = history.Skip(start).Take(length).ToList();
-
-
-
-            foreach (var item in history)
-            {
-                string GarmentsName = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
-                var invoiceUrl = Url.Action("Invoice", "Home", new { area = "Admin", orderId = item.OrderId });
-                var productDetailsUrl = Url.Action("ProductDetails", "Home", new { area = "Admin", orderId = item.OrderId });
-                var str = new List<string>()
-                {
-                    $"{item.OrderId}",
-                    $"{GarmentsName}",
-                    $"{item.CreatedBy}",
-                    $"{item.CreationDate}",
-                    $"{item.TotalPrice}",
-                    $@"<a href=""{invoiceUrl}"" class=""btn btn-outline-warning"">
-                        <i class=""fa-regular fa-lightbulb""></i>
-                    </a>
-                    <a href=""{productDetailsUrl}"" class=""btn btn-outline-success"">
-                        <i class=""fas fa-info-circle""></i>
-                    </a>"
-                };
-
-                data.Add(str);
-            }
-
-
-            return Json(new { draw, recordsTotal, recordsFiltered, start, length, data });
-        }
-        private string GetGarmentsNameByHistoryId(long garmentsId)
-        {
-            return _supplierService.GetSupplierByUserId(garmentsId)?.Name;
-        }
-        #endregion
-
-        #region Invoice
-        public ActionResult Invoice(long orderId)
-        {
-            var context = new ApplicationDbContext();
-
-            var History = _inventoryOrderHistoryService.GetByOrderId(orderId);
-            var firstOrderHistory = History.FirstOrDefault();
-
-            if (firstOrderHistory != null)
-            {
-                var employeeId = firstOrderHistory.EmployeeId;
-                var GarmentsId = firstOrderHistory.GarmentsId;
-                var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
-                var garments = _supplierService.GetSupplierByUserId(GarmentsId).Name;
-                if (manager != null && garments != null)
-                {
-                    InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
-                    {
-                        orderHistories = History,
-                        GarmentsName = garments,
-                        ManagerEmail = manager.Email,
-                    };
-                    return View(inventoryInvoiceViewModel);
-                }
-            }
-
-            return RedirectToAction("Index", "Home");
         }
         #endregion
 
