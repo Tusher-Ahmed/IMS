@@ -1,0 +1,64 @@
+﻿@model IEnumerable<IMS.Models.OrderHeader>
+@{
+    ViewBag.Title = "SellingReport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row pb-4 pt-2">
+    <div class="col-md-6">
+        <h4 class="text-uppercase">Selling Report</h4>
+    </div>
+</div>
+@using (Html.BeginForm("SellingReport", "ManagerHome", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col">
+            <input type="date" class="form-control" id="startDate" name="startDate" value="@(Request.QueryString["startDate"] ?? "")" />
+        </div>
+        <div class="col">
+            <input type="date" class="form-control" id="finalDate" name="endDate" value="@(Request.QueryString["endDate"] ?? "")" />
+        </div>
+        <div class="col">
+            <input type="text" class="form-control" id="search" name="searchText" placeholder="Write order id or shop name..." value="@(Request.QueryString["searchText"] ?? "")" />
+        </div>
+        <div class="col">
+            <input type="submit" id="btnView" class="btn btn-primary w-100" value="Search" />
+        </div>
+    </div>
+}
+
+<table id="reportTable" class="table table-striped mt-4">
+    <thead>
+        <tr>
+            <th>Order Id</th>
+            <th>Shop Name</th>
+            <th>Payment Status</th>
+            <th>Order Date</th>
+            <th>Order Total($)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.PaymentStatus</td>
+                <td>@item.OrderDate.ToString().AsDateTime().ToShortDateString()</td>
+                <td>@item.OrderTotal.ToString("C")</td>
+            </tr>
+        }
+        <tr class="bg-dark text-white">
+            <td class="fw-bold">Total :</td>
+            <td colspan="3"></td>
+            @{
+                decimal totalAmount = 0;
+            }
+            @foreach (var item in Model)
+            {
+                totalAmount += @item.OrderTotal;
+            }
+            <td class="fw-bold">@totalAmount.ToString("C")</td>
+        </tr>
+    </tbody>
+</table>

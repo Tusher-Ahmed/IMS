@@ -1,6 +1,7 @@
 ﻿using IMS.Models;
 using IMS.Models.ViewModel;
 using IMS.Service;
+using IMS.Utility;
 using IMS.Web.App_Start;
 using IMS.Web.Models;
 using Microsoft.AspNet.Identity;
@@ -386,6 +387,44 @@ namespace IMS.Web.Areas.Manager.Controllers
         }
         #endregion
 
+        #region Selling Report
+        [Authorize(Roles = "Manager,Admin")]
+        public ActionResult SellingReport(DateTime? startDate, DateTime? endDate,string searchText)
+        {
+            var orderHeader = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == ShoppingHelper.StatusShipped);
+            if (string.IsNullOrEmpty(searchText))
+            {
+                if (!startDate.HasValue && !endDate.HasValue)
+                {
+                    // If no dates provided, set default date range to the last 7 days
+                    endDate = DateTime.Now;
+                    startDate = endDate.Value.AddDays(-7);
+                    orderHeader = orderHeader.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped &&
+                        (u.ShippingDate >= startDate && u.ShippingDate <= endDate));
+                }
+            }
+              
+            else if(startDate.HasValue && endDate.HasValue)
+            {
+                orderHeader = orderHeader.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped &&
+                    (u.ShippingDate >= startDate && u.ShippingDate <= endDate));
+            }else if(startDate.HasValue && !endDate.HasValue)
+            {
+                orderHeader = orderHeader.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped &&
+                    (u.ShippingDate >= startDate));
+            }
+            else if (!startDate.HasValue && endDate.HasValue)
+            {
+                orderHeader = orderHeader.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped &&
+                    (u.ShippingDate <= endDate));
+            }
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                orderHeader = orderHeader.Where(x => x.Id.ToString().Contains(searchText) || x.Name.Contains(searchText)).ToList();
+            }
 
+            return View(orderHeader);
+        }
+        #endregion
     }
 }

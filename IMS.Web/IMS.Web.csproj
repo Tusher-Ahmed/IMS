@@ -449,6 +449,7 @@
     <Content Include="Areas\Customer\Views\CustomerHome\OrderDetails.cshtml" />
     <Content Include="Areas\Admin\Views\Home\DeactivatedEmployeeList.cshtml" />
     <Content Include="Areas\Admin\Views\Home\DeactivatedCustomerList.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\SellingReport.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
