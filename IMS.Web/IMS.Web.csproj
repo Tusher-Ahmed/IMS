@@ -447,6 +447,8 @@
     <Content Include="Areas\Customer\Views\Shared\_Layout.cshtml" />
     <Content Include="Areas\Customer\Views\CustomerHome\Index.cshtml" />
     <Content Include="Areas\Customer\Views\CustomerHome\OrderDetails.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\DeactivatedEmployeeList.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\DeactivatedCustomerList.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -475,7 +477,6 @@
     <Content Include="Views\Shared\_SearchDepartment.cshtml" />
     <Content Include="Views\Department\Create.cshtml" />
     <Content Include="Views\Department\Edit.cshtml" />
-    <Content Include="Views\Department\Delete.cshtml" />
     <Content Include="Views\Department\Status.cshtml" />
     <Content Include="Views\Department\Deactivate.cshtml" />
     <Content Include="Views\Department\Active.cshtml" />
@@ -483,7 +484,6 @@
     <Content Include="Views\Shared\_SearchProductType.cshtml" />
     <Content Include="Views\ProductType\Create.cshtml" />
     <Content Include="Views\ProductType\Edit.cshtml" />
-    <Content Include="Views\ProductType\Delete.cshtml" />
     <Content Include="Views\ProductType\Status.cshtml" />
     <Content Include="Views\ProductType\Deactivate.cshtml" />
     <Content Include="Views\ProductType\Active.cshtml" />

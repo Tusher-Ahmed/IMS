@@ -15,6 +15,7 @@ namespace IMS.Service
         Employee GetEmployeeById(long id);
         IEnumerable<Employee> GetAllEmployee();
         Employee GetEmployeeByUserId(long userId);
+        void UpdateEmployee(Employee employee);
     }
     public class EmployeeService:IEmployeeService
     {
@@ -59,6 +60,23 @@ namespace IMS.Service
         public Employee GetEmployeeByUserId(long userId)
         {
             return _session.Query<Employee>().FirstOrDefault(x => x.UserId == userId);
+        }
+
+        public void UpdateEmployee(Employee employee)
+        {
+            using (var transaction = _session.BeginTransaction())
+            {
+                try
+                {
+                    _repository.Update(employee);
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
     }
 }

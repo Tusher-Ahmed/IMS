@@ -137,32 +137,6 @@ namespace IMS.Web.Controllers
         }
         #endregion
 
-        #region Delete
-        public ActionResult Delete(long id)
-        {
-            if (id == 0)
-            {
-                return HttpNotFound();
-            }
-            var dept = _department.GetDeptById(id);
-            if (dept != null)
-            {
-                return View(dept);
-            }
-            return RedirectToAction("Index");
-        }
-        [HttpPost]
-        public ActionResult Delete(long id, Department dept)
-        {
-            if (dept != null)
-            {
-                _department.DeleteDept(id);
-                return RedirectToAction("Index");
-            }
-            return View();
-        }
-        #endregion
-
         #region Deactivate Status
         public ActionResult Status(long id)
         {

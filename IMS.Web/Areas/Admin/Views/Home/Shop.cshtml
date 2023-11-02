@@ -10,7 +10,8 @@
         <h4 class="text-uppercase">Shop List</h4>
     </div>
     <div class="col-md-6 text-end">
-        <a href="@Url.Action("Register", "Account", new {area=""})" class="btn btn-outline-success"><i class='fas fa-plus'></i> Add Shop</a>
+        <a href="@Url.Action("Register", "Account", new {area=""})" class="btn btn-outline-success"><i class='fas fa-plus'></i> Add Shop</a>        
+        <a href="@Url.Action("DeactivatedCustomerList", "Home", new {area="Admin"})" class="btn btn-outline-danger"><i class="fa-solid fa-right-from-bracket"></i> Deactivated Customers</a>
     </div>
 </div>
 
@@ -25,6 +26,7 @@
             <th>Street Address</th>
             <th>Thana</th>
             <th>Postal Code</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -39,6 +41,11 @@
                 <td>@item.StreetAddress</td>
                 <td>@item.Thana</td>
                 <td>@item.PostalCode</td>
+                <td>
+                    <a href="@Url.Action("DeactivateCustomer", "Home", new { id = item.Id ,area="Admin" })" class="btn btn-outline-danger">
+                        <i class="fas fa-xmark"></i>
+                    </a>
+                </td>
             </tr>
         }
     </tbody>

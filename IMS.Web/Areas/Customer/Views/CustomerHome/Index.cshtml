@@ -114,28 +114,30 @@
                                                 @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
                                                 {
                                                     <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id,area="Manager" })" class="btn btn-outline-info">
-                                                        <i class="fa-regular fa-lightbulb"></i>
+                                                        <i class="fa-solid fa-info"></i>
                                                     </a>
                                                 }
                                                 else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusInProces)
                                                 {
                                                     <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id,area="Manager" })" class="btn btn-outline-warning">
-                                                        <i class="fa-regular fa-lightbulb"></i>
+                                                        <i class="fa-solid fa-info"></i>
                                                     </a>
                                                 }
                                                 else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
                                                 {
                                                     <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id ,area="Manager"})" class="btn btn-outline-success">
-                                                        <i class="fa-regular fa-lightbulb"></i>
+                                                        <i class="fa-solid fa-info"></i>
                                                     </a>
                                                 }
                                                 else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
                                                 {
                                                     <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id ,area="Manager"})" class="btn btn-outline-danger">
-                                                        <i class="fa-regular fa-lightbulb"></i>
+                                                        <i class="fa-solid fa-info"></i>
                                                     </a>
                                                 }
-
+                                                <a href="@Url.Action("OrderConfirmation", "CustomerShopping", new { id = item.Id ,area=""})" class="btn btn-outline-warning">
+                                                    <i class="fa-solid fa-lightbulb"></i>
+                                                </a>
 
                                             </td>
                                         </tr>
@@ -146,7 +148,7 @@
                             <div class="text-end p-1">
                                 @if (Model.OrderHeaders.Count() > 5)
                                 {
-                                    @Html.ActionLink("Show More", "Index", "CustomerHome", new { area = "Customer" }, new { @class = "btn btn-outline-success" })
+                                    @Html.ActionLink("Show More", "OrderDetails", "CustomerHome", new { area = "Customer" }, new { @class = "btn btn-outline-success" })
                                 }
 
                             </div>

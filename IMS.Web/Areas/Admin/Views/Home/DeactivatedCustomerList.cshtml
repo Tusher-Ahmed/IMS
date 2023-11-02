@@ -1,0 +1,53 @@
+﻿@model List<IMS.Models.ViewModel.UserDetailViewModel>
+@{
+    ViewBag.Title = "Deactivated CustomerList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="row pb-4 pt-2">
+    <div class="col-md-6">
+        <h4 class="text-uppercase">Deactivated Shop List</h4>
+    </div>
+    <div class="col-6 text-end">
+        <a href="@Url.Action("Shop", "Home", new {area="Admin"})" class="btn btn-outline-success"><i class="fa-solid fa-right-from-bracket"></i> Back To Shop List</a>
+    </div>
+</div>
+<table id="employeeTable" class="table table-hover table-striped">
+    <thead>
+        <tr>
+            <th>User Id</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Shopname</th>
+            <th>City</th>
+            <th>Street Address</th>
+            <th>Thana</th>
+            <th>Postal Code</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Email</td>
+                <td>@item.Phone</td>
+                <td>@item.ShopName</td>
+                <td>@item.City</td>
+                <td>@item.StreetAddress</td>
+                <td>@item.Thana</td>
+                <td>@item.PostalCode</td>                
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#employeeTable").DataTable();
+        })</script>
+}
+

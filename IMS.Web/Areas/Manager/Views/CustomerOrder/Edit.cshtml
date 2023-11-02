@@ -7,7 +7,7 @@
 @using (Html.BeginForm("Update", "CustomerOrder", new { area = "Manager" }, FormMethod.Post))
 {
     @Html.HiddenFor(model => model.OrderHeader.Id)
-    <br /><div class="container  pb-5">
+    <br /><div class="container pb-5">
         <div class="card">
             <div class="card-header bg-dark text-light ml-0 p-3">
                 <div class="container row">
@@ -179,7 +179,7 @@
                                 <div class="row my-1">
                                     <div class="col-3">Arrival Date</div>
                                     <div class="col-9">        
-                                        <input type="text" value="@Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(5).ToShortDateString()" class="form-control" disabled/>
+                                        <input type="text" value="@Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(3).ToShortDateString()" class="form-control" disabled/>
                                     </div>
                                 </div>
                             }
@@ -199,7 +199,7 @@
                                     @Html.TextBoxFor(model => model.OrderHeader.PaymentStatus, new { @class = "form-control", @disabled = "disabled" })
                                 </div>
                             </div>
-                            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                            @if (Model.OrderHeader.ShippingDate == null && (User.IsInRole("Admin") || User.IsInRole("Manager")))
                             {
                                 if (Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
                                 {
@@ -270,11 +270,11 @@
                                 Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
                             {
 
-                                if (Model.OrderHeader.ShippingDate == null || User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                if (Model.OrderHeader.ShippingDate == null && (User.IsInRole("Admin") || User.IsInRole("Manager")))
                                 {
                                     <input type="submit" class="btn btn-danger form-control my-1 text-uppercase" formaction="@Url.Action("CancelOrder", "CustomerOrder", new { area = "Manager" })" value="Cancel Order" />
                                 }
-                                else if (Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(7) > DateTime.Now && User.IsInRole("Customer") && Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
+                                else if ((Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(3) < DateTime.Now && Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(10) > DateTime.Now) && User.IsInRole("Customer") && Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
                                 {
                                     <input type="submit" class="btn btn-danger form-control my-1 text-uppercase" formaction="@Url.Action("CancelOrder", "CustomerOrder", new { area = "Manager" })" value="Return Order" />
                                 }

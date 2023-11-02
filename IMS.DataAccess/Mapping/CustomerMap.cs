@@ -19,6 +19,7 @@ namespace IMS.DAO.Mapping
             Map(x => x.Thana);
             Map(x => x.PostalCode);
             Map(x => x.UserId);
+            Map(x => x.Status);
         }
     }
 }

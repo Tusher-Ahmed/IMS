@@ -249,7 +249,7 @@ namespace IMS.Web.Areas.Admin.Controllers
 
             //return usersWithRoles.Count();
             #endregion
-            var employee = _employeeService.GetAllEmployee().ToList();
+            var employee = _employeeService.GetAllEmployee().Where(u=>u.Status==1).ToList();
             return employee.Count();
         }
 
@@ -273,7 +273,7 @@ namespace IMS.Web.Areas.Admin.Controllers
 
             //return usersWithRoles.Count();
             #endregion
-            var shops = _supplierService.GetSuppliers().ToList();
+            var shops = _customerService.GetAllCustomer().Where(u => u.Status == 1).ToList();
             return shops.Count();
         }
         #endregion
@@ -297,20 +297,83 @@ namespace IMS.Web.Areas.Admin.Controllers
             foreach (var user in usersWithDetails)
             {
                 var employee = _employeeService.GetEmployeeByUserId(user.Id);
-                UserDetailViewModel userDetails = new UserDetailViewModel
+                if(employee.Status != 0)
                 {
-                    Id = user.Id,
-                    Email = user.Email,
-                    Phone = user.PhoneNumber,
-                    City = employee.City,
-                    StreetAddress = employee.StreetAddress,
-                    Thana = employee.Thana,
-                    PostalCode = employee.PostalCode,
-                    ERole = userManager.GetRoles(user.Id).FirstOrDefault()
-                };
-                usersDetails.Add(userDetails);
+                    UserDetailViewModel userDetails = new UserDetailViewModel
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        Phone = user.PhoneNumber,
+                        City = employee.City,
+                        StreetAddress = employee.StreetAddress,
+                        Thana = employee.Thana,
+                        PostalCode = employee.PostalCode,
+                        ERole = userManager.GetRoles(user.Id).FirstOrDefault()
+                    };
+                    usersDetails.Add(userDetails);
+                }
             }
+            return View(usersDetails);
+        }
+        #endregion
 
+        #region Deactivate Employee
+        public ActionResult DeactivateEmployee(long id)
+        {
+            var context = new ApplicationDbContext();
+            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+            var user = userManager.FindById(id);
+            var employee=_employeeService.GetEmployeeByUserId(user.Id);
+            if (user != null && employee!=null)
+            {                               
+                employee.Status = 0;
+                _employeeService.UpdateEmployee(employee);
+
+                return RedirectToAction("Employees");
+            }
+            else
+            {
+                return RedirectToAction("Employees");
+            }
+            
+        }
+        #endregion
+
+        #region Deactivate Employee List
+        public ActionResult DeactivatedEmployeeList()
+        {
+            var context = new ApplicationDbContext();
+            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+            var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
+            string[] roleNames = { "Manager", "Staff" };
+            var roleIds = roleManager.Roles
+                .Where(r => roleNames.Contains(r.Name))
+                .Select(r => r.Id)
+                .ToList();
+
+            var usersWithDetails = context.Users
+                .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
+                .ToList();
+            List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
+            foreach (var user in usersWithDetails)
+            {
+                var employee = _employeeService.GetEmployeeByUserId(user.Id);
+                if (employee.Status == 0)
+                {
+                    UserDetailViewModel userDetails = new UserDetailViewModel
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        Phone = user.PhoneNumber,
+                        City = employee.City,
+                        StreetAddress = employee.StreetAddress,
+                        Thana = employee.Thana,
+                        PostalCode = employee.PostalCode,
+                        ERole = userManager.GetRoles(user.Id).FirstOrDefault()
+                    };
+                    usersDetails.Add(userDetails);
+                }
+            }
             return View(usersDetails);
         }
         #endregion
@@ -334,24 +397,88 @@ namespace IMS.Web.Areas.Admin.Controllers
             foreach (var user in usersWithDetails)
             {
                 var customer = _customerService.GetCustomerByUserId(user.Id);
-                var userDetails = new UserDetailViewModel
+                if(customer.Status != 0)
                 {
-                    Id = user.Id,
-                    Email = user.Email,
-                    Phone = user.PhoneNumber,
-                    ShopName = customer.Name,
-                    City = customer.City,
-                    StreetAddress = customer.StreetAddress,
-                    Thana = customer.Thana,
-                    PostalCode = customer.PostalCode,
-                };
-                usersDetails.Add(userDetails);
+                    var userDetails = new UserDetailViewModel
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        Phone = user.PhoneNumber,
+                        ShopName = customer.Name,
+                        City = customer.City,
+                        StreetAddress = customer.StreetAddress,
+                        Thana = customer.Thana,
+                        PostalCode = customer.PostalCode,
+                    };
+                    usersDetails.Add(userDetails);
+                }                
             }
 
             return View(usersDetails);
         }
         #endregion
 
+        #region Deactivate Customer/Shop
+        public ActionResult DeactivateCustomer(long id)
+        {
+            var context = new ApplicationDbContext();
+            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+            var user = userManager.FindById(id);
+            var customer = _customerService.GetCustomerByUserId(user.Id);
+            if (user != null && customer != null)
+            {               
+                customer.Status = 0;
+                _customerService.UpdateCustomer(customer);
+
+                return RedirectToAction("Shop");
+            }
+            else
+            {
+                return RedirectToAction("Shop");
+            }
+            
+        }
+        #endregion
+
+        #region Deactivated Shop List
+        public ActionResult DeactivatedCustomerList()
+        {
+            var context = new ApplicationDbContext();
+            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+            var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
+            string roleNames = "Customer";
+            var roleIds = roleManager.Roles
+                .Where(r => roleNames.Contains(r.Name))
+                .Select(r => r.Id)
+                .ToList();
+
+            var usersWithDetails = context.Users
+                .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
+                .ToList();
+            List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
+            foreach (var user in usersWithDetails)
+            {
+                var customer = _customerService.GetCustomerByUserId(user.Id);
+                if (customer.Status == 0)
+                {
+                    var userDetails = new UserDetailViewModel
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        Phone = user.PhoneNumber,
+                        ShopName = customer.Name,
+                        City = customer.City,
+                        StreetAddress = customer.StreetAddress,
+                        Thana = customer.Thana,
+                        PostalCode = customer.PostalCode,
+                    };
+                    usersDetails.Add(userDetails);
+                }
+            }
+
+            return View(usersDetails);
+        }
+        #endregion
         #region Order History Product Details
 
         public ActionResult ProductDetails(long orderId)

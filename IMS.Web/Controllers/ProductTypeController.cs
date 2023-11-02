@@ -129,33 +129,6 @@ namespace IMS.Web.Controllers
         }
         #endregion
 
-        #region Delete
-        public ActionResult Delete(long id)
-        {
-            if (id == 0)
-            {
-                return HttpNotFound();
-            }
-            var productType = _productType.GetProductTypeById(id);
-            if (productType != null)
-            {
-                return View(productType);
-            }
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public ActionResult Delete(long id, Department dept)
-        {
-            if (dept != null)
-            {
-                _productType.DeleteProductType(id);
-                return RedirectToAction("Index");
-            }
-            return View();
-        }
-        #endregion
-
         #region Deactivate Status
         public ActionResult Status(long id)
         {

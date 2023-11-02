@@ -43,7 +43,7 @@ namespace IMS.Web.Areas.Customer.Controllers
             {
               OrderHeaders=orderHeaders.Take(5),
               OrderDetails=orders,
-              TotalOrders=orderHeaders.Count(),
+              TotalOrders=orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped).Count(),
               NewArrival=orderHeaders.Where(u=>u.OrderStatus!=ShoppingHelper.StatusShipped &&
                     u.OrderStatus!=ShoppingHelper.StatusCancelled && u.OrderStatus != ShoppingHelper.StatusRefunded).Count(),
               TotalCanceledOrder= orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled).Count()

@@ -13,6 +13,8 @@ namespace IMS.Service
     {
         void AddCustomer(Customer customer);
         Customer GetCustomerByUserId(long userId);
+        IEnumerable<Customer> GetAllCustomer();
+        void UpdateCustomer(Customer customer);
     }
 
     public class CustomerService:ICustomerService
@@ -49,6 +51,28 @@ namespace IMS.Service
         public Customer GetCustomerByUserId(long userId)
         {
             return _session.Query<Customer>().FirstOrDefault(u=>u.UserId == userId);
+        }
+
+        public IEnumerable<Customer> GetAllCustomer()
+        {
+            return _repository.GetAll();
+        }
+
+        public void UpdateCustomer(Customer customer)
+        {
+            using (var transaction = _session.BeginTransaction())
+            {
+                try
+                {
+                    _repository.Update(customer);
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
     }
 }

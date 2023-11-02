@@ -15,5 +15,6 @@ namespace IMS.Models
         public virtual string PostalCode { get; set; }
         public virtual long UserId { get; set; }
         public virtual long CreatedBy { get; set; }
+        public virtual int Status { get; set; }
     }
 }

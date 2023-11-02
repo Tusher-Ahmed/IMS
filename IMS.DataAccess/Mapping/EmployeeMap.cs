@@ -20,6 +20,7 @@ namespace IMS.DataAccess.Mapping
             Map(x => x.PostalCode);
             Map(x => x.UserId);
             Map(x => x.CreatedBy);
+            Map(x => x.Status);
         }
     }
 }
