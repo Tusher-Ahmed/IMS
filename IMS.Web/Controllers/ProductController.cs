@@ -226,7 +226,28 @@ namespace IMS.Web.Controllers
             return RedirectToAction("ApproveProduct");
         }
         #endregion
-
+        #region Reject the product by staff
+        [Authorize(Roles = "Staff,Admin")]
+        public ActionResult RejectByStaff(long id)
+        {
+            var prod = _product.GetProductById(id);
+            if (prod != null)
+            {
+                prod.Approved = false;
+                prod.ApprovedBy = Convert.ToInt64(User.Identity.GetUserId());
+                prod.ModificationDate = DateTime.Now;
+                prod.VersionNumber = 1;
+                _product.UpdateProduct(prod);
+            }
+            return RedirectToAction("ApproveProduct");
+        }
+        #endregion
+        [Authorize(Roles = "Staff,Admin")]
+        public ActionResult RejectedProductList()
+        {
+            var prod=_product.GetAllProduct().Where(u=>u.Approved==false).ToList();
+            return View(prod);
+        }
         #region Update Price and Status by Manager
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult ManagePrice()

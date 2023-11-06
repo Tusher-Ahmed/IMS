@@ -11,7 +11,7 @@ using System.Web.Mvc;
 
 namespace IMS.Web.Controllers
 {
-    [Authorize(Roles = "Manager,Admin")]
+    
     public class InventoryShoppingController : Controller
     {
         private readonly IGarmentsService _garmentsService;
@@ -25,7 +25,7 @@ namespace IMS.Web.Controllers
 
 
         #region Product details with add to cart
-        [AllowAnonymous]
+        [Authorize(Roles = "Manager,Admin,Supplier")]
         public ActionResult ProductDetails(long ProductId)
         {
             var garmentsProduct = _garmentsService.GetGarmentsProductById(ProductId);

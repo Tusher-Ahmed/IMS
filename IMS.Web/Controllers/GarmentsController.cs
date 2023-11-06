@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 
@@ -47,44 +49,85 @@ namespace IMS.Web.Controllers
         }
         [HttpPost]
         [Authorize(Roles = "Supplier")]
-        public ActionResult Create([Bind(Exclude = "ImageFile")] GarmentsProduct model, HttpPostedFileBase ImageFile)
+        [ValidateInput(false)] // Allow HTML input
+        public ActionResult Create([Bind(Exclude = "ImageFile")] GarmentsProduct model)
         {
-
             if (ModelState.IsValid)
             {
-                if (ImageFile != null && ImageFile.ContentLength > 0)
-                {
-                    long maxFileSizeBytes = 2 * 1024 * 1024;
-                    if (ImageFile.ContentLength > maxFileSizeBytes)
-                    {
-                        ModelState.AddModelError("ImageFile", "File size cannot exceed 1 MB.");
-                        
-                        return View(model);
-                    }
-                    var fileName = Path.GetFileName(ImageFile.FileName);
-                    var path = Path.Combine(Server.MapPath("~/Images"), fileName);
-                    ImageFile.SaveAs(path);
+                var (processedDescription, primaryImageUrl) = ProcessDescription(model.Description);
 
+                // Set the model.Description to the processed description
+                model.Description = processedDescription;
 
-                    model.Image = fileName;
-                }
+                // Set the primary image URL
+                model.Image = primaryImageUrl;
+
+                // Set other product-related properties
                 model.ProductType = _productTypeService.GetProductTypeById((long)model.ProductTypeId);
                 model.Department = _departmentService.GetDeptById((long)model.DepartmentId);
-                model.GarmentsId=  Convert.ToInt64(User.Identity.GetUserId());
+                model.GarmentsId = Convert.ToInt64(User.Identity.GetUserId());
+
+                // Save the product in your service
                 _garmentsService.CreateGarmentsProduct(model);
 
                 return RedirectToAction("Index");
             }
-            
 
+            // If ModelState is not valid, re-populate the dropdowns
+            var departments = _departmentService.GetAllDept();
+            var productTypes = _productTypeService.GetAllType();
+            ViewBag.Departments = new SelectList(departments, "Id", "Name");
+            ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
 
-                // If ModelState is not valid, re-populate the dropdowns
-                var departments = _departmentService.GetAllDept();
-                var productTypes = _productTypeService.GetAllType();
-                ViewBag.Departments = new SelectList(departments, "Id", "Name");
-                ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
+            return View(model);
+        }
+        private (string, string) ProcessDescription(string description)
+        {
+           
+            string pattern = "<img.*?src=[\"'](.*?)[\"'].*?>";
+            var match = Regex.Match(description, pattern);
 
-                return View(model);
+            if (match.Success)
+            {
+                string dataUri = match.Groups[1].Value;
+
+                if (dataUri.StartsWith("data:image/"))
+                {
+  
+                    string imageUrl = SaveDataUriAsImage(dataUri);
+
+                    // Remove the embedded image from the description
+                    string processedDescription = description.Replace(match.Value, string.Empty);
+
+                    // Remove extra line breaks and white spaces
+                    processedDescription = processedDescription.Trim();
+
+                    return (processedDescription, imageUrl);
+                }
+            }
+
+            // No embedded image found
+            return (description, null);
+        }
+
+        private string SaveDataUriAsImage(string dataUri)
+        {
+            // Extract the file extension from the data URI
+            string extension = dataUri.Split(';')[0].Split('/')[1];
+
+            // Create a unique file name
+            string fileName = Guid.NewGuid() + "." + extension;
+
+            // Get the base64-encoded image data
+            string base64Data = dataUri.Split(',')[1];
+
+            // Decode and save the image as a file
+            byte[] imageBytes = Convert.FromBase64String(base64Data);
+            string imagePath = Path.Combine(Server.MapPath("~/Images"), fileName); // Change this path to where you want to save the image
+            System.IO.File.WriteAllBytes(imagePath, imageBytes);
+
+            // Return the URL to the saved image
+            return  fileName; // Adjust the path as needed
         }
         #endregion
 

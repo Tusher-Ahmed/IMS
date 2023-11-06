@@ -1,0 +1,58 @@
+﻿@model IMS.Models.ViewModel.ProductShortageViewModel
+@{
+    ViewBag.Title = "ProductShortage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row pt-2 pb-4 mb-4">
+    <div class="col-md-6">
+        <h4 class="text-uppercase">Product Shortage List</h4>
+    </div>
+    <div class="col-md-6 text-end">
+        @if (User.IsInRole("Manager"))
+        {
+            <a href="@Url.Action("Index", "ManagerHome", new {area="Manager"})" class="btn btn-success"><i class="fa-solid fa-right-from-bracket"></i>&nbsp; Back to Dashboard </a>
+        }
+        else if (User.IsInRole("Admin"))
+        {
+            <a href="@Url.Action("Index", "Home", new {area="Admin"})" class="btn btn-success"><i class="fa-solid fa-right-from-bracket"></i>&nbsp; Back to Dashboard </a>
+        }
+    </div>
+</div>
+<table class="table table-striped table-hover" id="shortageProduct">
+    <thead>
+        <tr>
+            <th>Product Id</th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Shortage Count</th>
+            <th>Order Now</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ int i = 0;}
+        @foreach (var item in Model.products)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td><img src="@Url.Content("~/Images/" + item.Image)" width="40" alt="img" /></td>
+                <td>@item.Name</td>
+                <td>@Model.ShortageCounts.ElementAt(i)</td>
+                @Model.ProductIds.ElementAt(i)
+                <td>
+                    <a href="@Url.Action("ProductDetails", "InventoryShopping", new {area="",ProductId = @Model.ProductIds.ElementAt(i)})" class="btn btn-outline-danger"><i class="fa-solid fa-truck-ramp-box"></i>&nbsp; Buy Now </a>
+                </td>
+
+            </tr>
+            i++;
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#shortageProduct").DataTable();
+        })
+    </script>
+}

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace IMS.Models
 {
@@ -31,6 +32,7 @@ namespace IMS.Models
         public virtual string SKU { get; set; }
 
         [Required]
+        [AllowHtml]
         public virtual string Description { get; set; }
         public virtual int? ProductCode { get; set; }
         public virtual long? CreatedBy { get; set; }
@@ -42,9 +44,11 @@ namespace IMS.Models
         public virtual int? VersionNumber { get; set; }
         public virtual string BusinessId { get; set; }
         [Display(Name = "Select Depertment")]
+        [Required(ErrorMessage = "The Department is required.")]
         public virtual long? DepartmentId { get; set; }
         public virtual Department Department { get; set; }
         [Display(Name = "Select Product Type")]
+        [Required(ErrorMessage = "The ProductType is required.")]
         public virtual long? ProductTypeId { get; set; }
         public virtual ProductType ProductType { get; set; }
     }

@@ -23,6 +23,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         private readonly IEmployeeService _employeeService;
         private readonly ISupplierService _supplierService;
         private readonly IOrderHeaderService _orderHeaderService;
+        private readonly IGarmentsService _garmentsService;
         public ManagerHomeController(ISession session)
         {
             _product = new ProductService { Session = session };
@@ -30,6 +31,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             _employeeService=new EmployeeService { Session = session };
             _supplierService = new SupplierService { Session = session };
             _orderHeaderService = new OrderHeaderService { Session = session };
+            _garmentsService=new GarmentsService { Session = session };
         }
         // GET: Manager/ManagerHome
         [Authorize(Roles = "Manager")]
@@ -424,6 +426,30 @@ namespace IMS.Web.Areas.Manager.Controllers
             }
 
             return View(orderHeader);
+        }
+        #endregion
+
+        #region Product Shortage
+        [Authorize(Roles = "Manager,Admin")]
+        public ActionResult ProductShortage()
+        {
+            var products = _product.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded==true).ToList();
+            List<int>shortage= new List<int>();
+            List<long>productIds= new List<long>();
+            foreach(var product in products)
+            {
+                int count = 0 - product.Quantity;
+                long prodId = _garmentsService.GetGarmentsProductByProductCode(product.ProductCode).Id;
+                productIds.Add(prodId);
+                shortage.Add(count);
+            }
+            ProductShortageViewModel productShortageViewModel = new ProductShortageViewModel
+            {
+                products = products,
+                ShortageCounts = shortage,
+                ProductIds = productIds,
+            };
+            return View(productShortageViewModel);
         }
         #endregion
     }

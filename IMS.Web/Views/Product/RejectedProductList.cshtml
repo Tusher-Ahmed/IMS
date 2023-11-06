@@ -1,18 +1,18 @@
 ﻿@model IEnumerable<IMS.Models.Product>
 @{
-    ViewBag.Title = "ApproveProduct";
+    ViewBag.Title = "RejectedProductList";
 }
+
 
 <div class="row">
     <div class="col-md-6">
-        <h4 class="text-uppercase">Approved Product</h4>
+        <h4 class="text-uppercase">Rejected Product List</h4>
     </div>
     <div class="col-md-6 text-end">
-        <a href="@Url.Action("RejectedProductList", "Product", new {area=""})" class="btn btn-outline-danger"><i class="fa-solid fa-right-from-bracket"></i>&nbsp; Rejected Orders</a>
+        <a href="@Url.Action("ApproveProduct", "StaffHome", new {area="Staff"})" class="btn btn-outline-success"><i class="fa-solid fa-right-from-bracket"></i>&nbsp; Back To List</a>
     </div>
 </div>
-
-<br />
+<br/>
 <table class="table table-striped table-hover" id="approveTable">
     <thead>
         <tr>
@@ -22,7 +22,7 @@
             <th>SKU</th>
             <th>Quantity</th>
             <th>Garments Name</th>
-            <th>Approved By</th>
+            <th>Rejected By</th>
         </tr>
     </thead>
     <tbody>
@@ -36,8 +36,8 @@
                 <td>@item.Name</td>
                 <td>@item.SKU</td>
                 <td>@item.Quantity</td>
-                <td>@item.GarmentsId</td>               
-                <td>@item.ApprovedBy</td>               
+                <td>@item.GarmentsId</td>
+                <td>@item.ApprovedBy</td>
             </tr>
         }
     </tbody>

@@ -18,6 +18,7 @@ namespace IMS.Service
         IEnumerable<GarmentsProduct> GetAllP();
         GarmentsProductViewModel GetAllProduct(int pageNumber);
         GarmentsProduct GetGarmentsProductById(long id);
+        GarmentsProduct GetGarmentsProductByProductCode(int id);
         void CreateGarmentsProduct(GarmentsProduct garmentsProduct);
        
         void UpdateGarmentsProduct(long id, GarmentsProduct garmentsProduct);
@@ -205,8 +206,13 @@ namespace IMS.Service
                 }
             }
         }
+
+
         #endregion
 
-        
+        public GarmentsProduct GetGarmentsProductByProductCode(int id)
+        {
+            return _session.Query<GarmentsProduct>().FirstOrDefault(x=>x.ProductCode == id);
+        }
     }
 }

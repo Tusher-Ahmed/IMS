@@ -239,8 +239,14 @@ namespace IMS.Web.Controllers
 
             foreach (var orderDetail in OrderDetails)
             {
-                var product = _productService.GetProductById(orderDetail.ProductId);
+                var product = _productService.GetProductById(orderDetail.ProductId);                
                 products.Add(product);
+            }
+            foreach(var orderDetail in OrderDetails)
+            {
+                var prod= _productService.GetProductById(orderDetail.ProductId);
+                prod.Quantity = prod.Quantity - orderDetail.Count;
+                _productService.UpdateProduct(prod);
             }
             CustomerInvoiceViewModel customerInvoiceViewModel = new CustomerInvoiceViewModel()
             {
