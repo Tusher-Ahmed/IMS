@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace IMS.Models
 {
@@ -19,7 +20,7 @@ namespace IMS.Models
         [Required(ErrorMessage = "Product Image is required.")]
         [Display(Name = "Product Image")]
         public virtual string Image { get; set; }
-        [Required(ErrorMessage = "Product Image is required.")]
+        [Required(ErrorMessage = "Product Price is required.")]
         public virtual decimal Price { get; set; }
         [Required(ErrorMessage = "Stock Keeping Unit is required")]
         public virtual string SKU { get; set; }
@@ -27,6 +28,7 @@ namespace IMS.Models
         [Display(Name="Product Quantity")]
         public virtual int Quantity { get; set; }
         [Required]
+        [AllowHtml]
         public virtual string Description { get; set; }
         public virtual int ProductCode { get; set; }
         public virtual long OrderHistoryId { get; set; }

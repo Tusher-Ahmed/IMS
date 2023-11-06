@@ -11,7 +11,7 @@
     {
         <div class="col-md-3 mt-2 mb-2">
             <div class="card" style="width: 16rem;">
-                <img src="@Url.Content("~/Images/" + product.Image)" height="200" class="card-img-top" alt="Product Image">
+                <img src="@Url.Content("~/Images/" + product.Image)" height="250" class="card-img-top" alt="Product Image">
                 <div class="card-body">
                     <p class="card-title text-uppercase" style="font-weight:bold;font-size:15px;">@product.Name</p>
                     <p class="card-text" style="font-size:12px;">Sizes: @product.SKU</p>
@@ -23,16 +23,22 @@
     }
 
 </div>
-<div>
-    Page @Model.PageNumber of @Math.Ceiling((double)Model.TotalCount / Model.PageSize)
 
-    @if (Model.PageNumber > 1)
-    {
-        @Html.ActionLink("Previous", "Index", new { page = Model.PageNumber - 1, /* other filters */ })
-    }
+<div class=" row pt-5 mt-5 ">
+    <div class="col-md-6">
+        Page @Model.PageNumber of @Math.Ceiling((double)Model.TotalCount / Model.PageSize)
+    </div>
 
-    @if (Model.PageNumber < Math.Ceiling((double)Model.TotalCount / Model.PageSize))
-    {
-        @Html.ActionLink("Next", "Index", new { page = Model.PageNumber + 1, /* other filters */ })
-    }
+    <div class="text-end col-md-6">
+        @if (Model.PageNumber > 1)
+        {
+            <a href="@Url.Action("Index", new { pageNumber = Model.PageNumber - 1 })" class="btn btn-primary">Previous</a>
+        }
+        <span class="btn btn-light">@Model.PageNumber</span>
+        @if (Model.PageNumber < Math.Ceiling((double)Model.TotalCount / Model.PageSize))
+        {
+            <a href="@Url.Action("Index", new { pageNumber = Model.PageNumber + 1 })" class="btn btn-primary">Next</a>
+        }
+    </div>
+
 </div>

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<IMS.Models.Product>
+﻿@model IMS.Models.ViewModel.StaffDashboardViewModel
 @{
     ViewBag.Title = "ApproveProduct";
 }
@@ -26,7 +26,10 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @{ 
+            int i = 0;
+        }
+        @foreach (var item in Model.Products)
         {
             <tr>
                 <td>@item.OrderHistoryId</td>
@@ -36,9 +39,10 @@
                 <td>@item.Name</td>
                 <td>@item.SKU</td>
                 <td>@item.Quantity</td>
-                <td>@item.GarmentsId</td>               
-                <td>@item.ApprovedBy</td>               
+                <td>@Model.SuppliersName.ElementAt(i)</td>
+                <td>@item.ApprovedBy</td>
             </tr>
+            i++;
         }
     </tbody>
 </table>

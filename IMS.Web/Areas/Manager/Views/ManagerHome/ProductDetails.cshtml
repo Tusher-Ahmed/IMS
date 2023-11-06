@@ -25,7 +25,7 @@
                 <p><span style="font-weight:bold">Department:</span> @item.GarmentsProduct.Department.Name</p>
                 <p><span style="font-weight:bold">Product Type:</span> @item.GarmentsProduct.ProductType.Name</p>
                 <br />
-                <p style="text-align:justify"><span style="font-weight:bold">Product Description:</span><br />@item.GarmentsProduct.Description</p>
+                <p style="text-align:justify"><span style="font-weight:bold">Product Description:</span><br />@Html.Raw(item.GarmentsProduct.Description)</p>
             </div>
         </div>
         <hr />

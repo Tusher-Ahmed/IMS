@@ -1,4 +1,5 @@
-﻿using IMS.Models.ViewModel;
+﻿using IMS.Models;
+using IMS.Models.ViewModel;
 using IMS.Service;
 using NHibernate;
 using System;
@@ -38,7 +39,20 @@ namespace IMS.Web.Areas.Staff.Controllers
        public ActionResult ApprovedProducts()
         {
             var prod = _product.GetAllProduct().Where(u => u.Approved == true).ToList();
-            return View(prod);
+            List<string> suppliersName = new List<string>();
+
+            foreach(var item in prod)
+            {
+                string sup = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                suppliersName.Add(sup);
+            }
+            StaffDashboardViewModel staffDashboardViewModel = new StaffDashboardViewModel
+            {
+                Products = prod,
+                SuppliersName= suppliersName
+            };
+            
+            return View(staffDashboardViewModel);
         }
     }
 }

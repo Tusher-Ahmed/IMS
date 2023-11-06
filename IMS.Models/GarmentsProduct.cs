@@ -31,7 +31,7 @@ namespace IMS.Models
         [Required(ErrorMessage = "SKU is required")]
         public virtual string SKU { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Product Description is required.")]
         [AllowHtml]
         public virtual string Description { get; set; }
         public virtual int? ProductCode { get; set; }

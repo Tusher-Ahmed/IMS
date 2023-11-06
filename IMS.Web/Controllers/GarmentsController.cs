@@ -58,9 +58,28 @@ namespace IMS.Web.Controllers
 
                 // Set the model.Description to the processed description
                 model.Description = processedDescription;
-
-                // Set the primary image URL
+                if (string.IsNullOrEmpty(model.Description))
+                {
+                    ModelState.AddModelError("Description", "Product Description Is Required.");
+                    var dept = _departmentService.GetAllDept();
+                    var prodType = _productTypeService.GetAllType();
+                    ViewBag.Departments = new SelectList(dept, "Id", "Name");
+                    ViewBag.ProductTypes = new SelectList(prodType, "Id", "Name");
+                    return View(model);
+                }
                 model.Image = primaryImageUrl;
+                
+                // Set the primary image URL
+                
+                if (string.IsNullOrEmpty(model.Image))
+                {
+                    ModelState.AddModelError("Image", "Image Is Required.");
+                    var dept = _departmentService.GetAllDept();
+                    var prodType = _productTypeService.GetAllType();
+                    ViewBag.Departments = new SelectList(dept, "Id", "Name");
+                    ViewBag.ProductTypes = new SelectList(prodType, "Id", "Name");
+                    return View(model);
+                }
 
                 // Set other product-related properties
                 model.ProductType = _productTypeService.GetProductTypeById((long)model.ProductTypeId);
@@ -93,7 +112,14 @@ namespace IMS.Web.Controllers
 
                 if (dataUri.StartsWith("data:image/"))
                 {
-  
+                    byte[] imageBytes = Convert.FromBase64String(dataUri.Split(',')[1]);
+
+                    // Check the image size here
+                    if (imageBytes.Length > 5 * 1024 * 1024) 
+                    {                       
+                        ModelState.AddModelError("Image", "Image size cannot exceed 5 MB.");
+                        return (description, null);
+                    }
                     string imageUrl = SaveDataUriAsImage(dataUri);
 
                     // Remove the embedded image from the description
