@@ -14,7 +14,7 @@ namespace IMS.Models.ViewModel
         public int NewArrival {  get; set; }
         public int Processing {  get; set; }
         public int TotalCancel {  get; set; }
-        public int TotalStaff {  get; set; }
+        public int TotalShortage {  get; set; }
         public int NewOrder { get; set; }
         
     }

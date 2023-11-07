@@ -1,6 +1,7 @@
 ﻿@model IMS.Models.ViewModel.StaffDashboardViewModel
 @{
     ViewBag.Title = "ApproveProduct";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="row">
@@ -29,18 +30,18 @@
         @{ 
             int i = 0;
         }
-        @foreach (var item in Model.Products)
+        @foreach (var item in Model.GarmentsProducts)
         {
-            <tr>
-                <td>@item.OrderHistoryId</td>
+            <tr> 
+                <td>@Model.OrderIds[Model.Products.ElementAt(i).OrderHistoryId]</td>
                 <td>
                     <img src="@Url.Content("~/Images/" + item.Image)" width="30" class="rounded" alt="Product Image">
                 </td>
                 <td>@item.Name</td>
                 <td>@item.SKU</td>
-                <td>@item.Quantity</td>
+                <td>@Model.Quantity[Model.Products.ElementAt(i).OrderHistoryId]</td>
                 <td>@Model.SuppliersName.ElementAt(i)</td>
-                <td>@item.ApprovedBy</td>
+                <td>@Model.Products.ElementAt(i).ApprovedBy</td>
             </tr>
             i++;
         }

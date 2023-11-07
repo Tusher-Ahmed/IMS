@@ -258,6 +258,27 @@ namespace IMS.Web.Controllers
             
         }
         #endregion
+        #region Invoice for customer
+        public ActionResult InvoiceForCustomer(long id)
+        {
+            OrderHeader orderheader = _orderHeaderService.GetOrderHeaderById(id);
+            var OrderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeaderId == id);
+            List<IMS.Models.Product> products = new List<IMS.Models.Product>();
+
+            foreach (var orderDetail in OrderDetails)
+            {
+                var product = _productService.GetProductById(orderDetail.ProductId);
+                products.Add(product);
+            }
+            CustomerInvoiceViewModel customerInvoiceViewModel = new CustomerInvoiceViewModel()
+            {
+                OrderHeader = orderheader,
+                OrderDetails = OrderDetails,
+                Products = products
+            };
+            return View(customerInvoiceViewModel);
+        }
+        #endregion
 
         #region Cart's basic operations
 

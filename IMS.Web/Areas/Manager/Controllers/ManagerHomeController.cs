@@ -17,7 +17,7 @@ using System.Web.WebPages;
 
 namespace IMS.Web.Areas.Manager.Controllers
 {
-    
+
     public class ManagerHomeController : Controller
     {
         private readonly IProductService _product;
@@ -30,10 +30,10 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             _product = new ProductService { Session = session };
             _inventoryOrderHistoryService = new InventoryOrderHistoryService { Session = session };
-            _employeeService=new EmployeeService { Session = session };
+            _employeeService = new EmployeeService { Session = session };
             _supplierService = new SupplierService { Session = session };
             _orderHeaderService = new OrderHeaderService { Session = session };
-            _garmentsService=new GarmentsService { Session = session };
+            _garmentsService = new GarmentsService { Session = session };
         }
         // GET: Manager/ManagerHome
         [Authorize(Roles = "Manager")]
@@ -42,14 +42,14 @@ namespace IMS.Web.Areas.Manager.Controllers
             ManagerDashboardViewModel managerDashboardView = new ManagerDashboardViewModel
             {
                 TotalProducts = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true).Count(),
-                TotalStaff = GetAllStaff(),
-                NewArrival= _product.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).Count(),
-                OrderHeaders=_orderHeaderService.GetAllOrderHeaders().OrderByDescending(u=>u.Id).Take(5).ToList(),
-                NewOrder= _orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus=="Approved").Count(),
-                Processing= _orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus=="InProcess").Count(),
-                TotalCancel= _orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus=="Cancelled").Count(),
+                TotalShortage = _product.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded == true).Count(),
+                NewArrival = _product.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).Count(),
+                OrderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).ToList(),
+                NewOrder = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Approved").Count(),
+                Processing = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "InProcess").Count(),
+                TotalCancel = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Cancelled").Count(),
             };
-            
+
             return View(managerDashboardView);
         }
         [Authorize(Roles = "Manager")]
@@ -255,7 +255,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             var context = new ApplicationDbContext();
             var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
             var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-            string roleNames ="Staff";
+            string roleNames = "Staff";
             var roleIds = roleManager.Roles
                 .Where(r => roleNames.Contains(r.Name))
                 .Select(r => r.Id)
@@ -318,7 +318,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         }
         #endregion
 
-        #region Inventory Order
+        #region Inventory Order History
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult InventoryOrder()
         {
@@ -327,18 +327,18 @@ namespace IMS.Web.Areas.Manager.Controllers
             return View();
         }
         [Authorize(Roles = "Manager,Admin")]
-        public ActionResult InventoryOrderDataTable(int draw, int start, int length, DateTime? startDate,DateTime? finalDate,string search)
+        public ActionResult InventoryOrderDataTable(int draw, int start, int length, DateTime? startDate, DateTime? finalDate, string search)
         {
             int recordsTotal = 0;
             int recordsFiltered = 0;
             var data = new List<object>();
-            var history = _inventoryOrderHistoryService.GetAll()                   
+            var history = _inventoryOrderHistoryService.GetAll()
                    .GroupBy(u => u.OrderId)
                    .Select(u => u.First())
                    .ToList();
             if (startDate != null && finalDate != null)
             {
-                history = history.Where(x => x.CreationDate >= startDate && x.CreationDate <= finalDate).ToList();
+                history = history.Where(x => x.CreationDate >= startDate && x.CreationDate <= finalDate.Value.AddDays(1)).ToList();
             }
             if (startDate != null)
             {
@@ -347,7 +347,7 @@ namespace IMS.Web.Areas.Manager.Controllers
 
             if (finalDate != null)
             {
-                history = history.Where(x => x.CreationDate <= finalDate).ToList();
+                history = history.Where(x => x.CreationDate <= finalDate.Value.AddDays(1)).ToList();
             }
             if (!string.IsNullOrEmpty(search))
             {
@@ -356,9 +356,9 @@ namespace IMS.Web.Areas.Manager.Controllers
             recordsTotal = history.Count;
             recordsFiltered = recordsTotal;
 
-            history = history.OrderByDescending(u=>u.OrderId).Skip(start).Take(length).ToList();
+            history = history.OrderByDescending(u => u.OrderId).Skip(start).Take(length).ToList();
 
-           
+
 
             foreach (var item in history)
             {
@@ -372,8 +372,8 @@ namespace IMS.Web.Areas.Manager.Controllers
                     $"{item.CreatedBy}",
                     $"{item.CreationDate.ToString().AsDateTime().ToShortDateString()}",
                     $"{item.TotalPrice.ToString("C")}",
-                    $@"<a href=""{invoiceUrl}"" class=""btn btn-outline-warning"">
-                        <i class=""fa-regular fa-lightbulb""></i>
+                    $@"<a href=""{invoiceUrl}"" class=""btn btn-outline-dark"">
+                        <i class=""fa-solid fa-receipt""></i>
                     </a>
                     <a href=""{productDetailsUrl}"" class=""btn btn-outline-success"">
                         <i class=""fas fa-info-circle""></i>
@@ -384,9 +384,9 @@ namespace IMS.Web.Areas.Manager.Controllers
             }
 
 
-            return Json(new {draw, recordsTotal, recordsFiltered, start, length, data});
+            return Json(new { draw, recordsTotal, recordsFiltered, start, length, data });
         }
-        
+
         private string GetGarmentsNameByHistoryId(long garmentsId)
         {
             return _supplierService.GetSupplierByUserId(garmentsId)?.Name;
@@ -457,7 +457,7 @@ namespace IMS.Web.Areas.Manager.Controllers
 
         #region Selling Report
         [Authorize(Roles = "Manager,Admin")]
-        public ActionResult SellingReport(DateTime? startDate, DateTime? endDate,string searchText)
+        public ActionResult SellingReport(DateTime? startDate, DateTime? endDate, string searchText)
         {
             var orderHeader = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == ShoppingHelper.StatusShipped);
             if (string.IsNullOrEmpty(searchText))
@@ -471,20 +471,22 @@ namespace IMS.Web.Areas.Manager.Controllers
                         (u.ShippingDate >= startDate && u.ShippingDate <= endDate));
                 }
             }
-              
-            else if(startDate.HasValue && endDate.HasValue)
+
+            if (startDate.HasValue && endDate.HasValue)
             {
                 orderHeader = orderHeader.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped &&
-                    (u.ShippingDate >= startDate && u.ShippingDate <= endDate));
-            }else if(startDate.HasValue && !endDate.HasValue)
+                    (u.ShippingDate >= startDate && u.ShippingDate <= endDate.Value.AddDays(1)));
+            }
+            if (startDate.HasValue && !endDate.HasValue)
             {
                 orderHeader = orderHeader.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped &&
                     (u.ShippingDate >= startDate));
             }
-            else if (!startDate.HasValue && endDate.HasValue)
+
+            if (!startDate.HasValue && endDate.HasValue)
             {
                 orderHeader = orderHeader.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped &&
-                    (u.ShippingDate <= endDate));
+                    (u.ShippingDate <= endDate.Value.AddDays(1)));
             }
             if (!string.IsNullOrEmpty(searchText))
             {
@@ -495,14 +497,61 @@ namespace IMS.Web.Areas.Manager.Controllers
         }
         #endregion
 
+        #region Buying Report
+        [Authorize(Roles = "Manager,Admin")]
+        public ActionResult BuyingReport(DateTime? startDate, DateTime? endDate, string searchText)
+        {
+            var history = _inventoryOrderHistoryService.GetAll().GroupBy(u => u.OrderId).Select(u => u.First()).ToList();
+            if (string.IsNullOrEmpty(searchText))
+            {
+                if (!startDate.HasValue && !endDate.HasValue)
+                {
+                    // If no dates provided, set default date range to the last 7 days
+                    endDate = DateTime.Now;
+                    startDate = endDate.Value.AddDays(-7);
+                    history = history.Where(x => x.CreationDate >= startDate && x.CreationDate <= endDate).ToList();
+                }
+            }
+            if (startDate != null && endDate != null)
+            {
+                history = history.Where(x => x.CreationDate >= startDate && x.CreationDate <= endDate.Value.AddDays(1)).ToList();
+            }
+            if (startDate != null)
+            {
+                history = history.Where(x => x.CreationDate >= startDate).ToList();
+            }
+
+            if (endDate != null)
+            {
+                history = history.Where(x => x.CreationDate <= endDate.Value.AddDays(1)).ToList();
+            }
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                history = history.Where(x => x.OrderId.ToString().Contains(searchText) || GetGarmentsNameByHistoryId(x.GarmentsId).Contains(searchText)).ToList();
+            }
+            Dictionary<long,string> GName = new Dictionary<long, string>();
+            foreach(var item in history)
+            {
+                var GarmentsName = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                GName.Add(item.Id, GarmentsName);
+            }
+            BuyingReportViewModel viewModel = new BuyingReportViewModel
+            {
+                History = history,
+                GarmentsNames = GName,
+            };
+            return View(viewModel);
+        }
+        #endregion
+
         #region Product Shortage
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult ProductShortage()
         {
-            var products = _product.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded==true).ToList();
-            List<int>shortage= new List<int>();
-            List<long>productIds= new List<long>();
-            foreach(var product in products)
+            var products = _product.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded == true).ToList();
+            List<int> shortage = new List<int>();
+            List<long> productIds = new List<long>();
+            foreach (var product in products)
             {
                 int count = 0 - product.Quantity;
                 long prodId = _garmentsService.GetGarmentsProductByProductCode(product.ProductCode).Id;

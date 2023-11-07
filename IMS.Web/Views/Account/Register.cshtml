@@ -52,15 +52,18 @@
         @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control", placeholder = "Postal code" })
     </div>
 </div>
-        
-        <div class="row">
-            <div class="text-center p-2">
-                <input type="submit" value="CREATE YOUR ACCOUNT" class="btn btn-success" style="width:100%"/>
-                <div class="d-block pt-4">
-                    <span class="pt-4">Already Registered?</span>
-                    @Html.ActionLink("Login", "Login", "Account", new { @class = "btn pt-1 text-primary" })
-                </div>
+<div class="row">
+    <div class="text-center p-2">
+        <input type="submit" value="CREATE ACCOUNT" class="btn btn-success" style="width:100%" />
+        @if (User.IsInRole("Admin") == false)
+        {
+            <div class="d-block pt-4">
+                <span class="pt-4 mt-1">Already Registered?</span>
+                @Html.ActionLink("Login", "Login", "Account", new { @class = "btn pt-1 text-primary" })
             </div>
+        }
+
+    </div>
         </div>
     }
 </main>

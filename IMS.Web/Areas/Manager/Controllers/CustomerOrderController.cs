@@ -125,7 +125,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
         }
 
-        [Authorize(Roles = "Manager,Admin")]
+        [Authorize(Roles = "Manager,Admin,Customer")]
         [HttpPost]
         public ActionResult CancelOrder(CustomerInvoiceViewModel customerInvoiceViewModel)
         {
@@ -140,6 +140,13 @@ namespace IMS.Web.Areas.Manager.Controllers
                 var service = new RefundService();
                 Refund refund = service.Create(options);
                 _orderHeaderService.UpdateStatus(orderHeader.Id, ShoppingHelper.StatusCancelled, ShoppingHelper.StatusRefunded);
+                var orderDetails=_orderDetailService.getAllOrderDetails().Where(u=>u.OrderHeader.Id==orderHeader.Id).ToList();
+                foreach (var item in orderDetails)
+                {
+                    var prod=_product.GetProductById(item.Product.Id);
+                    prod.Quantity = prod.Quantity + item.Count;
+                    _product.UpdateProduct(prod);
+                }
             }
             else
             {

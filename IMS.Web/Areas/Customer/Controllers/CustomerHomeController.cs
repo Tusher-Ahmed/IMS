@@ -41,7 +41,7 @@ namespace IMS.Web.Areas.Customer.Controllers
                 //OrderDetails=_orderDetailService.getAllOrderDetails().
             CustomerDashboardViewModel viewModel = new CustomerDashboardViewModel
             {
-              OrderHeaders=orderHeaders.Take(5),
+              OrderHeaders=orderHeaders,
               OrderDetails=orders,
               TotalOrders=orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped).Count(),
               NewArrival=orderHeaders.Where(u=>u.OrderStatus!=ShoppingHelper.StatusShipped &&

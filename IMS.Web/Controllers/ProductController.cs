@@ -291,14 +291,14 @@ namespace IMS.Web.Controllers
                     existingProduct.Price = product.Price;
                     existingProduct.Name = product.Name;
                     existingProduct.Description = processedDescription;
-                    existingProduct.Image = primaryImageUrl;
+                    
                     if (!string.IsNullOrEmpty(primaryImageUrl))
                     {
                         existingProduct.Image = primaryImageUrl;
                     }
                     else
                     {
-                        existingProduct.Image = prod.Image;
+                        existingProduct.Image = existingProduct.Image;
                     }
                     existingProduct.IsPriceAdded = true;
                     existingProduct.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());//ManagerId

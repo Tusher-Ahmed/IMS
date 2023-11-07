@@ -387,6 +387,7 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Images\dashboard.png" />
     <Content Include="Images\login.png" />
     <Content Include="Images\sort_asc.png" />
     <Content Include="Images\sort_asc_disabled.png" />
@@ -451,6 +452,7 @@
     <Content Include="Areas\Admin\Views\Home\DeactivatedCustomerList.cshtml" />
     <Content Include="Areas\Manager\Views\ManagerHome\SellingReport.cshtml" />
     <Content Include="Areas\Manager\Views\ManagerHome\ProductShortage.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\BuyingReport.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -535,6 +537,7 @@
     <Content Include="Views\CustomerShopping\Summary.cshtml" />
     <Content Include="Views\CustomerShopping\OrderConfirmation.cshtml" />
     <Content Include="Views\Product\RejectedProductList.cshtml" />
+    <Content Include="Views\CustomerShopping\InvoiceForCustomer.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
