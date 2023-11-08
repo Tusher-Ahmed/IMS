@@ -74,8 +74,8 @@ namespace IMS.Web.Areas.Admin.Controllers
                 TotalProduct = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true).Count(),
                 TotalEmployee = GetEmployeeWithRoles(),
                 TotalShop = GetShopsWithRoles(),
-                orderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).Take(5).ToList(),
-                TotalOrders =_orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus==ShoppingHelper.StatusShipped).Count(),
+                orderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).ToList(),
+                TotalOrders =_orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus==ShoppingHelper.StatusShipped || u.OrderStatus == ShoppingHelper.StatusDelivered).Count(),
                 TotalNewOrders= _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus != ShoppingHelper.StatusCancelled &&
                     u.OrderStatus != ShoppingHelper.StatusRefunded && u.OrderStatus != ShoppingHelper.StatusShipped).Count(),
                 TotalCancelOrder= _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled).Count()

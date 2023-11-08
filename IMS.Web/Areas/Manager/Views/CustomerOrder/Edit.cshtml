@@ -223,11 +223,11 @@
                             </h4>
                             @if (Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
                             {
-                                <label class="btn btn-outline-dark form-control my-2" >Order Status - @Model.OrderHeader.OrderStatus</label>
+                                <label class="btn btn-outline-dark form-control my-2">Order Status - @Model.OrderHeader.OrderStatus</label>
                             }
                             else
                             {
-                                <label class="btn btn-danger form-control my-2" >Order Status - @Model.OrderHeader.OrderStatus</label>
+                                <label class="btn btn-danger form-control my-2">Order Status - @Model.OrderHeader.OrderStatus</label>
                             }
 
                             <ul class="list-group mb-3">
@@ -273,7 +273,10 @@
                                     <input type="submit" class="btn btn-primary form-control my-1 text-uppercase" value="Ship Order" formaction="@Url.Action("ShipOrder", "CustomerOrder", new { area = "Manager" })" onclick="return validateCarrierNumber();" />
                                 }
                             }
-
+                            @if (@Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(3) <= DateTime.Now && (User.IsInRole("Admin") || User.IsInRole("Manager")) && Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
+                            {
+                                <input type="submit" class="btn btn-dark form-control my-1 text-uppercase" value="Delivered Order" formaction="@Url.Action("DeliveredOrder", "CustomerOrder", new { area = "Manager" })"  />
+                            }
                             @if (Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusRefunded &&
                                 Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
                             {
@@ -282,13 +285,13 @@
                                 {
                                     <input type="submit" class="btn btn-danger form-control my-1 text-uppercase" formaction="@Url.Action("CancelOrder", "CustomerOrder", new { area = "Manager" })" value="Cancel Order" />
                                 }
-                                else if ((Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(3) < DateTime.Now && Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(10) > DateTime.Now) && User.IsInRole("Customer") && Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
+                                else if ((Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(3) < DateTime.Now &&
+                                    Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(10) > DateTime.Now) && User.IsInRole("Customer") &&
+                                    Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled && Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusDelivered)
                                 {
                                     <input type="submit" class="btn btn-danger form-control my-1 text-uppercase" formaction="@Url.Action("CancelOrder", "CustomerOrder", new { area = "Manager" })" value="Return Order" />
                                 }
-
                             }
-
                         </div>
                     </div>
                 </div>
@@ -302,7 +305,7 @@
 
             var carrierField = document.getElementById("carrier");
             if (carrierField.value.trim() === "") {
-                alert("Carrier Number is required.");
+                alert("Carrier Name is required.");
                 return false; // Prevent form submission
             }
 

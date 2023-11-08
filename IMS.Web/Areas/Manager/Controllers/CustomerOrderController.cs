@@ -43,6 +43,10 @@ namespace IMS.Web.Areas.Manager.Controllers
             {
                 return View(orderHeader.Where(u => u.OrderStatus == "InProcess"));
             }
+            else if (status == "Delivered")
+            {
+                return View(orderHeader.Where(u => u.OrderStatus == "Delivered"));
+            }
             else if (status == "Cancelled")
             {
                 return View(orderHeader.Where(u => u.OrderStatus == "Cancelled"));
@@ -124,7 +128,13 @@ namespace IMS.Web.Areas.Manager.Controllers
             _orderHeaderService.Update(orderHeader);
             return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
         }
-
+        [Authorize(Roles = "Manager,Admin")]
+        [HttpPost]
+        public ActionResult DeliveredOrder(CustomerInvoiceViewModel customerInvoiceViewModel)
+        {
+            _orderHeaderService.UpdateStatus(customerInvoiceViewModel.OrderHeader.Id, ShoppingHelper.StatusDelivered, customerInvoiceViewModel.OrderHeader.PaymentStatus);
+            return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
+        }
         [Authorize(Roles = "Manager,Admin,Customer")]
         [HttpPost]
         public ActionResult CancelOrder(CustomerInvoiceViewModel customerInvoiceViewModel)

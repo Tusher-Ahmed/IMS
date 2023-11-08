@@ -6,7 +6,7 @@
 
 <div class="container-fluid p-0">
     <div class="row">
-        <div class="col-md-3 bg-dark text-dark pt-4" style="height:700px">
+        <div class="col-md-3 bg-dark text-dark pt-4" style="height:750px">
             <h5 class="pb-2 p-2 mb-5 text-white"><i class="fa-solid fa-user-tie"></i>&nbsp; @User.Identity.Name</h5>
             <a href="@Url.Action("Index","Home")" class="btn btn-dark mb-2  w-100 text-start"><i class="fa-solid fa-box"></i>&nbsp; Dashboard</a>
             <a href="@Url.Action("Employees","Home")" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-users"></i>&nbsp; Employee</a>
@@ -15,8 +15,8 @@
             <a href="@Url.Action("Index", "ProductType", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-shirt"></i>&nbsp; Manage Product Type</a>
             <a href="@Url.Action("InventoryOrder", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-cart-flatbed-suitcase"></i>&nbsp; Inventory Order History</a>
             <a href="@Url.Action("ProductShortage", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-arrow-down-wide-short"></i>&nbsp; Product Shortage</a>
-            <a href="@Url.Action("SellingReport", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-book-open"></i>&nbsp; Selling Report</a>
-            <a href="@Url.Action("BuyingReport", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-bag-shopping"></i>&nbsp; Buying Report</a>
+            <a href="@Url.Action("SellingReport", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-chart-line"></i>&nbsp; Selling Report</a>
+            <a href="@Url.Action("BuyingReport", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-chart-column"></i>&nbsp; Buying Report</a>
             <a href="@Url.Action("Index", "Manage", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-gear"></i>&nbsp; Setting</a>
         </div>
         <div class="col-md-9" id="result-container">
@@ -52,7 +52,7 @@
                 </div>
                 <br />
                 <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a  href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Shipped"})" id="totalProduct" style="text-decoration:none;">
+                    <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Shipped"})" id="totalProduct" style="text-decoration:none;">
                         <div class="box bg-secondary text-center text-light p-3">
                             <i class="fa-solid fa-bag-shopping font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalOrders</h5>
@@ -62,7 +62,7 @@
                 </div>
                 <br />
                 <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a  href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="All"})" id="totalProduct" style="text-decoration:none;">
+                    <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="All"})" id="totalProduct" style="text-decoration:none;">
                         <div class="box bg-info text-center text-light p-3">
                             <i class="fa-solid fa-table font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalNewOrders</h5>
@@ -72,7 +72,7 @@
                 </div>
                 <br />
                 <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a  href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Cancelled"})" id="totalProduct" style="text-decoration:none;">
+                    <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Cancelled"})" id="totalProduct" style="text-decoration:none;">
                         <div class="box bg-danger text-center text-light p-3">
                             <i class="fa-solid fa-circle-left font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalCancelOrder</h5>
@@ -105,7 +105,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in Model.orderHeaders)
+                                    @foreach (var item in Model.orderHeaders.Take(5))
                                     {
                                         <tr>
                                             <td>
@@ -124,6 +124,10 @@
                                                     <span class="badge bg-warning text-dark">@item.OrderStatus</span>
                                                 }
                                                 else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
+                                                {
+                                                    <span class="badge bg-secondary">@item.OrderStatus</span>
+                                                }
+                                                else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusDelivered)
                                                 {
                                                     <span class="badge bg-success">@item.OrderStatus</span>
                                                 }
@@ -160,6 +164,12 @@
                                                 }
                                                 else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
                                                 {
+                                                    <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id,area="Manager" })" class="btn btn-outline-secondary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                }
+                                                else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusDelivered)
+                                                {
                                                     <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id,area="Manager" })" class="btn btn-outline-success">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
@@ -179,11 +189,12 @@
 
                                 </tbody>
                             </table>
-                            @if (Model.orderHeaders.Count() > 5)
-                            {
-                                @Html.ActionLink("Show More", "Index", "CustomerOrder", new { area = "Manager" }, new { @class = "btn btn-outline-success" })
-                            }
-
+                            <div class="text-end p-2">
+                                @if (Model.orderHeaders.Count() > 5)
+                                {
+                                    @Html.ActionLink("Show More", "Index", "CustomerOrder", new { area = "Manager" }, new { @class = "btn btn-outline-success" })
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>

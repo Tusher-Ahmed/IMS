@@ -18,6 +18,7 @@ using System.Web.Mvc;
 namespace IMS.Web.Controllers
 {
     [Authorize(Roles = "Customer")]
+    [SessionState(System.Web.SessionState.SessionStateBehavior.ReadOnly)]
     public class CustomerShoppingController : Controller
     {
         private readonly ICustomerShoppingService _customerShopping;
@@ -48,8 +49,10 @@ namespace IMS.Web.Controllers
                     ProductId = ProductId,
                     Count = 1,
                 };
+                Session["CartItemCount"] = _customerShopping.GetAllOrders().Where(u => u.CustomerId == Convert.ToInt64(User.Identity.GetUserId())).Count();
                 return View(shoppingCart);
             }
+            
             return RedirectToAction("Index", "Product");
         }
 
@@ -73,6 +76,7 @@ namespace IMS.Web.Controllers
 
                     // Add the inventoryOrder to the shopping cart
                     _customerShopping.AddCutomerShoppingCart(customerOrder);
+                   
                     return RedirectToAction("Index", "Product");
                 }
             }
@@ -83,6 +87,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Shopping Cart
+        
         public ActionResult ShoppingCart()
         {
             long userId = Convert.ToInt64(User.Identity.GetUserId());
@@ -95,7 +100,8 @@ namespace IMS.Web.Controllers
             {
                 shoppingCartViewModel.OrderHeader.OrderTotal += (cart.Product.Price * cart.Count);
             }
-
+            
+           
             return View(shoppingCartViewModel);
         }
         #endregion
@@ -234,7 +240,7 @@ namespace IMS.Web.Controllers
                 _customerShopping.RemoveProduct(cart);
             }
 
-            var OrderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeaderId == id);
+            var OrderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == id);
             List<IMS.Models.Product> products = new List<IMS.Models.Product>();
 
             foreach (var orderDetail in OrderDetails)
@@ -258,11 +264,12 @@ namespace IMS.Web.Controllers
             
         }
         #endregion
+
         #region Invoice for customer
         public ActionResult InvoiceForCustomer(long id)
         {
             OrderHeader orderheader = _orderHeaderService.GetOrderHeaderById(id);
-            var OrderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeaderId == id);
+            var OrderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == id);
             List<IMS.Models.Product> products = new List<IMS.Models.Product>();
 
             foreach (var orderDetail in OrderDetails)

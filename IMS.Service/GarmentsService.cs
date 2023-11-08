@@ -129,6 +129,7 @@ namespace IMS.Service
                     prod.Name = garmentsProduct.Name;
                     prod.SKU = garmentsProduct.SKU;
                     prod.Price = garmentsProduct.Price;
+                    prod.Image = garmentsProduct.Image;
                     prod.Department = garmentsProduct.Department;
                     prod.ProductCode = garmentsProduct.ProductCode;
                     prod.Description = garmentsProduct.Description;

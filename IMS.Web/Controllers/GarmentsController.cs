@@ -192,11 +192,32 @@ namespace IMS.Web.Controllers
         public ActionResult Edit(long id, GarmentsProduct garmentsProduct)
         {
             var product = _garmentsService.GetGarmentsProductById(id);
+            garmentsProduct.Image= product.Image;
+
             if (ModelState.IsValid)
             {
+                var (processedDescription, primaryImageUrl) = ProcessDescription(garmentsProduct.Description);
+                garmentsProduct.Description = processedDescription;
+                if (string.IsNullOrEmpty(garmentsProduct.Description))
+                {
+                    ModelState.AddModelError("Description", "Product Description Is Required.");
+                    var dept = _departmentService.GetAllDept();
+                    var prodType = _productTypeService.GetAllType();
+                    ViewBag.Departments = new SelectList(dept, "Id", "Name");
+                    ViewBag.ProductTypes = new SelectList(prodType, "Id", "Name");
+                    return View(garmentsProduct);
+                }
+                if (string.IsNullOrEmpty(primaryImageUrl))
+                {
+                    garmentsProduct.Image = product.Image;
+                }
+                else
+                {
+                    garmentsProduct.Image = primaryImageUrl;
+                }
                 garmentsProduct.ProductType = _productTypeService.GetProductTypeById((long)garmentsProduct.ProductTypeId);
                 garmentsProduct.Department = _departmentService.GetDeptById((long)garmentsProduct.DepartmentId);
-                garmentsProduct.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                garmentsProduct.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());                
                 _garmentsService.UpdateGarmentsProduct(id, garmentsProduct);
                 return RedirectToAction("ProductList", "Garments");
             }

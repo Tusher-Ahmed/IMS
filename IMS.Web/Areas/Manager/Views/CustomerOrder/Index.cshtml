@@ -10,6 +10,7 @@
     var shipped = "";
     var all = "";
     var approved = "";
+    var delivered = "";
     var cancelled = "";
 
     switch (status)
@@ -22,6 +23,9 @@
             break;
         case "Shipped":
             shipped = "active text-white";
+            break;
+        case "Delivered":
+            delivered = "active text-white";
             break;
         case "Cancelled":
             cancelled = "active text-white";
@@ -44,6 +48,9 @@
         </a>
         <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "Shipped" })" class="btn btn-outline-secondary @shipped rounded-0">
             Shipped
+        </a>
+        <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "Delivered" })" class="btn btn-outline-secondary @delivered rounded-0">
+            Delivered
         </a>
         <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "Cancelled" })" class="btn btn-outline-secondary @cancelled rounded-0">
             Cancelled
@@ -87,6 +94,10 @@
                     }
                     else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
                     {
+                        <span class="badge bg-secondary">@item.OrderStatus</span>
+                    }
+                    else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusDelivered)
+                    {
                         <span class="badge bg-success">@item.OrderStatus</span>
                     }
                     else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
@@ -107,33 +118,10 @@
                 </td>
                 <td>@item.OrderDate.ToString().AsDateTime().ToShortDateString()</td>
                 <td class="text-end">
-                    @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
-                        {
-                            <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-info">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        }
-                        else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusInProces)
-                        {
-                            <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-warning">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        }
-                        else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
-                        {
-                            <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-success">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        }
-                        else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
-                        {
-                            <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-danger">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        }
-                    
-                    
-
+                    <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-success">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                   
                 </td>
             </tr>
         }

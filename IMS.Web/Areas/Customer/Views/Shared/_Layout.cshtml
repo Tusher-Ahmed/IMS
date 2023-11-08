@@ -4,19 +4,61 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - My ASP.NET Application</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="~/Content/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="~/Content/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <script src="https://cdn.tiny.cloud/1/1swkj3t5mmhqf62oqz8va52fwr8uk9n91hn9sldz3rop1jzg/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <link href="~/Content/track.css" rel="stylesheet" />
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
-   
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark p-0" style="height:55px">
+        <div class="container">
+            @Html.ActionLink("IMS", "Index", "Product", new { area = "" }, new { @class = "navbar-brand" })
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
 
+                    <li>@Html.ActionLink("Product", "Index", "Product", new { area = "" }, new { @class = "nav-link" })</li>
+
+                    @if (User.IsInRole("Manager") || User.IsInRole("Admin") || User.IsInRole("Supplier"))
+                    {
+                        <li>@Html.ActionLink("Garments Product", "Index", "Garments", new { area = "" }, new { @class = "nav-link" })</li>
+                    }@if (User.IsInRole("Manager") || User.IsInRole("Admin"))
+                    {
+                        <li>
+                            <a href="@Url.Action("InventoryCart", "InventoryShopping")" class="nav-link">
+                                <i class="fas fa-shopping-cart"></i>
+                            </a>
+                        </li>
+                    }
+                    @if (User.IsInRole("Customer"))
+                    {
+                        <li>
+                            <a href="@Url.Action("ShoppingCart", "CustomerShopping")" class="nav-link">
+                                <i class="fas fa-shopping-cart"></i>
+                            </a>
+                        </li>
+                    }
+
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </nav>
     <div class="container body-content">
         @RenderBody()
-        <hr />
-       
     </div>
 
     @Scripts.Render("~/bundles/jquery")
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
 </body>

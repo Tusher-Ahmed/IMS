@@ -2,7 +2,6 @@
 @{
     ViewBag.Title = "InvoiceForCustomer";
     Layout = "~/Views/Shared/_Layout.cshtml";
-
 }
 
 <a href="@Url.Action("Index", "CustomerHome", new {area="Customer"})" class="dont-show mt-2 btn btn-outline-info">
@@ -70,12 +69,9 @@
                         </h5>
                         <p>@Model.OrderHeader.PaymentStatus</p>
                     </div>
-                    <div class="col-6 pb-2">
-                        <img src="~/Images/happyShopping.jpg" width="200" alt="" />
-                    </div>
 
                     <div class="col-12">
-                        <h5>Clothing Products</h5>
+                        <h5 class="text-uppercase pt-2 pb-1 text-decoration-underline">Clothing Products</h5>
                         <br />
                         <table class="table table-striped">
                             <thead>

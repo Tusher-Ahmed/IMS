@@ -9,57 +9,95 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
-<div class="form-horizontal">
 
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-    @Html.HiddenFor(model => model.Id)
+    <div class="form-horizontal">
 
-    <div class="row">
-        <div class="col-10">
-            <div class="form-group">
-                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-            </div>
-            <br/>
-            <div class="form-group">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
 
-                @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
-            </div>
-            <br />
-            <div class="form-group">
+        <div class="row">
+            <div class="col-10">
+                <div class="form-group">
+                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                </div>
+                <br />
+                <div class="form-group">
 
-                @Html.EditorFor(model => model.SKU, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.SKU, "", new { @class = "text-danger" })
-            </div>
-            <br />
-            <div class="form-group">
-                @Html.DropDownListFor(model => model.DepartmentId, (SelectList)ViewBag.Departments, "Select Department", new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.DepartmentId, "", new { @class = "text-danger" })
-            </div>
-            <br />
+                    @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+                </div>
+                <br />
+                <div class="form-group">
 
-            <div class="form-group">
-                @Html.DropDownListFor(model => model.ProductTypeId, (SelectList)ViewBag.ProductTypes, "Select Product Type", new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.ProductTypeId, "", new { @class = "text-danger" })
-            </div>
-            <br />
-            <div class="form-group">
-                @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4" })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-            </div>
-            <br />
-            <div class="form-group">
-                <div class="col-md-offset-2 col-md-10">
-                    <input type="submit" value="Save Changes" class="btn btn-outline-success" />
-                    @Html.ActionLink("Back to List", "ProductList", null, new {@class="btn btn-outline-info"})
+                    @Html.EditorFor(model => model.SKU, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.SKU, "", new { @class = "text-danger" })
+                </div>
+                <br />
+                <div class="form-group">
+                    @Html.DropDownListFor(model => model.DepartmentId, (SelectList)ViewBag.Departments, "Select Department", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.DepartmentId, "", new { @class = "text-danger" })
+                </div>
+                <br />
+
+                <div class="form-group">
+                    @Html.DropDownListFor(model => model.ProductTypeId, (SelectList)ViewBag.ProductTypes, "Select Product Type", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.ProductTypeId, "", new { @class = "text-danger" })
+                </div>
+                <br />
+                <div class="form-group">
+                    @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
+                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                </div>
+                <br />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save Changes" class="btn btn-outline-success" />
+                        @Html.ActionLink("Back to List", "ProductList", null, new { @class = "btn btn-outline-info" })
+                    </div>
                 </div>
             </div>
+            <div class="col-2">  <img src="@Url.Content("~/Images/" + Model.Image)" alt="Product Image" class="img-fluid" style="box-shadow: 0 5px 10px -5px rgba(0, 0, 0, 0.2) "> </div>
         </div>
-        <div class="col-2">  <img src="@Url.Content("~/Images/" + Model.Image)" alt="Product Image" class="img-fluid"  style="box-shadow: 0 5px 10px -5px rgba(0, 0, 0, 0.2) "> </div>
+
     </div>
-   
-</div>
 }
 
+@section Scripts{
+    <script>tinymce.init({
+            selector: 'textarea#tiny',
+            plugins: 'ai mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            image_title: true,
+            automatic_uploads: true,
+
+            file_picker_types: 'image',
+
+            file_picker_callback: function (cb, value, meta) {
+                var input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+
+                input.onchange = function () {
+                  var file = this.files[0];
+
+                  var reader = new FileReader();
+                  reader.onload = function () {
+                    var id = 'blobid' + (new Date()).getTime();
+                    var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
+                    var base64 = reader.result.split(',')[1];
+                    var blobInfo = blobCache.create(id, file, base64);
+                    blobCache.add(blobInfo);
+
+                    /* call the callback and populate the Title field with the file name */
+                    cb(blobInfo.blobUri(), { title: file.name });
+                  };
+                  reader.readAsDataURL(file);
+                };
+
+                input.click();
+            },
+
+            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
+        });</script>
+}

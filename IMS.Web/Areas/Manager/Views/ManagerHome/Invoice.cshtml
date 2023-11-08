@@ -1,6 +1,8 @@
 ﻿@model IMS.Models.ViewModel.InventoryInvoiceViewModel
 @{
     ViewBag.Title = "Invoice";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
 <a href="@Url.Action("InventoryOrder", "ManagerHome", new {area="Manager"})" class="dont-show mt-2 btn btn-outline-info">
     <i class="fa-solid fa-circle-left"></i>

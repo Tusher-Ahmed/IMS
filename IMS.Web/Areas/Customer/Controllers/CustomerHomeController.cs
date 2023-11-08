@@ -14,17 +14,21 @@ using System.Web.Mvc;
 namespace IMS.Web.Areas.Customer.Controllers
 {
     [Authorize(Roles ="Customer")]
+    [SessionState(System.Web.SessionState.SessionStateBehavior.ReadOnly)]
     public class CustomerHomeController : Controller
     {
         private readonly IOrderHeaderService _orderHeaderService;
         private readonly ICustomerService _customerService;
         private readonly IOrderDetailService _orderDetailService;
-        
+        private readonly ICustomerShoppingService _customerShopping;
+
         public CustomerHomeController(ISession session)
         {
             _orderHeaderService=new OrderHeaderService { Session = session };
             _orderDetailService=new OrderDetailService { Session=session};
             _customerService=new CustomerService { Session=session};
+            _customerShopping=new CustomerShoppingService { Session=session};
+           
         }
         // GET: Customer/CustomerHome
         public ActionResult Index()
@@ -48,6 +52,7 @@ namespace IMS.Web.Areas.Customer.Controllers
                     u.OrderStatus!=ShoppingHelper.StatusCancelled && u.OrderStatus != ShoppingHelper.StatusRefunded).Count(),
               TotalCanceledOrder= orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled).Count()
             };
+            Session["CartItemCount"] = _customerShopping.GetAllOrders().Where(u => u.CustomerId == Convert.ToInt64(User.Identity.GetUserId())).Count();
             return View(viewModel);
         }
 
@@ -66,6 +71,10 @@ namespace IMS.Web.Areas.Customer.Controllers
             else if (status == "InProcess")
             {
                 return View(orderHeader.Where(u => u.OrderStatus == "InProcess"));
+            }
+            else if (status == "Delivered")
+            {
+                return View(orderHeader.Where(u => u.OrderStatus == "Delivered"));
             }
             else if (status == "Cancelled")
             {

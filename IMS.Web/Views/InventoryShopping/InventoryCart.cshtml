@@ -70,9 +70,17 @@
             </div>
             <div class="row">
                 <div class="col-md-2 offset-md-5">
-                    <form method="post" action="@Url.Action("PlaceOrder", "Product")">
-                        <input type="submit" value="Place Order" class="btn btn-success border-0 bg-gradient w-100 py-2" />
-                    </form>
+                    @if (Model.OrderCarts.Count() > 0)
+                    {
+                        <form method="post" action="@Url.Action("PlaceOrder", "Product")">
+                            <input type="submit" value="Place Order" class="btn btn-success border-0 bg-gradient w-100 py-2" />
+                        </form>
+                    }
+                    else
+                    {
+                        <input type="submit" value="Place Order" class="btn btn-success border-0 bg-gradient w-100 py-2" disabled />
+                    }
+
                 </div>
             </div>
         </div>

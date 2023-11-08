@@ -459,7 +459,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult SellingReport(DateTime? startDate, DateTime? endDate, string searchText)
         {
-            var orderHeader = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == ShoppingHelper.StatusShipped);
+            var orderHeader = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus != ShoppingHelper.StatusCancelled);
             if (string.IsNullOrEmpty(searchText))
             {
                 if (!startDate.HasValue && !endDate.HasValue)
@@ -467,26 +467,22 @@ namespace IMS.Web.Areas.Manager.Controllers
                     // If no dates provided, set default date range to the last 7 days
                     endDate = DateTime.Now;
                     startDate = endDate.Value.AddDays(-7);
-                    orderHeader = orderHeader.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped &&
-                        (u.ShippingDate >= startDate && u.ShippingDate <= endDate));
+                    orderHeader = orderHeader.Where(u =>(u.ShippingDate >= startDate && u.ShippingDate <= endDate));
                 }
             }
 
             if (startDate.HasValue && endDate.HasValue)
             {
-                orderHeader = orderHeader.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped &&
-                    (u.ShippingDate >= startDate && u.ShippingDate <= endDate.Value.AddDays(1)));
+                orderHeader = orderHeader.Where(u =>(u.ShippingDate >= startDate && u.ShippingDate <= endDate.Value.AddDays(1)));
             }
             if (startDate.HasValue && !endDate.HasValue)
             {
-                orderHeader = orderHeader.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped &&
-                    (u.ShippingDate >= startDate));
+                orderHeader = orderHeader.Where(u => (u.ShippingDate >= startDate));
             }
 
             if (!startDate.HasValue && endDate.HasValue)
             {
-                orderHeader = orderHeader.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped &&
-                    (u.ShippingDate <= endDate.Value.AddDays(1)));
+                orderHeader = orderHeader.Where(u =>(u.ShippingDate <= endDate.Value.AddDays(1)));
             }
             if (!string.IsNullOrEmpty(searchText))
             {

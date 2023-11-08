@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<IMS.Models.OrderHeader>
 @{
     ViewBag.Title = "Order Details";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
 
 @{
@@ -11,6 +11,7 @@
     var all = "";
     var approved = "";
     var cancelled = "";
+    var delivered = "";
 
     switch (status)
     {
@@ -26,6 +27,9 @@
         case "Cancelled":
             cancelled = "active text-white";
             break;
+        case "Delivered":
+            delivered = "active text-white";
+            break;
         default:
             all = "active text-white";
             break;
@@ -33,7 +37,7 @@
 }
 <div class="row pb-4 pt-2 mb-4">
     <div class="col-md-4">
-        <h4 class="text-uppercase">Customer Order List</h4>
+        <h4 class="text-uppercase">My Order's</h4>
     </div>
     <div class="col-md-8 text-end">
         <a href="@Url.Action("OrderDetails", "CustomerHome", new { area = "Customer", status = "Approved" })" class="btn btn-outline-secondary @approved rounded-0">
@@ -45,6 +49,9 @@
         <a href="@Url.Action("OrderDetails", "CustomerHome", new { area = "Customer", status = "Shipped" })" class="btn btn-outline-secondary @shipped rounded-0">
             Shipped
         </a>
+        <a href="@Url.Action("OrderDetails", "CustomerHome", new { area = "Customer", status = "Delivered" })" class="btn btn-outline-secondary @delivered rounded-0">
+            Delivered
+        </a>
         <a href="@Url.Action("OrderDetails", "CustomerHome", new { area = "Customer", status = "Cancelled" })" class="btn btn-outline-secondary @cancelled rounded-0">
             Cancelled
         </a>
@@ -53,7 +60,53 @@
         </a>
     </div>
 </div>
-
+@if (Context.Request.QueryString["status"] == "Approved")
+{
+    <div class="track ">
+        <div class="step active"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order confirmed</span> </div>
+        <div class="step "> <span class="icon"> <i class="fa-solid fa-gift"></i> </span> <span class="text"> Packaging</span> </div>
+        <div class="step "> <span class="icon"> <i class="fa-solid fa-people-carry-box"></i> </span> <span class="text"> Picked by courier</span> </div>
+        <div class="step"> <span class="icon"> <i class="fa fa-truck"></i> </span> <span class="text"> On the way </span> </div>
+        <div class="step"> <span class="icon"> <i class="fa fa-box"></i> </span> <span class="text">Ready for pickup</span> </div>
+    </div>
+}
+@if (Context.Request.QueryString["status"] == "InProcess")
+{
+    <div class="track ">
+        <div class="step active"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order confirmed</span> </div>
+        <div class="step active"> <span class="icon"> <i class="fa-solid fa-gift"></i> </span> <span class="text"> Packaging</span> </div>
+        <div class="step "> <span class="icon"> <i class="fa-solid fa-people-carry-box"></i> </span> <span class="text"> Picked by courier</span> </div>
+        <div class="step "> <span class="icon"> <i class="fa fa-truck"></i> </span> <span class="text"> On the way </span> </div>
+        <div class="step"> <span class="icon"> <i class="fa fa-box"></i> </span> <span class="text">Ready for pickup</span> </div>
+    </div>
+}
+@if (Context.Request.QueryString["status"] == "Shipped")
+{
+    <div class="track ">
+        <div class="step active"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order confirmed</span> </div>
+        <div class="step active"> <span class="icon"> <i class="fa-solid fa-gift"></i> </span> <span class="text"> Packaging</span> </div>
+        <div class="step active"> <span class="icon"> <i class="fa-solid fa-people-carry-box"></i> </span> <span class="text"> Picked by courier</span> </div>
+        <div class="step active"> <span class="icon"> <i class="fa fa-truck"></i> </span> <span class="text"> On the way </span> </div>
+        <div class="step"> <span class="icon"> <i class="fa fa-box"></i> </span> <span class="text">Ready for pickup</span> </div>
+    </div>
+}
+@if (Context.Request.QueryString["status"] == "Delivered")
+{
+    <div class="track ">
+        <div class="step active"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order confirmed</span> </div>
+        <div class="step active"> <span class="icon"> <i class="fa-solid fa-gift"></i> </span> <span class="text"> Packaging</span> </div>
+        <div class="step active"> <span class="icon"> <i class="fa-solid fa-people-carry-box"></i> </span> <span class="text"> Picked by courier</span> </div>
+        <div class="step active"> <span class="icon"> <i class="fa fa-truck"></i> </span> <span class="text"> On the way </span> </div>
+        <div class="step active"> <span class="icon"> <i class="fa fa-box"></i> </span> <span class="text">Ready for pickup</span> </div>
+    </div>
+}
+@if (Context.Request.QueryString["status"] == "Cancelled")
+{
+    <div class="track ">        
+        <div class="step cancel"> <span class="icon"> <i class="fa-solid fa-xmark"></i> </span> <span class="text"> Order Cancelled</span> </div>
+    </div>
+}
+<div class="pt-4 mt-4"></div>
 <table id="customerOrderTable" class="table table-hover table-striped">
     <thead>
         <tr>
@@ -67,7 +120,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.OrderByDescending(u=>u.Id))
+        @foreach (var item in Model.OrderByDescending(u => u.Id))
         {
             <tr>
                 <td>
@@ -86,6 +139,10 @@
                         <span class="badge bg-warning text-dark">@item.OrderStatus</span>
                     }
                     else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
+                    {
+                        <span class="badge bg-secondary">@item.OrderStatus</span>
+                    }
+                    else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusDelivered)
                     {
                         <span class="badge bg-success">@item.OrderStatus</span>
                     }
@@ -108,30 +165,9 @@
                 <td>@item.OrderDate.ToString().AsDateTime().ToShortDateString()</td>
                 <td class="text-end">
 
-                    @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
-                    {
-                        <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id,area="Manager" })" class="btn btn-outline-info">
-                            <i class="fa-solid fa-info"></i>
-                        </a>
-                    }
-                    else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusInProces)
-                    {
-                        <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id,area="Manager" })" class="btn btn-outline-warning">
-                            <i class="fa-solid fa-info"></i>
-                        </a>
-                    }
-                    else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
-                    {
-                        <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id ,area="Manager"})" class="btn btn-outline-success">
-                            <i class="fa-solid fa-info"></i>
-                        </a>
-                    }
-                    else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
-                    {
-                        <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id ,area="Manager"})" class="btn btn-outline-danger">
-                            <i class="fa-solid fa-info"></i>
-                        </a>
-                    }
+                    <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id,area="Manager" })" class="btn btn-outline-dark">
+                        <i class="fa-solid fa-info"></i>
+                    </a>
                     <a href="@Url.Action("InvoiceForCustomer", "CustomerShopping", new { id = item.Id ,area=""})" class="btn btn-outline-dark">
                         <i class="fa-solid fa-receipt"></i>
                     </a>

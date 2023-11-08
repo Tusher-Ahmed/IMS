@@ -14,6 +14,7 @@ using System.Web.Mvc;
 
 namespace IMS.Web.Controllers
 {
+    [SessionState(System.Web.SessionState.SessionStateBehavior.ReadOnly)]
     public class ProductController : Controller
     {
         private readonly IProductService _product;
@@ -22,6 +23,7 @@ namespace IMS.Web.Controllers
         private readonly IInventoryShoppingService _inventoryShoppingService;
         private readonly IInventoryOrderHistoryService _inventoryOrderHistoryService;
         private readonly IGarmentsService _garmentsService;
+        private readonly ICustomerShoppingService _customerShopping;
         public ProductController(ISession session)
         {
             _product = new ProductService { Session = session };
@@ -30,6 +32,7 @@ namespace IMS.Web.Controllers
             _inventoryShoppingService = new InventoryShoppingService { Session = session };
             _inventoryOrderHistoryService = new InventoryOrderHistoryService { Session = session };
             _garmentsService = new GarmentsService { Session = session };
+            _customerShopping = new CustomerShoppingService { Session = session };
 
         }
 
@@ -41,11 +44,12 @@ namespace IMS.Web.Controllers
             product = _product.GetProducts(product);
             product.ProductTypes = _productType.GetAllType().ToList();
             product.Departments = _department.GetAllDept().ToList();
-
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
             if (Request.IsAjaxRequest())
             {
                 return PartialView("_ProductListPartial", product);
             }
+            Session["CartItemCount"] = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).Count();
             return View(product);
         }
         #endregion
