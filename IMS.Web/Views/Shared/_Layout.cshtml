@@ -14,7 +14,15 @@
 <body>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark ">
         <div class="container">
-            @Html.ActionLink("IMS", "Index", "Product", new { area = "" }, new { @class = "navbar-brand" })
+            @if (User.IsInRole("Supplier"))
+            {
+                @Html.ActionLink("IMS", "Index", "Garments", new { area = "" }, new { @class = "navbar-brand" })
+            }
+            else
+            {
+                @Html.ActionLink("IMS", "Index", "Product", new { area = "" }, new { @class = "navbar-brand" })
+            }
+
             <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -22,28 +30,36 @@
             <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
 
-                    <li>@Html.ActionLink("Product", "Index", "Product", new { area = "" }, new { @class = "nav-link" })</li>
+                    @if (!User.IsInRole("Supplier"))
+                    {
+                        <li>@Html.ActionLink("Product", "Index", "Product", new { area = "" }, new { @class = "nav-link" })</li>
+                    }
 
                     @if (User.IsInRole("Manager") || User.IsInRole("Admin") || User.IsInRole("Supplier"))
                     {
                         <li>@Html.ActionLink("Garments Product", "Index", "Garments", new { area = "" }, new { @class = "nav-link" })</li>
-                    }@if (User.IsInRole("Manager") || User.IsInRole("Admin")) { 
-                    <li>
-                        <a href="@Url.Action("InventoryCart", "InventoryShopping")" class="nav-link">
-                            <i class="fas fa-shopping-cart"></i>
-                        </a>
-                    </li>
+                    }@if (User.IsInRole("Manager") || User.IsInRole("Admin"))
+                    {
+                        <li>
+                            <a href="@Url.Action("InventoryCart", "InventoryShopping", new {area=""})" class="nav-link position-relative">
+                                <i class="fas fa-shopping-cart"></i>
+                                @if (ViewBag.InventoryCartItemCount != null && (int)ViewBag.InventoryCartItemCount > 0)
+                                {
+                                    <span class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger">@ViewBag.InventoryCartItemCount</span>
+                                }
+                            </a>
+                        </li>
                     }
                     @if (User.IsInRole("Customer"))
                     {
                         <li>
-                            <a href="@Url.Action("ShoppingCart", "CustomerShopping")" class="nav-link position-relative">
+                            <a href="@Url.Action("ShoppingCart", "CustomerShopping", new {area=""})" class="nav-link position-relative">
                                 <i class="fas fa-shopping-cart"></i>
-                                @if (Session !=null  && Session["CartItemCount"] != null)
+                                @if (ViewBag.CartItemCount != null && (int)ViewBag.CartItemCount > 0)
                                 {
-                                <span class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger">@Session["CartItemCount"]</span>
+                                    <span class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger">@ViewBag.CartItemCount</span>
                                 }
-                                
+
                             </a>
                         </li>
                     }

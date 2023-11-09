@@ -3,6 +3,7 @@ using IMS.Models.ViewModel;
 using IMS.Service;
 using IMS.Utility;
 using IMS.Web.App_Start;
+using IMS.Web.Controllers;
 using IMS.Web.Models;
 using Microsoft.AspNet.Identity;
 using NHibernate;
@@ -18,7 +19,7 @@ using System.Web.WebPages;
 namespace IMS.Web.Areas.Manager.Controllers
 {
 
-    public class ManagerHomeController : Controller
+    public class ManagerHomeController : BaseController
     {
         private readonly IProductService _product;
         private readonly IInventoryOrderHistoryService _inventoryOrderHistoryService;
@@ -26,7 +27,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         private readonly ISupplierService _supplierService;
         private readonly IOrderHeaderService _orderHeaderService;
         private readonly IGarmentsService _garmentsService;
-        public ManagerHomeController(ISession session)
+        public ManagerHomeController(ISession session):base(session)
         {
             _product = new ProductService { Session = session };
             _inventoryOrderHistoryService = new InventoryOrderHistoryService { Session = session };

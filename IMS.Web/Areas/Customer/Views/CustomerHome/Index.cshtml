@@ -10,7 +10,7 @@
         <!-- Left Side - Action Buttons -->
         <div class="col-md-3 bg-dark text-dark pt-4" style="height:750px">
             <h5 class="pb-2 p-2 mb-5 text-white"><i class="fa-solid fa-user-tie"></i>&nbsp; @User.Identity.Name</h5>
-            <a href="@Url.Action("Index", "CustomerHome", new {area="Customer"})" class="btn btn-dark mb-2  w-100 text-start"><i class="fa-solid fa-box"></i>&nbsp; Dashboard</a>
+            <a href="@Url.Action("Index", "CustomerHome", new {area="Customer"})" class="btn btn-dark mb-2  w-100 text-start"> <img src="~/Images/dash.png"  style="width:25px;padding:0px 6px 0px 0px;" />&nbsp; Dashboard</a>
             <a href="@Url.Action("OrderDetails", "CustomerHome", new {area="Customer"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-dolly"></i>&nbsp; My Order</a>
             <a href="@Url.Action("Index", "Manage", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-gear"></i>&nbsp; Setting</a>
         </div>

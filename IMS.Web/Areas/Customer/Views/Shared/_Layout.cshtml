@@ -39,8 +39,13 @@
                     @if (User.IsInRole("Customer"))
                     {
                         <li>
-                            <a href="@Url.Action("ShoppingCart", "CustomerShopping")" class="nav-link">
+                            <a href="@Url.Action("ShoppingCart", "CustomerShopping", new {area=""})" class="nav-link position-relative">
                                 <i class="fas fa-shopping-cart"></i>
+                                @if (ViewBag.CartItemCount != null && (int)ViewBag.CartItemCount > 0)
+                                {
+                                    <span class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger">@ViewBag.CartItemCount</span>
+                                }
+
                             </a>
                         </li>
                     }

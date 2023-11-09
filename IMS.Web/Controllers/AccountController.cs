@@ -16,7 +16,7 @@ using IMS.Service;
 
 namespace IMS.Web.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
@@ -24,14 +24,14 @@ namespace IMS.Web.Controllers
         private readonly IEmployeeService _employeeService;
         private readonly ISupplierService _supplierService;
 
-        public AccountController(ISession session)
+        public AccountController(ISession session):base(session)
         {
             _customerService=new CustomerService { Session= session };
             _employeeService=new EmployeeService { Session=session };
             _supplierService=new SupplierService { Session=session };
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, ISession session) : this(session)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -70,7 +70,7 @@ namespace IMS.Web.Controllers
             return View();
         }
 
-        //
+        #region Login
         // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
@@ -152,7 +152,14 @@ namespace IMS.Web.Controllers
                     switch (result)
                     {
                         case SignInStatus.Success:
-                            return RedirectToLocal(returnUrl);
+                            if(userRole == "Supplier") 
+                            {
+                                return SupplierRedirectToLocal(returnUrl);
+                            }
+                            else
+                            {
+                                return RedirectToLocal(returnUrl);
+                            }                            
                         case SignInStatus.LockedOut:
                             return View("Lockout");
                         case SignInStatus.RequiresVerification:
@@ -184,7 +191,7 @@ namespace IMS.Web.Controllers
                 }
             }
         }
-
+        #endregion
         //
         // GET: /Account/VerifyCode
         [AllowAnonymous]
@@ -723,6 +730,14 @@ namespace IMS.Web.Controllers
                 return Redirect(returnUrl);
             }
             return RedirectToAction("Index", "Product");
+        }
+        private ActionResult SupplierRedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return RedirectToAction("Index", "Garments");
         }
 
         internal class ChallengeResult : HttpUnauthorizedResult

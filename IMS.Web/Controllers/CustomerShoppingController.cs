@@ -18,15 +18,15 @@ using System.Web.Mvc;
 namespace IMS.Web.Controllers
 {
     [Authorize(Roles = "Customer")]
-    [SessionState(System.Web.SessionState.SessionStateBehavior.ReadOnly)]
-    public class CustomerShoppingController : Controller
+   
+    public class CustomerShoppingController : BaseController
     {
         private readonly ICustomerShoppingService _customerShopping;
         private readonly IProductService _productService;
         private readonly IOrderHeaderService _orderHeaderService;
         private readonly IOrderDetailService _orderDetailService;
         private readonly ICustomerService _customerService;
-        public CustomerShoppingController(ISession session)
+        public CustomerShoppingController(ISession session) : base(session)
         {
             _customerShopping = new CustomerShoppingService { Session = session };
             _productService = new IMS.Service.ProductService { Session = session };
@@ -48,8 +48,7 @@ namespace IMS.Web.Controllers
                     Product = product,
                     ProductId = ProductId,
                     Count = 1,
-                };
-                Session["CartItemCount"] = _customerShopping.GetAllOrders().Where(u => u.CustomerId == Convert.ToInt64(User.Identity.GetUserId())).Count();
+                };          
                 return View(shoppingCart);
             }
             
@@ -75,8 +74,7 @@ namespace IMS.Web.Controllers
                     };
 
                     // Add the inventoryOrder to the shopping cart
-                    _customerShopping.AddCutomerShoppingCart(customerOrder);
-                   
+                    _customerShopping.AddCutomerShoppingCart(customerOrder);              
                     return RedirectToAction("Index", "Product");
                 }
             }

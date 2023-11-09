@@ -339,6 +339,7 @@
     <Compile Include="Areas\Staff\StaffAreaRegistration.cs" />
     <Compile Include="ControllerFactory\CustomControllerFactory.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\CustomerShoppingController.cs" />
     <Compile Include="Controllers\DepartmentController.cs" />
     <Compile Include="Controllers\GarmentsController.cs" />
@@ -388,7 +389,7 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Images\dashboard.png" />
+    <Content Include="Images\dash.png" />
     <Content Include="Images\login.png" />
     <Content Include="Images\sort_asc.png" />
     <Content Include="Images\sort_asc_disabled.png" />
@@ -547,6 +548,9 @@
     <Folder Include="Areas\Garmentss\Data\" />
     <Folder Include="Areas\Manager\Data\" />
     <Folder Include="Areas\Staff\Data\" />
+    <Folder Include="Views\Base\" />
+    <Folder Include="Views\CustomerBase\" />
+    <Folder Include="Views\InventoryBase\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

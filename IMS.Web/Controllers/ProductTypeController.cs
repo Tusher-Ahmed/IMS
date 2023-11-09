@@ -11,11 +11,11 @@ using System.Web.Mvc;
 namespace IMS.Web.Controllers
 {
     [Authorize(Roles ="Admin")]
-    public class ProductTypeController : Controller
+    public class ProductTypeController : BaseController
     {
         // GET: ProductType
         private readonly IProductTypeService _productType;
-        public ProductTypeController(ISession session)
+        public ProductTypeController(ISession session):base(session)
         {
             _productType = new ProductTypeService { Session=session};
 

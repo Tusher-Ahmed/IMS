@@ -2,6 +2,7 @@
 using IMS.Models.ViewModel;
 using IMS.Service;
 using IMS.Utility;
+using IMS.Web.Controllers;
 using IMS.Web.Models;
 using NHibernate;
 using Stripe;
@@ -14,13 +15,13 @@ using System.Web.Mvc;
 namespace IMS.Web.Areas.Manager.Controllers
 {
     
-    public class CustomerOrderController : Controller
+    public class CustomerOrderController : BaseController
     {
         private readonly IProductService _product;
         private readonly IOrderHeaderService _orderHeaderService;
         private readonly IOrderDetailService _orderDetailService;
         private readonly ICustomerService _customerService;
-        public CustomerOrderController(ISession session)
+        public CustomerOrderController(ISession session):base(session)
         {
             _product = new IMS.Service.ProductService { Session = session };
             _orderHeaderService = new OrderHeaderService { Session = session };

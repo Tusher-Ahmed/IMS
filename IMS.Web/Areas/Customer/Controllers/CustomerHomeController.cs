@@ -3,6 +3,7 @@ using IMS.Models;
 using IMS.Models.ViewModel;
 using IMS.Service;
 using IMS.Utility;
+using IMS.Web.Controllers;
 using Microsoft.AspNet.Identity;
 using NHibernate;
 using System;
@@ -14,15 +15,15 @@ using System.Web.Mvc;
 namespace IMS.Web.Areas.Customer.Controllers
 {
     [Authorize(Roles ="Customer")]
-    [SessionState(System.Web.SessionState.SessionStateBehavior.ReadOnly)]
-    public class CustomerHomeController : Controller
+    
+    public class CustomerHomeController : BaseController
     {
         private readonly IOrderHeaderService _orderHeaderService;
         private readonly ICustomerService _customerService;
         private readonly IOrderDetailService _orderDetailService;
         private readonly ICustomerShoppingService _customerShopping;
 
-        public CustomerHomeController(ISession session)
+        public CustomerHomeController(ISession session):base(session) 
         {
             _orderHeaderService=new OrderHeaderService { Session = session };
             _orderDetailService=new OrderDetailService { Session=session};
@@ -52,7 +53,7 @@ namespace IMS.Web.Areas.Customer.Controllers
                     u.OrderStatus!=ShoppingHelper.StatusCancelled && u.OrderStatus != ShoppingHelper.StatusRefunded).Count(),
               TotalCanceledOrder= orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled).Count()
             };
-            Session["CartItemCount"] = _customerShopping.GetAllOrders().Where(u => u.CustomerId == Convert.ToInt64(User.Identity.GetUserId())).Count();
+            
             return View(viewModel);
         }
 
@@ -84,7 +85,9 @@ namespace IMS.Web.Areas.Customer.Controllers
             {
                 return View(orderHeader);
             }
+            
             return View(orderHeader);
+
             
         }
     }

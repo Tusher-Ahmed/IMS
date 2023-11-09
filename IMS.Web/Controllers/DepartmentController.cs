@@ -11,11 +11,11 @@ using System.Web.Mvc;
 namespace IMS.Web.Controllers
 {
     [Authorize(Roles ="Admin")]
-    public class DepartmentController : Controller
+    public class DepartmentController : BaseController
     {
         // GET: Department
         private readonly IDepartmentService _department;
-        public DepartmentController(ISession session)
+        public DepartmentController(ISession session):base(session)
         {
             _department = new DepartmentService { Session=session};
            

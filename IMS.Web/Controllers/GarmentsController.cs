@@ -15,12 +15,12 @@ using System.Web.Mvc;
 namespace IMS.Web.Controllers
 {
     
-    public class GarmentsController : Controller
+    public class GarmentsController : BaseController
     {
         private readonly IGarmentsService _garmentsService;
         private readonly IDepartmentService _departmentService;
         private readonly IProductTypeService _productTypeService;
-        public GarmentsController(ISession session)
+        public GarmentsController(ISession session):base(session)
         {
             _garmentsService = new GarmentsService { Session = session };
             _departmentService = new DepartmentService { Session = session };

@@ -12,11 +12,11 @@ using System.Web.Mvc;
 namespace IMS.Web.Controllers
 {
     
-    public class InventoryShoppingController : Controller
+    public class InventoryShoppingController : BaseController
     {
         private readonly IGarmentsService _garmentsService;
         private readonly IInventoryShoppingService _inventoryShoppingService;
-        public InventoryShoppingController(ISession session)
+        public InventoryShoppingController(ISession session):base(session)
         {
             _inventoryShoppingService=new InventoryShoppingService { Session = session };
             _garmentsService=new GarmentsService { Session=session};

@@ -3,6 +3,7 @@ using IMS.Models.ViewModel;
 using IMS.Service;
 using IMS.Utility;
 using IMS.Web.App_Start;
+using IMS.Web.Controllers;
 using IMS.Web.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -21,7 +22,7 @@ namespace IMS.Web.Areas.Admin.Controllers
 {
     
     [Authorize(Roles ="Admin")]
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly IProductService _product;
         private readonly IDepartmentService _department;
@@ -36,7 +37,7 @@ namespace IMS.Web.Areas.Admin.Controllers
         private ApplicationUserManager _userManager;
 
         // GET: Admin/Home
-        public HomeController(ISession session)
+        public HomeController(ISession session):base(session)
         {
             _product = new ProductService { Session = session };
             _department = new DepartmentService { Session = session };
@@ -49,7 +50,7 @@ namespace IMS.Web.Areas.Admin.Controllers
             _customerService = new CustomerService { Session = session };
             _orderHeaderService=new OrderHeaderService { Session = session };
         }
-        public HomeController(ApplicationUserManager userManager)
+        public HomeController(ApplicationUserManager userManager, ISession session) : this(session)
         {
             UserManager = userManager;
         }

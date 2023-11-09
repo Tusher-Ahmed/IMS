@@ -15,7 +15,7 @@ using System.Web.Mvc;
 namespace IMS.Web.Controllers
 {
     [SessionState(System.Web.SessionState.SessionStateBehavior.ReadOnly)]
-    public class ProductController : Controller
+    public class ProductController : BaseController
     {
         private readonly IProductService _product;
         private readonly IDepartmentService _department;
@@ -24,7 +24,7 @@ namespace IMS.Web.Controllers
         private readonly IInventoryOrderHistoryService _inventoryOrderHistoryService;
         private readonly IGarmentsService _garmentsService;
         private readonly ICustomerShoppingService _customerShopping;
-        public ProductController(ISession session)
+        public ProductController(ISession session):base(session)
         {
             _product = new ProductService { Session = session };
             _department = new DepartmentService { Session = session };
