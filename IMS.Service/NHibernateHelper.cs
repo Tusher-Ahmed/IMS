@@ -48,6 +48,8 @@ namespace IMS.Service
                                 .AddFromAssemblyOf<OrderHeaderMap>();
                    m.FluentMappings
                                 .AddFromAssemblyOf<OrderDetailMap>();
+                   m.FluentMappings
+                                .AddFromAssemblyOf<CancelReasonMap>();
 
                })
                 .ExposeConfiguration(cfg => new SchemaExport(cfg)

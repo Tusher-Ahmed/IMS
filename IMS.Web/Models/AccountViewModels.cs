@@ -53,7 +53,7 @@ namespace IMS.Web.Models
     {
         [Required]
         [Display(Name = "Email")]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
         public string Email { get; set; }
 
         [Required]
@@ -68,12 +68,12 @@ namespace IMS.Web.Models
     public class RegisterViewModel
     {
         [Required]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [Required]       
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", ErrorMessage = "Passwords must be at least 8 characters long and contain at least an upper case letter, lower case letter, digit and a symbol")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -100,6 +100,7 @@ namespace IMS.Web.Models
 
         [Required]
         [Display(Name = "Phone Number")]
+        [RegularExpression(@"(^([+]{1}[8]{2}|0088)?(01){1}[3-9]{1}\d{8})$", ErrorMessage = "Invalid phone number")]
         public string PhoneNumber { get; set; }
         public string ERoles { get; set; }
        

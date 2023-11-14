@@ -52,7 +52,7 @@ namespace IMS.Service
         {
             var query = _repository.GetAll().Where(u=>u.Status==1).ToList();
 
-            int pageSize = 10;
+            int pageSize = 8;
             int totalCount = query.Count();
 
             IEnumerable<GarmentsProduct> products = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
@@ -131,7 +131,7 @@ namespace IMS.Service
                     prod.Price = garmentsProduct.Price;
                     prod.Image = garmentsProduct.Image;
                     prod.Department = garmentsProduct.Department;
-                    prod.ProductCode = garmentsProduct.ProductCode;
+                    prod.ProductCode = prod.ProductCode;
                     prod.Description = garmentsProduct.Description;
                     prod.VersionNumber = prod.VersionNumber + 1;
                     prod.ModifyBy = garmentsProduct.ModifyBy;

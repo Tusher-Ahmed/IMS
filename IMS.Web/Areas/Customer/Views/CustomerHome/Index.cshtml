@@ -90,6 +90,10 @@
                                                 }
                                                 else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
                                                 {
+                                                    <span class="badge bg-secondary">@item.OrderStatus</span>
+                                                }
+                                                else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusDelivered)
+                                                {
                                                     <span class="badge bg-success">@item.OrderStatus</span>
                                                 }
                                                 else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
@@ -124,6 +128,12 @@
                                                     </a>
                                                 }
                                                 else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
+                                                {
+                                                    <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id ,area="Manager"})" class="btn btn-outline-secondary">
+                                                        <i class="fa-solid fa-info"></i>
+                                                    </a>
+                                                }
+                                                else if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusDelivered)
                                                 {
                                                     <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id ,area="Manager"})" class="btn btn-outline-success">
                                                         <i class="fa-solid fa-info"></i>

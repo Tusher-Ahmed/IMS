@@ -66,6 +66,14 @@ namespace IMS.Web.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                if (User.IsInRole("Supplier"))
+                {
+                    return RedirectToAction("Index", "Garments");
+                }
+                return RedirectToAction("Index", "Product"); // Redirect to the home page or any other page
+            }
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
@@ -73,10 +81,11 @@ namespace IMS.Web.Controllers
         #region Login
         // POST: /Account/Login
         [HttpPost]
-        [AllowAnonymous]
+        [AllowAnonymous]      
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
+            
             if (!ModelState.IsValid)
             {
                 return View(model);

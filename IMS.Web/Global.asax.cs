@@ -21,6 +21,7 @@ namespace IMS.Web
             string stripeSecretKey = ConfigurationManager.AppSettings["StripeSecretKey"];
 
             StripeConfiguration.ApiKey = stripeSecretKey;
+
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);

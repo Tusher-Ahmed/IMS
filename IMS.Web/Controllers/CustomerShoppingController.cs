@@ -56,8 +56,13 @@ namespace IMS.Web.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public ActionResult ProductDetails(ShoppingCart shoppingCart)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("ProductDetails", "CustomerShopping", new { shoppingCart.ProductId }) });
+            }
             if (ModelState.IsValid)
             {
                 // Retrieve the GarmentsProduct based on the ProductId from your service

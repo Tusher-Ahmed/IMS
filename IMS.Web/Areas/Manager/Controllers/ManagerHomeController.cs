@@ -48,7 +48,10 @@ namespace IMS.Web.Areas.Manager.Controllers
                 OrderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).ToList(),
                 NewOrder = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Approved").Count(),
                 Processing = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "InProcess").Count(),
-                TotalCancel = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Cancelled").Count(),
+                TotalCancel = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus!="Refunded").Count(),
+                TotalShipped= _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Shipped").Count(),
+                TotalRefunded = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus == "Refunded").Count(),
+
             };
 
             return View(managerDashboardView);

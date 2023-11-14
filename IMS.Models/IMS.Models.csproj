@@ -88,6 +88,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CancelReason.cs" />
     <Compile Include="Customer.cs" />
     <Compile Include="Department.cs" />
     <Compile Include="Employee.cs" />

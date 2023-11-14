@@ -1,0 +1,63 @@
+﻿@model IMS.Models.ViewModel.CustomerInvoiceViewModel
+
+@{
+    ViewBag.Title = "ShowReason";
+}
+
+<div class="row pt-4 pb-5">
+    <div class="col-md-6">
+        
+            <h4 class="text-uppercase">Refund order</h4>
+ 
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="@Url.Action("Edit", "CustomerOrder", new {area="Manager",id=Model.OrderHeader.Id})" class="btn btn-outline-success">Back to Order</a>
+    </div>
+</div>
+<div class="row pt-4">
+    <div class="col">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Order Id</th>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrderDetails)
+                {
+                    <tr>
+                        <td>@item.OrderHeader.Id</td>
+                        <td><img src="@Url.Content("~/Images/" + item.Product.Image)" width="30" alt="img" /></td>
+                        <td>@item.Product.Name</td>
+                        <td>@item.Count</td>
+                        <td>@((item.Price * item.Count).ToString("C"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row pt-3 pb-4">
+    @if (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled && Model.OrderHeader.PaymentStatus!=IMS.Utility.ShoppingHelper.StatusRefunded)
+    {
+        using (Html.BeginForm("CancelOrder", "CustomerOrder", new { area = "Manager" }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary("", new { @class = "text-danger" });
+            @Html.HiddenFor(model => model.OrderHeader.Id)
+            <div class="form-group">
+                @Html.TextAreaFor(model => model.CancelReason.Reason, new { placeholder = "Cancel Order Reason...", @class = "form-control", rows = 6, @disabled="disabled" })
+                @Html.ValidationMessageFor(model => model.CancelReason.Reason, "", new { @class = "text-danger" })
+            </div>
+            <br />
+            <button type="submit" class="btn btn-outline-danger" onclick="return validateCarrierNumber();">Refund Order</button>
+        }
+
+    }
+</div>
+
+

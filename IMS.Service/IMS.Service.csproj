@@ -207,6 +207,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CancelReasonService.cs" />
     <Compile Include="CustomerService.cs" />
     <Compile Include="CustomerShoppingService.cs" />
     <Compile Include="DepartmentService.cs" />

@@ -79,7 +79,11 @@ namespace IMS.Web.Areas.Customer.Controllers
             }
             else if (status == "Cancelled")
             {
-                return View(orderHeader.Where(u => u.OrderStatus == "Cancelled"));
+                return View(orderHeader.Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus != ShoppingHelper.StatusRefunded));
+            }
+            else if (status == "Refunded")
+            {
+                return View(orderHeader.Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus == ShoppingHelper.StatusRefunded));
             }
             else if (status == "All")
             {

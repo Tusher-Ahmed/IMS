@@ -24,7 +24,7 @@
         <!-- Right Side - View of Corresponding Action -->
         <div class="col-md-9" id="result-container">
             <div class="row">
-                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
+                <div class="col-md-6 col-lg-3 col-xlg-6 pb-2">
                     <a href="@Url.Action("ProductList", "ManagerHome")" style="text-decoration:none;">
                         <div class="box bg-primary text-center text-light p-3">
                             <i class="fa-solid fa-warehouse font-16"></i>
@@ -34,7 +34,7 @@
                     </a>
                 </div>
                 <br />
-                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
+                <div class="col-md-6 col-lg-3 col-xlg-6 pb-2">
                     <a href="@Url.Action("ManagePrice", "Product", new {area=""})" style="text-decoration:none;">
                         <div class="box bg-success text-center text-light p-3">
                             <i class="fa-solid fa-tag font-16"></i>
@@ -44,8 +44,8 @@
                     </a>
                 </div>
                 <br />
-                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a href="@Url.Action("ProductShortage", "ManagerHome")"  style="text-decoration:none;">
+                <div class="col-md-6 col-lg-3 col-xlg-6 pb-2">
+                    <a href="@Url.Action("ProductShortage", "ManagerHome")" style="text-decoration:none;">
                         <div class="box text-center text-light p-3" style="background-color:#670d0d">
                             <i class="fa-solid fa-arrow-down-wide-short font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalShortage</h5>
@@ -54,7 +54,7 @@
                     </a>
                 </div>
                 <br />
-                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
+                <div class="col-md-6 col-lg-3 col-xlg-6 pb-2">
                     <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Approved"})" style="text-decoration:none;">
                         <div class="box bg-dark text-center text-light p-3">
                             <i class="fa-solid fa-gift font-16"></i>
@@ -64,7 +64,7 @@
                     </a>
                 </div>
                 <br />
-                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
+                <div class="col-md-6 col-lg-3 col-xlg-6 pb-2">
                     <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="InProcess"})" style="text-decoration:none;">
                         <div class="box bg-warning text-center text-light p-3">
                             <i class="fa-solid fa-people-carry-box font-16"></i>
@@ -74,13 +74,32 @@
                     </a>
                 </div>
                 <br />
-               
-                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
+                <div class="col-md-6 col-lg-3 col-xlg-6 pb-2">
+                    <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Shipped"})" style="text-decoration:none;">
+                        <div class="box text-center text-light p-3"style="background-color:#3d0583">
+                            <i class="fa-solid fa-truck-fast font-16"></i>
+                            <h5 class="mb-0 mt-1">@Model.TotalShipped</h5>
+                            <small class="font-light">Shipped</small>
+                        </div>
+                    </a>
+                </div>
+                <br />
+                <div class="col-md-6 col-lg-3 col-xlg-6 pb-2">
                     <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Cancelled"})" style="text-decoration:none;">
-                        <div class="box bg-danger text-center text-light p-3">
+                        <div class="box bg-danger text-center text-light p-3" >
                             <i class="fa-solid fa-xmark font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalCancel</h5>
                             <small class="font-light">Cancelled</small>
+                        </div>
+                    </a>
+                </div>
+                <br />
+                <div class="col-md-6 col-lg-3 col-xlg-6 pb-2">
+                    <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Refunded"})" style="text-decoration:none;">
+                        <div class="box text-center text-light p-3"style="background-color:#ff0000">
+                            <i class="fa-solid fa-money-bill-transfer font-16"></i>
+                            <h5 class="mb-0 mt-1">@Model.TotalRefunded</h5>
+                            <small class="font-light">Refunded</small>
                         </div>
                     </a>
                 </div>
@@ -141,7 +160,7 @@
 
                                             </td>
                                             <td>
-                                                @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
+                                                @if ( item.PaymentStatus==IMS.Utility.ShoppingHelper.StatusRefunded)
                                                 {
                                                     <span class="badge bg-danger">@item.PaymentStatus</span>
                                                 }

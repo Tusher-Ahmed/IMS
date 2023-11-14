@@ -12,6 +12,7 @@
     var approved = "";
     var delivered = "";
     var cancelled = "";
+    var refunded = "";
 
     switch (status)
     {
@@ -29,6 +30,9 @@
             break;
         case "Cancelled":
             cancelled = "active text-white";
+            break;
+        case "Refunded":
+            refunded = "active text-white";
             break;
         default:
             all = "active text-white";
@@ -54,6 +58,9 @@
         </a>
         <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "Cancelled" })" class="btn btn-outline-secondary @cancelled rounded-0">
             Cancelled
+        </a>
+        <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "Refunded" })" class="btn btn-outline-secondary @refunded rounded-0">
+            Refunded
         </a>
         <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "All" })" class="btn btn-outline-secondary @all rounded-0">
             All
@@ -107,7 +114,7 @@
 
                 </td>
                 <td>
-                    @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
+                    @if (item.PaymentStatus == IMS.Utility.ShoppingHelper.StatusRefunded)
                     {
                         <span class="badge bg-danger">@item.PaymentStatus</span>
                     }
@@ -118,10 +125,16 @@
                 </td>
                 <td>@item.OrderDate.ToString().AsDateTime().ToShortDateString()</td>
                 <td class="text-end">
+                    @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled && item.PaymentStatus !=IMS.Utility.ShoppingHelper.StatusRefunded)
+                    {
+                        <a href="@Url.Action("ShowReason", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-dark">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                    }
                     <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-success">
                         <i class="fas fa-edit"></i>
                     </a>
-                   
+
                 </td>
             </tr>
         }

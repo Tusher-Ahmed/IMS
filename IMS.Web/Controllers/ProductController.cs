@@ -14,7 +14,7 @@ using System.Web.Mvc;
 
 namespace IMS.Web.Controllers
 {
-    [SessionState(System.Web.SessionState.SessionStateBehavior.ReadOnly)]
+    
     public class ProductController : BaseController
     {
         private readonly IProductService _product;
@@ -49,7 +49,7 @@ namespace IMS.Web.Controllers
             {
                 return PartialView("_ProductListPartial", product);
             }
-            Session["CartItemCount"] = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).Count();
+            
             return View(product);
         }
         #endregion

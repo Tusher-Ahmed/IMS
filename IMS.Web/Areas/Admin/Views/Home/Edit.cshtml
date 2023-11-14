@@ -50,7 +50,7 @@
                     </div>
                     <br />
                     <div class="form-group mb-3">
-                        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4" })
+                        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
                         @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
                     </div>
                     <br />
@@ -59,7 +59,7 @@
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
                         <input type="submit" value="Save Changes" class="btn btn-outline-success" />
-                        @Html.ActionLink("Back to List", "ProductList","Home", null, new { @class = "btn btn-outline-info" })
+                        @Html.ActionLink("Back to List", "ProductList", "Home", null, new { @class = "btn btn-outline-info" })
                     </div>
                 </div>
             </div>
@@ -68,4 +68,44 @@
     </div>
 }
 
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>// Clear the Price field when the page loads
 
+        tinymce.init({
+            selector: 'textarea#tiny',
+            plugins: 'ai mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            image_title: true,
+            automatic_uploads: true,
+
+            file_picker_types: 'image',
+
+            file_picker_callback: function (cb, value, meta) {
+                var input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+
+                input.onchange = function () {
+                    var file = this.files[0];
+
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        var id = 'blobid' + (new Date()).getTime();
+                        var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                        var base64 = reader.result.split(',')[1];
+                        var blobInfo = blobCache.create(id, file, base64);
+                        blobCache.add(blobInfo);
+
+                        /* call the callback and populate the Title field with the file name */
+                        cb(blobInfo.blobUri(), { title: file.name });
+                    };
+                    reader.readAsDataURL(file);
+                };
+
+                input.click();
+            },
+
+            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
+        });</script>
+}

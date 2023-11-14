@@ -12,6 +12,7 @@
     var approved = "";
     var cancelled = "";
     var delivered = "";
+    var refunded = "";
 
     switch (status)
     {
@@ -29,6 +30,9 @@
             break;
         case "Delivered":
             delivered = "active text-white";
+            break;
+        case "Refunded":
+            refunded = "active text-white";
             break;
         default:
             all = "active text-white";
@@ -54,6 +58,9 @@
         </a>
         <a href="@Url.Action("OrderDetails", "CustomerHome", new { area = "Customer", status = "Cancelled" })" class="btn btn-outline-secondary @cancelled rounded-0">
             Cancelled
+        </a>
+        <a href="@Url.Action("OrderDetails", "CustomerHome", new { area = "Customer", status = "Refunded" })" class="btn btn-outline-secondary @refunded rounded-0">
+            Refunded
         </a>
         <a href="@Url.Action("OrderDetails", "CustomerHome", new { area = "Customer", status = "All" })" class="btn btn-outline-secondary @all rounded-0">
             All
@@ -102,8 +109,14 @@
 }
 @if (Context.Request.QueryString["status"] == "Cancelled")
 {
-    <div class="track ">        
+    <div class="track ">
         <div class="step cancel"> <span class="icon"> <i class="fa-solid fa-xmark"></i> </span> <span class="text"> Order Cancelled</span> </div>
+    </div>
+}
+@if (Context.Request.QueryString["status"] == "Refunded")
+{
+    <div class="track ">
+        <div class="step cancel"> <span class="icon"> <i class="fa-solid fa-money-bill-transfer"></i> </span> <span class="text"> Money Refunded</span> </div>
     </div>
 }
 <div class="pt-4 mt-4"></div>
@@ -153,7 +166,7 @@
 
                 </td>
                 <td>
-                    @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
+                    @if (item.PaymentStatus == IMS.Utility.ShoppingHelper.StatusRefunded)
                     {
                         <span class="badge bg-danger">@item.PaymentStatus</span>
                     }

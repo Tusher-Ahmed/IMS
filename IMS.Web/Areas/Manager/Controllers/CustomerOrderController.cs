@@ -4,6 +4,7 @@ using IMS.Service;
 using IMS.Utility;
 using IMS.Web.Controllers;
 using IMS.Web.Models;
+
 using NHibernate;
 using Stripe;
 using System;
@@ -21,14 +22,17 @@ namespace IMS.Web.Areas.Manager.Controllers
         private readonly IOrderHeaderService _orderHeaderService;
         private readonly IOrderDetailService _orderDetailService;
         private readonly ICustomerService _customerService;
+        private readonly ICancelReasonService _cancelReasonService;
         public CustomerOrderController(ISession session):base(session)
         {
             _product = new IMS.Service.ProductService { Session = session };
             _orderHeaderService = new OrderHeaderService { Session = session };
             _orderDetailService = new OrderDetailService { Session = session };
             _customerService = new IMS.Service.CustomerService { Session = session };
+            _cancelReasonService = new CancelReasonService { Session = session };
         }
         // GET: Manager/CustomerOrder
+        #region Customer Order List
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult Index( string status)
         {
@@ -50,7 +54,11 @@ namespace IMS.Web.Areas.Manager.Controllers
             }
             else if (status == "Cancelled")
             {
-                return View(orderHeader.Where(u => u.OrderStatus == "Cancelled"));
+                return View(orderHeader.Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus != ShoppingHelper.StatusRefunded));
+            }
+            else if (status == "Refunded")
+            {
+                return View(orderHeader.Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus == ShoppingHelper.StatusRefunded));
             }
             else if (status == "All")
             {
@@ -58,13 +66,15 @@ namespace IMS.Web.Areas.Manager.Controllers
             }
             return View(orderHeader);
         }
+        #endregion
 
-
+        #region Edit
         [Authorize(Roles ="Customer,Admin,Manager")]
         public ActionResult Edit(long id)
         {
             var orderHeader = _orderHeaderService.GetOrderHeaderById(id);
             var orderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == orderHeader.Id);
+            var cancleReason=_cancelReasonService.GetReasonByOrderHeaderId(orderHeader.Id);
             var context = new ApplicationDbContext();
             var customer = context.Users.FirstOrDefault(u => u.Id == orderHeader.CustomerId);
 
@@ -80,12 +90,15 @@ namespace IMS.Web.Areas.Manager.Controllers
                 OrderHeader = orderHeader,
                 OrderDetails = orderDetails,
                 Products = products,
-                Email = customer.Email
+                Email = customer.Email,
+                CancelReason= cancleReason,
+                
             };
             return View(customerInvoiceViewModel);
         }
+        #endregion
 
-
+        #region Update Order Detail
         [HttpPost]
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult UpdateOrderDetail(CustomerInvoiceViewModel customerInvoiceViewModel)
@@ -108,7 +121,9 @@ namespace IMS.Web.Areas.Manager.Controllers
             _orderHeaderService.Update(orderHeader);
             return RedirectToAction("Edit", "CustomerOrder", new {id=customerInvoiceViewModel.OrderHeader.Id});
         }
+        #endregion
 
+        #region Start Processing
         [Authorize(Roles = "Manager,Admin")]
         [HttpPost]
         public ActionResult StartProcessing(CustomerInvoiceViewModel customerInvoiceViewModel)
@@ -116,7 +131,9 @@ namespace IMS.Web.Areas.Manager.Controllers
             _orderHeaderService.UpdateStatus(customerInvoiceViewModel.OrderHeader.Id, ShoppingHelper.StatusInProces, customerInvoiceViewModel.OrderHeader.PaymentStatus);
             return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
         }
+        #endregion
 
+        #region Shipped Order
         [Authorize(Roles = "Manager,Admin")]
         [HttpPost]
         public ActionResult ShipOrder(CustomerInvoiceViewModel customerInvoiceViewModel)
@@ -129,6 +146,9 @@ namespace IMS.Web.Areas.Manager.Controllers
             _orderHeaderService.Update(orderHeader);
             return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
         }
+        #endregion
+
+        #region Delivered Order
         [Authorize(Roles = "Manager,Admin")]
         [HttpPost]
         public ActionResult DeliveredOrder(CustomerInvoiceViewModel customerInvoiceViewModel)
@@ -136,10 +156,51 @@ namespace IMS.Web.Areas.Manager.Controllers
             _orderHeaderService.UpdateStatus(customerInvoiceViewModel.OrderHeader.Id, ShoppingHelper.StatusDelivered, customerInvoiceViewModel.OrderHeader.PaymentStatus);
             return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
         }
+        #endregion
+
+        #region Cancel reason
+        public ActionResult CancelReasonPage(long orderId)
+        {
+            var orderHeader = _orderHeaderService.GetOrderHeaderById(orderId);
+            var orderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == orderHeader.Id);
+            CustomerInvoiceViewModel customerInvoiceViewModel = new CustomerInvoiceViewModel
+            {
+                OrderHeader = orderHeader,
+                OrderDetails = orderDetails,           
+            };
+
+            return View(customerInvoiceViewModel);
+        }
+        #endregion
+
+        #region Cancel Order Without Refund by customer
+        public ActionResult CancelOrderWithoutRefund(CustomerInvoiceViewModel customerInvoiceViewModel)
+        {
+            var orderHeader = _orderHeaderService.GetOrderHeaderById(customerInvoiceViewModel.OrderHeader.Id);
+            if (customerInvoiceViewModel.CancelReason.Reason == null)
+            {
+                ModelState.AddModelError("cancel", "Cancel Reason is required");
+                return RedirectToAction("CancelReasonPage", new { orderId = customerInvoiceViewModel.OrderHeader.Id });
+            }
+            CancelReason cancelReason = new CancelReason
+            {
+                OrderStatus = ShoppingHelper.StatusCancelled,
+                PaymentStatus = orderHeader.PaymentStatus,
+                OrderHeader = orderHeader,
+                Reason = customerInvoiceViewModel.CancelReason.Reason
+            };
+            _orderHeaderService.UpdateStatus(orderHeader.Id, ShoppingHelper.StatusCancelled, orderHeader.PaymentStatus);
+            _cancelReasonService.AddReason(cancelReason);
+            return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
+        }
+        #endregion
+
+        #region Cancel/Return Order
         [Authorize(Roles = "Manager,Admin,Customer")]
         [HttpPost]
         public ActionResult CancelOrder(CustomerInvoiceViewModel customerInvoiceViewModel)
         {
+
             var orderHeader = _orderHeaderService.GetOrderHeaderById(customerInvoiceViewModel.OrderHeader.Id);
             if(orderHeader.PaymentStatus==ShoppingHelper.StatusApproved)
             {
@@ -150,7 +211,8 @@ namespace IMS.Web.Areas.Manager.Controllers
                 };
                 var service = new RefundService();
                 Refund refund = service.Create(options);
-                _orderHeaderService.UpdateStatus(orderHeader.Id, ShoppingHelper.StatusCancelled, ShoppingHelper.StatusRefunded);
+                _orderHeaderService.UpdateStatus(orderHeader.Id, ShoppingHelper.StatusCancelled, ShoppingHelper.StatusRefunded);                
+
                 var orderDetails=_orderDetailService.getAllOrderDetails().Where(u=>u.OrderHeader.Id==orderHeader.Id).ToList();
                 foreach (var item in orderDetails)
                 {
@@ -167,6 +229,22 @@ namespace IMS.Web.Areas.Manager.Controllers
             _orderHeaderService.Update(orderHeader);
             return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
         }
+        #endregion
 
+        #region Show Reason
+        public ActionResult ShowReason(long id)
+        {
+            var orderHeader = _orderHeaderService.GetOrderHeaderById(id);
+            var orderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == orderHeader.Id);
+            var cancleReason = _cancelReasonService.GetReasonByOrderHeaderId(orderHeader.Id);
+            CustomerInvoiceViewModel customerInvoiceViewModel = new CustomerInvoiceViewModel
+            {
+                OrderHeader = orderHeader,
+                OrderDetails = orderDetails,
+                CancelReason = cancleReason
+            };
+            return View(customerInvoiceViewModel);
+        }
+        #endregion
     }
 } 
