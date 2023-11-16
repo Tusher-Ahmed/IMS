@@ -283,7 +283,7 @@
 
                                 if (Model.OrderHeader.ShippingDate == null && (User.IsInRole("Admin") || User.IsInRole("Manager")))
                                 {
-                                    <input type="submit" class="btn btn-danger form-control my-1 text-uppercase" formaction="@Url.Action("CancelOrder", "CustomerOrder", new { area = "Manager" })" value="Cancel Order" />
+                                    <input type="submit" class="btn btn-danger form-control my-1 text-uppercase" formaction="@Url.Action("CancelReasonPage", "CustomerOrder", new { area = "Manager" ,orderId=Model.OrderHeader.Id })" value="Cancel Order" />
                                 }
                                 else if ((Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(3) < DateTime.Now &&
                                     Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(10) > DateTime.Now) && User.IsInRole("Customer") &&
@@ -295,16 +295,19 @@
                             @if (User.IsInRole("Customer") && Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
                             {
                                 <div>
-                                    <input type="submit"  class="btn btn-danger form-control my-1 text-uppercase" formaction="@Url.Action("CancelReasonPage", "CustomerOrder", new { area = "Manager",orderId=Model.OrderHeader.Id })" value="Cancel Order" />
+                                    <input type="submit" class="btn btn-danger form-control my-1 text-uppercase" formaction="@Url.Action("CancelReasonPage", "CustomerOrder", new { area = "Manager",orderId=Model.OrderHeader.Id })" value="Cancel Order" />
                                 </div>
                             }
-                            @if(Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
-                {
-                    <div class="form-group">
-                        <label for="@Model.CancelReason.Reason" class="form-label text-danger">Cancel Reason:</label>
-                        @Html.TextAreaFor(model => model.CancelReason.Reason, new { @class = "form-control", rows = "4", @disabled = "disabled" })                      
-                    </div>
-                }
+
+                                @if (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
+                                {
+                                    <div class="form-group">
+                                        <label for="@Model.CancelReason.Reason" class="form-label text-danger">Cancel Reason:</label>
+                                        @Html.TextAreaFor(model => model.CancelReason.Reason, new { @class = "form-control", rows = "4", @disabled = "disabled" })
+                                    </div>
+                                }
+                            
+
                         </div>
                     </div>
                 </div>

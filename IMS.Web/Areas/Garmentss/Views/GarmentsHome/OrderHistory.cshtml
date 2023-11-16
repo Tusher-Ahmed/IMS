@@ -1,4 +1,4 @@
-﻿@model IEnumerable<IMS.Models.OrderHistory>
+﻿@model IMS.Models.ViewModel.GarmentsOrderHistoryViewModel
 @{
     ViewBag.Title = "OrderHistory";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -22,17 +22,20 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.GroupBy(u => u.OrderId).Select(t => t.First()))
+        
+
+        @foreach (var item in Model.OrderHistory.GroupBy(u => u.OrderId).Select(t => t.First()))
         {
+            
             <tr>
                 <td class="txt-oflo">@item.OrderId</td>
                 <td class="txt-oflo">@item.CreationDate</td>
-                <td class="txt-oflo">@item.TotalPrice.ToString("C")</td>
+                <td class="txt-oflo">@Model.TotalPrice[item.OrderId].ToString("C")</td>
                 <td>
-                    <a href="@Url.Action("Details", "GarmentsHome",new {area="Garmentss", orderId = item.OrderId })" class="btn btn-outline-dark">                       
+                    <a href="@Url.Action("Details", "GarmentsHome",new {area="Garmentss", orderId = item.OrderId })" class="btn btn-outline-dark">
                         <i class="fa-solid fa-list"></i>
                     </a>
-                   
+
                 </td>
             </tr>
         }

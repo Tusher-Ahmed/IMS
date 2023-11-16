@@ -20,6 +20,7 @@
                     <th>Product Type</th>
                     <th>Quantity</th>
                     <th>Price(Each)</th>
+                    <th>Quantity x Price</th>
                 </tr>
             </thead>
             <tbody>
@@ -33,18 +34,21 @@
                         <td>@item.GarmentsProduct.Department.Name</td>
                         <td>@item.GarmentsProduct.ProductType.Name</td>
                         <td>@item.Quantity</td>
-                        <td>@item.Price</td>
+                        <td>@item.Price.ToString("C")</td>
+                        <td>@((item.Price*item.Quantity).ToString("C"))</td>
                     </tr>
                 }
-                <tr>
-                    <td class="fw-bold">Total Price</td>
-                    <td colspan="5"></td>
-                    @foreach (var item in Model.Take(1))
-                    {
-                        <td class="fw-bold">@item.TotalPrice.ToString("C")</td>
+            <tr class="bg-dark">
+                <td class="fw-bold  text-white">Total Price</td>
+                <td colspan="6"></td>
+                @{ decimal TotalPrice = 0;}
+                @foreach (var item in Model)
+                {                   
+                    TotalPrice += item.Price * item.Quantity;
 
-                    }
-                </tr>
+                }
+                <td class="fw-bold  text-white">@TotalPrice.ToString("C")</td>
+            </tr>
             </tbody>
         </table>
 

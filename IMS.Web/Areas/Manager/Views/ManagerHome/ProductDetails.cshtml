@@ -8,6 +8,7 @@
 <h4 class="text-uppercase">Prduct Details</h4>
 
 <div class="p-4">
+    @{ int i = 0;}
     @foreach (var item in Model.orderHistories)
     {
 
@@ -17,7 +18,7 @@
             </div>
             <div class="col-md-6">
                 <h3 class="text-uppercase">@item.GarmentsProduct.Name</h3><br />
-                <p><span style="font-weight:bold">Garments Name:</span>  @Model.GarmentsName</p>
+                <p><span style="font-weight:bold">Garments Name:</span>  @Model.GarmentsName.ElementAt(i)</p>
                 <p><span style="font-weight:bold">Order By:</span>  @Model.ManagerEmail</p>
                 <p><span style="font-weight:bold">Buying Price:</span>  @item.Price.ToString("C")</p>
                 <p><span style="font-weight:bold">Quantity:</span>  @item.Quantity</p>
@@ -29,6 +30,7 @@
             </div>
         </div>
         <hr />
+        i++;
     }
 
     <div class="mt-4 text-end">

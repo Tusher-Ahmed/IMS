@@ -1,0 +1,57 @@
+﻿@model IMS.Models.ViewModel.RejectedProductListViewModel
+@{
+    ViewBag.Title = "RejectedOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row pb-4">
+    <div class="col-md-6">
+        <h4 class="text-uppercase">Rejected Product List</h4>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="@Url.Action("Index", "ManagerHome", new {area="Manager"})" class="btn btn-outline-success"><i class="fa-solid fa-right-from-bracket"></i>&nbsp; Back To Dashboard</a>
+    </div>
+</div>
+<br />
+<table class="table table-striped table-hover" id="approveTable">
+    <thead>
+        <tr>
+            <th>Order Id</th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Order By</th>
+            <th>Order Date</th>
+            <th>SKU</th>
+            <th>Quantity</th>
+            <th>Amount</th>
+            <th>Garments Name</th>
+            <th>Rejected By</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Products)
+        {
+            <tr>
+                <td>@item.OrderHistoryId</td>
+                <td>
+                    <img src="@Url.Content("~/Images/" + item.Image)" width="30" class="rounded" alt="Product Image">
+                </td>
+                <td>@item.Name</td>
+                <td>@Model.Managers[item.Id]</td>
+                <td>@item.CreationDate.ToString().AsDateTime().ToShortDateString()</td>
+                <td>@item.SKU</td>
+                <td>@item.Quantity</td>
+                <td>@((item.BuyingPrice * item.Quantity).ToString("C"))</td>
+                <td>@Model.Garments[item.Id]</td>
+                <td>@Model.Staffs[item.Id]</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#approveTable").DataTable();
+        })</script>
+}

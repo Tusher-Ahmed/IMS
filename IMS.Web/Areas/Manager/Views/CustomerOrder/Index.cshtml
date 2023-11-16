@@ -125,15 +125,22 @@
                 </td>
                 <td>@item.OrderDate.ToString().AsDateTime().ToShortDateString()</td>
                 <td class="text-end">
-                    @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled && item.PaymentStatus !=IMS.Utility.ShoppingHelper.StatusRefunded)
+                    @if (item.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled && item.PaymentStatus != IMS.Utility.ShoppingHelper.StatusRefunded)
                     {
                         <a href="@Url.Action("ShowReason", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-dark">
                             <i class="fa-solid fa-eye"></i>
                         </a>
+                        <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-danger">
+                            <i class="fas fa-edit"></i>
+                        </a>
                     }
-                    <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-success">
-                        <i class="fas fa-edit"></i>
-                    </a>
+                    else
+                    {
+                        <a href="@Url.Action("Edit", "CustomerOrder", new { id = item.Id })" class="btn btn-outline-success">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    }
+
 
                 </td>
             </tr>

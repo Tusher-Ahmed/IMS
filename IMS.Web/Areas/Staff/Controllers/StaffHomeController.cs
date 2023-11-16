@@ -35,6 +35,7 @@ namespace IMS.Web.Areas.Staff.Controllers
                 Products= _product.GetAllProduct().Where(u=>u.Approved==null ).ToList(),
                 TotalNewProduct= _product.GetAllProduct().Where(u => u.Approved == null ).Count(),
                 TotalApprovedProduct= _product.GetAllProduct().Where(u => u.Approved == true).Count(),               
+                TotalRejectedProduct= _product.GetAllProduct().Where(u => u.Approved == false && u.Rejected ==false).Count(),               
             };
             return View(staffDashboardViewModel);
         }

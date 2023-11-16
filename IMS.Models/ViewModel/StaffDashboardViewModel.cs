@@ -15,6 +15,7 @@ namespace IMS.Models.ViewModel
         public List<string> SuppliersName { get; set; }
         public int TotalNewProduct {  get; set; }
         public int TotalApprovedProduct { get; set; }
+        public int TotalRejectedProduct { get; set; }
         public Supplier Supplier { get; set; }
     }
 }

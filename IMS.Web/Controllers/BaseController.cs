@@ -23,7 +23,7 @@ namespace IMS.Web.Controllers
             base.OnActionExecuting(filterContext);
 
             // Set the order count in the session and store it in ViewBag
-            int cartItemCount = _customerShopping.GetAllOrders().Where(u => u.CustomerId == Convert.ToInt64(User.Identity.GetUserId())).Count(); // Implement your logic to get the cart item count
+            int cartItemCount = _customerShopping.GetAllOrders().Where(u => u.CustomerId == Convert.ToInt64(User.Identity.GetUserId()) && u.Product.Status==1).Count(); // Implement your logic to get the cart item count
             ViewBag.CartItemCount = cartItemCount;
 
             int InventoryCartCount = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == Convert.ToInt64(User.Identity.GetUserId())).Count();

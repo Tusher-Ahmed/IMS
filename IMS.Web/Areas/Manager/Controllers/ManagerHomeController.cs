@@ -6,11 +6,14 @@ using IMS.Web.App_Start;
 using IMS.Web.Controllers;
 using IMS.Web.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json.Linq;
 using NHibernate;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
@@ -27,7 +30,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         private readonly ISupplierService _supplierService;
         private readonly IOrderHeaderService _orderHeaderService;
         private readonly IGarmentsService _garmentsService;
-        public ManagerHomeController(ISession session):base(session)
+        public ManagerHomeController(ISession session) : base(session)
         {
             _product = new ProductService { Session = session };
             _inventoryOrderHistoryService = new InventoryOrderHistoryService { Session = session };
@@ -48,8 +51,8 @@ namespace IMS.Web.Areas.Manager.Controllers
                 OrderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).ToList(),
                 NewOrder = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Approved").Count(),
                 Processing = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "InProcess").Count(),
-                TotalCancel = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus!="Refunded").Count(),
-                TotalShipped= _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Shipped").Count(),
+                TotalCancel = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus != "Refunded").Count(),
+                TotalShipped = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Shipped").Count(),
                 TotalRefunded = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus == "Refunded").Count(),
 
             };
@@ -355,7 +358,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             }
             if (!string.IsNullOrEmpty(search))
             {
-                history = history.Where(x => x.OrderId.ToString().Contains(search) || GetGarmentsNameByHistoryId(x.GarmentsId).Contains(search)).ToList();
+                history = history.Where(x => x.OrderId.ToString().Contains(search) || GetEmployeeNameByHistoryId(x.EmployeeId).Contains(search)).ToList();
             }
             recordsTotal = history.Count;
             recordsFiltered = recordsTotal;
@@ -366,14 +369,14 @@ namespace IMS.Web.Areas.Manager.Controllers
 
             foreach (var item in history)
             {
-                var GarmentsName = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                var context = new ApplicationDbContext();
+                string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
                 var invoiceUrl = Url.Action("Invoice", "ManagerHome", new { area = "Manager", orderId = item.OrderId });
                 var productDetailsUrl = Url.Action("ProductDetails", "ManagerHome", new { area = "Manager", orderId = item.OrderId });
                 var str = new List<string>()
                 {
                     $"{item.OrderId}",
-                    $"{GarmentsName}",
-                    $"{item.CreatedBy}",
+                    $"{manager}",
                     $"{item.CreationDate.ToString().AsDateTime().ToShortDateString()}",
                     $"{item.TotalPrice.ToString("C")}",
                     $@"<a href=""{invoiceUrl}"" class=""btn btn-outline-dark"">
@@ -391,9 +394,43 @@ namespace IMS.Web.Areas.Manager.Controllers
             return Json(new { draw, recordsTotal, recordsFiltered, start, length, data });
         }
 
-        private string GetGarmentsNameByHistoryId(long garmentsId)
+        private string GetEmployeeNameByHistoryId(long createdBy)
         {
-            return _supplierService.GetSupplierByUserId(garmentsId)?.Name;
+            var context = new ApplicationDbContext();
+            string manager = context.Users.FirstOrDefault(u => u.Id == createdBy).Email;
+            return manager;
+        }
+        #endregion
+
+        #region Rejected Order History
+        public ActionResult RejectedOrder()
+        {           
+            var history = _product.GetAllProduct().Where(u => u.Approved == false && u.Rejected == true);
+            Dictionary<long,string> managers= new Dictionary<long, string>();
+            Dictionary<long, string> staffs = new Dictionary<long, string>();
+            Dictionary<long, string> garments = new Dictionary<long, string>();
+            foreach(var item in history)
+            {
+                managers.Add(item.Id,GetUserEmailById(item.CreatedBy));
+                staffs.Add(item.Id,GetUserEmailById(item.ApprovedBy));
+                var gName = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                garments.Add(item.Id,gName);
+            }
+            RejectedProductListViewModel rejectedProductListViewModel = new RejectedProductListViewModel
+            {
+                Products = history,
+                Managers = managers,
+                Staffs = staffs,
+                Garments=garments
+            };
+            return View(rejectedProductListViewModel);           
+        }
+        public string GetUserEmailById(long? userId)
+        {
+            var context = new ApplicationDbContext();
+            string manager = context.Users.FirstOrDefault(u => u.Id == userId).Email;
+            
+            return manager;
         }
         #endregion
 
@@ -405,19 +442,23 @@ namespace IMS.Web.Areas.Manager.Controllers
 
             var History = _inventoryOrderHistoryService.GetByOrderId(orderId);
             var firstOrderHistory = History.FirstOrDefault();
-
+            List<string> name = new List<string>();
+            foreach (var item in History)
+            {
+                var garments = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                name.Add(garments);
+            }
             if (firstOrderHistory != null)
             {
                 var employeeId = firstOrderHistory.EmployeeId;
-                var GarmentsId = firstOrderHistory.GarmentsId;
                 var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
-                var garments = _supplierService.GetSupplierByUserId(GarmentsId).Name;
-                if (manager != null && garments != null)
+
+                if (manager != null)
                 {
                     InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
                     {
                         orderHistories = History,
-                        GarmentsName = garments,
+                        GarmentsName = name,
                         ManagerEmail = manager.Email,
                     };
                     return View(inventoryInvoiceViewModel);
@@ -443,13 +484,18 @@ namespace IMS.Web.Areas.Manager.Controllers
                 var employeeId = firstOrderHistory.EmployeeId;
                 var GarmentsId = firstOrderHistory.GarmentsId;
                 var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
-                var garments = _supplierService.GetSupplierByUserId(GarmentsId).Name;
-                if (manager != null && garments != null)
+                List<string> name = new List<string>();
+                foreach (var item in History)
+                {
+                    var garments = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                    name.Add(garments);
+                }
+                if (manager != null)
                 {
                     InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
                     {
                         orderHistories = History,
-                        GarmentsName = garments,
+                        GarmentsName = name,
                         ManagerEmail = manager.Email,
                     };
                     return View(inventoryInvoiceViewModel);
@@ -471,13 +517,13 @@ namespace IMS.Web.Areas.Manager.Controllers
                     // If no dates provided, set default date range to the last 7 days
                     endDate = DateTime.Now;
                     startDate = endDate.Value.AddDays(-7);
-                    orderHeader = orderHeader.Where(u =>(u.ShippingDate >= startDate && u.ShippingDate <= endDate));
+                    orderHeader = orderHeader.Where(u => (u.ShippingDate >= startDate && u.ShippingDate <= endDate));
                 }
             }
 
             if (startDate.HasValue && endDate.HasValue)
             {
-                orderHeader = orderHeader.Where(u =>(u.ShippingDate >= startDate && u.ShippingDate <= endDate.Value.AddDays(1)));
+                orderHeader = orderHeader.Where(u => (u.ShippingDate >= startDate && u.ShippingDate <= endDate.Value.AddDays(1)));
             }
             if (startDate.HasValue && !endDate.HasValue)
             {
@@ -486,11 +532,20 @@ namespace IMS.Web.Areas.Manager.Controllers
 
             if (!startDate.HasValue && endDate.HasValue)
             {
-                orderHeader = orderHeader.Where(u =>(u.ShippingDate <= endDate.Value.AddDays(1)));
+                orderHeader = orderHeader.Where(u => (u.ShippingDate <= endDate.Value.AddDays(1)));
             }
             if (!string.IsNullOrEmpty(searchText))
             {
-                orderHeader = orderHeader.Where(x => x.Id.ToString().Contains(searchText) || x.Name.Contains(searchText)).ToList();
+                orderHeader = orderHeader
+                                 .Where(x =>
+                                     x.Id.ToString().Equals(searchText) || // Exact numeric match for ID
+                                     (
+                                         x.Id.ToString().Contains(searchText) && // Contains numeric match for ID
+                                         x.Id.ToString().IndexOf(searchText, StringComparison.OrdinalIgnoreCase) == 0
+                                     ) ||
+                                     x.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) == 0
+                                 )
+                                 .ToList();
             }
 
             return View(orderHeader);
@@ -501,7 +556,16 @@ namespace IMS.Web.Areas.Manager.Controllers
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult BuyingReport(DateTime? startDate, DateTime? endDate, string searchText)
         {
-            var history = _inventoryOrderHistoryService.GetAll().GroupBy(u => u.OrderId).Select(u => u.First()).ToList();
+            var context = new ApplicationDbContext();
+            var product = _product.GetAllProduct().Where(u=>u.Rejected!=true);
+            List<OrderHistory> history = new List<OrderHistory>();
+            foreach(var item in product)
+            {
+                var his = _inventoryOrderHistoryService.GetById(item.OrderHistoryId);
+                history.Add(his);
+            }
+            //var history = _inventoryOrderHistoryService.GetAll().GroupBy(u => u.OrderId).Select(u => u.First()).ToList();
+      
             if (string.IsNullOrEmpty(searchText))
             {
                 if (!startDate.HasValue && !endDate.HasValue)
@@ -527,18 +591,27 @@ namespace IMS.Web.Areas.Manager.Controllers
             }
             if (!string.IsNullOrEmpty(searchText))
             {
-                history = history.Where(x => x.OrderId.ToString().Contains(searchText) || GetGarmentsNameByHistoryId(x.GarmentsId).Contains(searchText)).ToList();
+                history = history
+                             .Where(x =>
+                                 x.OrderId.ToString().Equals(searchText) || // Exact numeric match for Order ID
+                                 (
+                                     x.OrderId.ToString().Contains(searchText) && // Contains numeric match for Order ID
+                                     x.OrderId.ToString().IndexOf(searchText, StringComparison.OrdinalIgnoreCase) == 0
+                                 ) ||
+                                 GetEmployeeNameByHistoryId(x.EmployeeId).IndexOf(searchText, StringComparison.OrdinalIgnoreCase) == 0
+                             )
+                             .ToList();
             }
-            Dictionary<long,string> GName = new Dictionary<long, string>();
-            foreach(var item in history)
+            Dictionary<long,string> managers = new Dictionary<long, string>();
+            foreach(var item in history.GroupBy(u=>u.OrderId).Select(t=>t.First()))
             {
-                var GarmentsName = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
-                GName.Add(item.Id, GarmentsName);
+                string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
+                managers.Add(item.OrderId,manager);
             }
             BuyingReportViewModel viewModel = new BuyingReportViewModel
             {
                 History = history,
-                GarmentsNames = GName,
+                Name = managers
             };
             return View(viewModel);
         }

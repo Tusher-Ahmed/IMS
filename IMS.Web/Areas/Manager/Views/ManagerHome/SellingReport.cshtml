@@ -26,7 +26,57 @@
         </div>
     </div>
 }
+<div class="pt-3 pb-3 rounded-1">
+    @{
+        DateTime? start = string.IsNullOrEmpty(Request.QueryString["startDate"]) ? (DateTime?)null : Request.QueryString["startDate"].AsDateTime();
+        DateTime? end = string.IsNullOrEmpty(Request.QueryString["endDate"]) ? (DateTime?)null : Request.QueryString["endDate"].AsDateTime();
+        int duration = 7;
+        string searchText = Request.QueryString["searchText"] ?? "";
+        string status = "";
 
+        if (start.HasValue && end.HasValue)
+        {
+            TimeSpan difference = end.Value - start.Value;
+            duration = (int)difference.TotalDays+1;
+            if (string.IsNullOrEmpty(searchText))
+            {
+                <div class="bg-dark text-white p-2 rounded-1 w-25">
+                    Records:  @duration <span>days</span>
+                </div>
+            }
+        }
+        else if (start.HasValue && !end.HasValue)
+        {
+            TimeSpan difference = DateTime.Now - start.Value;
+            duration = (int)difference.TotalDays+1;
+            if (string.IsNullOrEmpty(searchText))
+            {
+                <div class="bg-dark text-white p-2 rounded-1 w-25">
+                    Records:  @duration <span>days</span>
+                </div>
+            }
+        }
+        else if (!start.HasValue && end.HasValue)
+        {
+            status = "All records before " + end.Value.ToString("MM/dd/yyyy");
+            if (string.IsNullOrEmpty(searchText))
+            {
+                <div class="bg-dark text-white p-2 rounded-1 w-25">
+                    Records:   @status
+                </div>
+            }
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(searchText))
+            {
+                <div class="bg-dark text-white p-2 rounded-1 w-25">
+                    Records: Last 7 days
+                </div>
+            }
+        }
+    }
+</div>
 <table id="reportTable" class="table table-striped mt-4">
     <thead>
         <tr>

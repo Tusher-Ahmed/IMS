@@ -81,7 +81,7 @@ namespace IMS.Web.Areas.Admin.Controllers
                 TotalOrders =_orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus==ShoppingHelper.StatusShipped || u.OrderStatus == ShoppingHelper.StatusDelivered).Count(),
                 TotalNewOrders= _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus != ShoppingHelper.StatusCancelled &&
                     u.OrderStatus != ShoppingHelper.StatusRefunded && u.OrderStatus != ShoppingHelper.StatusShipped).Count(),
-                TotalCancelOrder= _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled && u.PaymentStatus!=ShoppingHelper.StatusRefunded).Count()
+                TotalCancelOrder= _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled && u.PaymentStatus==ShoppingHelper.StatusRefunded).Count()
 
             };
             return View(prod);
@@ -560,13 +560,18 @@ namespace IMS.Web.Areas.Admin.Controllers
                 var employeeId = firstOrderHistory.EmployeeId;
                 var GarmentsId = firstOrderHistory.GarmentsId;
                 var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
-                var garments = _supplierService.GetSupplierByUserId(GarmentsId).Name;
-                if (manager != null && garments != null)
+                List<string> name = new List<string>();
+                foreach (var item in History)
+                {
+                    var garments = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                    name.Add(garments);
+                }
+                if (manager != null )
                 {
                     InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
                     {
                         orderHistories = History,
-                        GarmentsName = garments,
+                        GarmentsName = name,
                         ManagerEmail = manager.Email,
                     };
                     return View(inventoryInvoiceViewModel);

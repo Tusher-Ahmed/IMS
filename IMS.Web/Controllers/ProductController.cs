@@ -240,6 +240,7 @@ namespace IMS.Web.Controllers
             if (prod != null)
             {
                 prod.Approved = false;
+                prod.Rejected = true;
                 prod.ApprovedBy = Convert.ToInt64(User.Identity.GetUserId());
                 prod.ModificationDate = DateTime.Now;
                 prod.VersionNumber = 1;
@@ -251,7 +252,7 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Staff,Admin")]
         public ActionResult RejectedProductList()
         {
-            var prod = _product.GetAllProduct().Where(u => u.Approved == false).ToList();
+            var prod = _product.GetAllProduct().Where(u => u.Approved == false && u.Rejected==true).ToList();
             return View(prod);
         }
         #region Update Price and Status by Manager

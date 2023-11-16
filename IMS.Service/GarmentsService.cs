@@ -16,7 +16,7 @@ namespace IMS.Service
     public interface IGarmentsService
     {
         IEnumerable<GarmentsProduct> GetAllP();
-        GarmentsProductViewModel GetAllProduct(int pageNumber);
+        GarmentsProductViewModel GetAllProduct(int pageNumber,long? supplierId);
         GarmentsProduct GetGarmentsProductById(long id);
         GarmentsProduct GetGarmentsProductByProductCode(int id);
         void CreateGarmentsProduct(GarmentsProduct garmentsProduct);
@@ -48,9 +48,14 @@ namespace IMS.Service
         #endregion
 
         #region Get All Product with Page number
-        public GarmentsProductViewModel GetAllProduct(int pageNumber)
+        public GarmentsProductViewModel GetAllProduct(int pageNumber, long? supplierId)
         {
-            var query = _repository.GetAll().Where(u=>u.Status==1).ToList();
+            var query = _repository.GetAll().Where(u => u.Status == 1).ToList();
+            if (supplierId != 0)
+            {
+                query = query.Where(u => u.GarmentsId==supplierId).ToList();
+            }
+           
 
             int pageSize = 8;
             int totalCount = query.Count();

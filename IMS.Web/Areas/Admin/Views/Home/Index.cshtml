@@ -72,11 +72,11 @@
                 </div>
                 <br />
                 <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Cancelled"})" id="totalProduct" style="text-decoration:none;">
+                    <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Refunded"})" id="totalProduct" style="text-decoration:none;">
                         <div class="box bg-danger text-center text-light p-3">
                             <i class="fa-solid fa-circle-left font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalCancelOrder</h5>
-                            <small class="font-light">Refund Orders</small>
+                            <small class="font-light">Refunded Orders</small>
                         </div>
                     </a>
                 </div>

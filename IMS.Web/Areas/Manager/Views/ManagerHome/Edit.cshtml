@@ -50,7 +50,7 @@
                     </div>
                     <br />
                     <div class="form-group mb-3">
-                        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4",id= "tiny" })
+                        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
                         @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
                     </div>
                     <br />
@@ -70,8 +70,9 @@
 
 @section Scripts{
     @Scripts.Render("~/bundles/jqueryval")
-    <script>// Clear the Price field when the page loads
-       
+    <script>
+    // Clear the Price field when the page loads
+
         tinymce.init({
             selector: 'textarea#tiny',
             plugins: 'ai mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
@@ -109,3 +110,6 @@
             ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
         });</script>
 }
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

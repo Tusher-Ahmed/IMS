@@ -50,10 +50,10 @@
                 messageElement.innerHTML = data.message;
 
                 if (data.success) {
-                    
+
                     messageElement.classList.add("message");
                 } else {
-                   
+
                     messageElement.classList.add("messageError");
                 }
 
@@ -75,3 +75,6 @@
 
     @Scripts.Render("~/bundles/jqueryval")
 }
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

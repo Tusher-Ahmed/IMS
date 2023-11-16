@@ -49,7 +49,7 @@
     </div>
 </div>
 <div class="row pt-3 pb-4">
-    @if (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
+    @if (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved || User.IsInRole("Manager") || User.IsInRole("Admin"))
     {
         using (Html.BeginForm("CancelOrderWithoutRefund", "CustomerOrder", new { area = "Manager" }, FormMethod.Post))
         {

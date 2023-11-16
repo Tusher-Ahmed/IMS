@@ -70,7 +70,8 @@
 
 @section Scripts{
     @Scripts.Render("~/bundles/jqueryval")
-    <script>// Clear the Price field when the page loads
+    <script>
+    // Clear the Price field when the page loads
 
         tinymce.init({
             selector: 'textarea#tiny',
@@ -109,3 +110,6 @@
             ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
         });</script>
 }
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

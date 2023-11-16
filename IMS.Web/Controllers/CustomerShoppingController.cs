@@ -96,7 +96,7 @@ namespace IMS.Web.Controllers
             long userId = Convert.ToInt64(User.Identity.GetUserId());
             CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
             {
-                shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList(),
+                shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status==1).ToList(),
                 OrderHeader = new OrderHeader()
             };
             foreach (var cart in shoppingCartViewModel.shoppingCarts)
@@ -120,7 +120,7 @@ namespace IMS.Web.Controllers
 
             CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
             {
-                shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList(),
+                shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status == 1).ToList(),
                 OrderHeader = new OrderHeader()
             };
             foreach (var cart in shoppingCartViewModel.shoppingCarts)
@@ -148,7 +148,7 @@ namespace IMS.Web.Controllers
 
             CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
             {
-                shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList(),
+                shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status == 1).ToList(),
                 OrderHeader = new OrderHeader()
             };
             foreach (var cart in shoppingCartViewModel.shoppingCarts)
@@ -237,7 +237,7 @@ namespace IMS.Web.Controllers
                 _orderHeaderService.UpdateStatus(id, ShoppingHelper.StatusApproved, ShoppingHelper.PaymentStatusApproved);
             }
 
-            List<ShoppingCart> shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList();
+            List<ShoppingCart> shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId ).ToList();
             foreach (var cart in shoppingCarts)
             {
                 _customerShopping.RemoveProduct(cart);

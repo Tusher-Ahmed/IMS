@@ -7,7 +7,7 @@
 <main aria-labelledby="title">
     <div class="row">
         <div class="col-6">
-            <h4 class="text-uppercase">Create a new account</h4>
+            <h4 class="text-uppercase">Register as a new user</h4>
         </div>
         <div class="col-6 text-end">
             @Html.ActionLink("Register as a Customer", "Register", "Account", new { @class = "btn btn-outline-secondary" })
@@ -22,8 +22,8 @@
         @Html.ValidationSummary("", new { @class = "text-danger" })
         <div class="row">
             @*<div class="col-md-12 pb-2">
-                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Enter your username" })
-            </div>*@
+                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Enter your username" })
+                </div>*@
             <div class="col-md-12 pb-2">
                 @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter your email" })
             </div>
@@ -63,7 +63,7 @@
                         @Html.ActionLink("Login", "Login", "Account", new { @class = "btn pt-1 text-primary" })
                     </div>
                 }
-                </div>
+            </div>
         </div>
     }
 </main>
@@ -71,3 +71,6 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

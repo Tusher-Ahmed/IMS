@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace IMS.Models.ViewModel
 {
-    public class GarmentsDashboardViewModel
+    public class GarmentsOrderHistoryViewModel
     {
-        public IEnumerable<GarmentsProduct> Products { get; set; }
-        public int TotalProduct {  get; set; }
-        public int TotalHistory {  get; set; }
         public IEnumerable<OrderHistory> OrderHistory { get; set; }
         public Dictionary<long, decimal> TotalPrice { get; set; }
     }

@@ -31,6 +31,7 @@ namespace IMS.DAO.Mapping
             Map(x => x.ModifyBy);
             Map(x => x.ModificationDate);
             Map(x => x.Approved);
+            Map(x => x.Rejected);
             Map(x => x.ApprovedBy);
             Map(x => x.Status);
             Map(x => x.Rank);

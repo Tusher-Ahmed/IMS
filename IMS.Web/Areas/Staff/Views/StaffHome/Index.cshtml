@@ -17,7 +17,7 @@
         <!-- Right Side - View of Corresponding Action -->
         <div class="col-md-9" id="result-container">
             <div class="row">
-                <div class="col-md-6 col-lg-6 col-xlg-6 pb-2">
+                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
                     <a href="@Url.Action("ApproveProduct", "Product", new {area=""})" style="text-decoration:none;">
                         <div class="box bg-primary text-center text-light p-3">
                             <i class="fa-solid fa-warehouse font-16"></i>
@@ -27,12 +27,22 @@
                     </a>
                 </div>
                 <br />
-                <div class="col-md-6 col-lg-6 col-xlg-6 pb-2">
+                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
                     <a href="@Url.Action("ApprovedProducts", "StaffHome", new {area="Staff"})" style="text-decoration:none;">
                         <div class="box bg-success text-center text-light p-3">
                             <i class="fa-solid fa-check-double"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalApprovedProduct</h5>
                             <small class="font-light">Approved Products</small>
+                        </div>
+                    </a>
+                </div>
+                <br />
+                <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
+                    <a href="@Url.Action("RejectedProductList", "Product", new {area=""})" style="text-decoration:none;">
+                        <div class="box bg-danger text-center text-light p-3">
+                            <i class="fa-solid fa-right-left"></i>
+                            <h5 class="mb-0 mt-1">@Model.TotalRejectedProduct</h5>
+                            <small class="font-light">Rejected Products</small>
                         </div>
                     </a>
                 </div>
@@ -44,7 +54,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Latest Product</h4>
+                            <h4 class="card-title text-uppercase">Latest Product</h4>
                         </div>
                         <div class="table-responsive p-2">
                             <table class="table table-hover">

@@ -8,7 +8,7 @@ namespace IMS.Models.ViewModel
 {
     public class BuyingReportViewModel
     {
-        public IEnumerable<OrderHistory> History { get; set; }
-        public Dictionary<long, string> GarmentsNames { get; set; }
+        public List<OrderHistory> History { get; set; }
+        public Dictionary<long,string> Name {  get; set; }
     }
 }

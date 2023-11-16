@@ -10,7 +10,7 @@
         <!-- Left Side - Action Buttons -->
         <div class="col-md-3 bg-dark text-dark pt-4" style="height:750px">
             <h5 class="pb-2 p-2 mb-5 text-white"><i class="fa-solid fa-user-tie"></i>&nbsp; @User.Identity.Name</h5>
-            <a href="@Url.Action("Index", "CustomerHome", new {area="Customer"})" class="btn btn-dark mb-2  w-100 text-start"> <img src="~/Images/dash.png"  style="width:25px;padding:0px 6px 0px 0px;" />&nbsp; Dashboard</a>
+            <a href="@Url.Action("Index", "CustomerHome", new {area="Customer"})" class="btn btn-dark mb-2  w-100 text-start"> <img src="~/Images/dash.png" style="width:25px;padding:0px 6px 0px 0px;" />&nbsp; Dashboard</a>
             <a href="@Url.Action("OrderDetails", "CustomerHome", new {area="Customer"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-dolly"></i>&nbsp; My Order</a>
             <a href="@Url.Action("Index", "Manage", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-gear"></i>&nbsp; Setting</a>
         </div>
@@ -31,13 +31,13 @@
                 <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
                     <a href="@Url.Action("OrderDetails", "CustomerHome", new {area="Customer"})" style="text-decoration:none;">
                         <div class="box bg-success text-center text-light p-3">
-                            <i class="fa-solid fa-cart-plus font-16"></i>
+                            <i class="fa-solid fa-clock font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.NewArrival</h5>
                             <small class="font-light">Order In Queue</small>
                         </div>
                     </a>
                 </div>
-                <br />                
+                <br />
                 <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
                     <a href="@Url.Action("OrderDetails", "CustomerHome", new {area="Customer", status = "Cancelled" })" id="totalProduct" style="text-decoration:none;">
                         <div class="box bg-danger text-center text-light p-3">
@@ -56,7 +56,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Latest Sales</h4>
+                            <h4 class="card-title text-uppercase">Recent Orders</h4>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -71,7 +71,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in Model.OrderHeaders.OrderByDescending(u=>u.Id).Take(5))
+                                    @foreach (var item in Model.OrderHeaders.OrderByDescending(u => u.Id).Take(5))
                                     {
                                         <tr>
                                             <td>
@@ -170,3 +170,6 @@
         </div>
     </div>
 </div>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

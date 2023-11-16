@@ -6,7 +6,7 @@
 
 <h2 class="text-uppercase">Add Garments Product</h2>
 <br />
-@using (Html.BeginForm("Create", "Garments", FormMethod.Post, new { enctype = "multipart/form-data", @class = "pb-4 pt-2"}))
+@using (Html.BeginForm("Create", "Garments", FormMethod.Post, new { enctype = "multipart/form-data", @class = "pb-4 pt-2" }))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary("", new { @class = "text-danger" });
@@ -38,7 +38,7 @@
     </div>
     <br />
     <div class="form-group">
-        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
+        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4",id="tiny" })
         @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
     </div>
     <br />
@@ -47,7 +47,7 @@
         </div>*@
 
     <br />
-    <button type="submit" class="btn btn-outline-primary">Add Product</button>
+    <button type="submit" id="btnAdd" class="btn btn-outline-primary">Add Product</button>
     @Html.ActionLink("Back to List", "ProductList", null, new { @class = "btn btn-outline-info" })
 }
 
@@ -68,26 +68,35 @@
                 input.setAttribute('accept', 'image/*');
 
                 input.onchange = function () {
-                  var file = this.files[0];
+                    var file = this.files[0];
 
-                  var reader = new FileReader();
-                  reader.onload = function () {
-                    var id = 'blobid' + (new Date()).getTime();
-                    var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
-                    var base64 = reader.result.split(',')[1];
-                    var blobInfo = blobCache.create(id, file, base64);
-                    blobCache.add(blobInfo);
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        var id = 'blobid' + (new Date()).getTime();
+                        var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                        var base64 = reader.result.split(',')[1];
+                        var blobInfo = blobCache.create(id, file, base64);
+                        blobCache.add(blobInfo);
 
-                    /* call the callback and populate the Title field with the file name */
-                    cb(blobInfo.blobUri(), { title: file.name });
-                  };
-                  reader.readAsDataURL(file);
+                        /* call the callback and populate the Title field with the file name */
+                        cb(blobInfo.blobUri(), { title: file.name });
+                    };
+                    reader.readAsDataURL(file);
                 };
 
                 input.click();
             },
-            
+
             ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
         });
+
+        //$(document).on("click", "#btnAdd", function (e) {
+        //    e.preventDefault();
+        //    let a = $("#Description").val();
+        //    console.log(a);
+        //})
     </script>
 }
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

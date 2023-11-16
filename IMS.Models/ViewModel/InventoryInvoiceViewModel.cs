@@ -9,7 +9,7 @@ namespace IMS.Models.ViewModel
     public class InventoryInvoiceViewModel
     {
         public IEnumerable<OrderHistory> orderHistories { get; set; }
-        public string GarmentsName { get; set; }
+        public List<string> GarmentsName { get; set; }
         public string ManagerEmail {  get; set; }
 
     }

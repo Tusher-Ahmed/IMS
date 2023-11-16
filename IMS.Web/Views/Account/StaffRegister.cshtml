@@ -27,7 +27,7 @@
             </div>
             <div class="col-md-6 pb-2">
                 @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "Enter your phone number" })
-            </div>            
+            </div>
             <div class="col-md-6 pb-2">
                 @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
             </div>
@@ -59,3 +59,6 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

@@ -13,7 +13,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-12 text-center pb-4 mb-5 pt-2">
-                        <h4>@Model.GarmentsName</h4>
+                        <h4>Inventory Invoice</h4>
                     </div>
                     <div class="col-6 pb-2">
                         <h5>Order By</h5>
@@ -57,6 +57,7 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Product Name</th>
+                                    <th>Garments Name</th>
                                     <th>Quantity</th>
                                     <th>Price</th>
                                     <th>Amount</th>
@@ -65,17 +66,20 @@
                             <tbody>
                                 @{
                                     int i = 1;
+                                    int j = 0;
                                 }
                                 @foreach (var item in Model.orderHistories)
                                 {
                                     <tr>
                                         <td>@i</td>
                                         <td>@item.GarmentsProduct.Name</td>
+                                        <td>@Model.GarmentsName.ElementAt(j)</td>
                                         <td>@item.Quantity</td>
                                         <td>@item.Price.ToString("C")</td>
                                         <td>$@(item.Quantity * item.Price)</td>
                                     </tr>
                                     i++;
+                                    j++;
                                 }
                             </tbody>
                         </table>
