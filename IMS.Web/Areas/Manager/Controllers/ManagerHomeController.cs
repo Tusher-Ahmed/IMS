@@ -39,6 +39,8 @@ namespace IMS.Web.Areas.Manager.Controllers
             _orderHeaderService = new OrderHeaderService { Session = session };
             _garmentsService = new GarmentsService { Session = session };
         }
+
+        #region Manager Dashboard
         // GET: Manager/ManagerHome
         [Authorize(Roles = "Manager")]
         public ActionResult Index()
@@ -59,12 +61,16 @@ namespace IMS.Web.Areas.Manager.Controllers
 
             return View(managerDashboardView);
         }
+        #endregion
+
+        #region Product List
         [Authorize(Roles = "Manager")]
         public ActionResult ProductList()
         {
             var product = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true);
             return View(product);
         }
+        #endregion
 
         #region Edit
         [Authorize(Roles = "Manager")]
@@ -102,6 +108,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                 prod.VersionNumber = prod.VersionNumber + 1;
 
                 _product.UpdateProduct(prod);
+                TempData["success"] = "Product updated successfully!";
                 return RedirectToAction("ProductList");
             }
             return View(product);
@@ -190,6 +197,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                 prod.Status = 0;
                 prod.ModifyBy = userId;
                 _product.UpdateProduct(prod);
+                TempData["success"] = "Product status change successfully!";
                 return RedirectToAction("ProductList");
             }
             return View();
@@ -249,6 +257,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                 prod.Status = 1;
                 prod.ModifyBy = userId;
                 _product.UpdateProduct(prod);
+                TempData["success"] = "Product status change successfully!";
                 return RedirectToAction("ProductList");
             }
             return View();

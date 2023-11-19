@@ -22,6 +22,8 @@ namespace IMS.Web.Areas.Garmentss.Controllers
             _garmentsService = new GarmentsService { Session = session };
             _inventoryOrderHistoryService = new InventoryOrderHistoryService { Session = session };
         }
+
+        #region Garments Dashboard
         public ActionResult Index()
         {
             long userId = Convert.ToInt64(User.Identity.GetUserId());
@@ -42,7 +44,9 @@ namespace IMS.Web.Areas.Garmentss.Controllers
             };
             return View(viewModel);
         }
+        #endregion
 
+        #region Order history
         public ActionResult OrderHistory()
         {
             long userId = Convert.ToInt64(User.Identity.GetUserId());
@@ -60,12 +64,17 @@ namespace IMS.Web.Areas.Garmentss.Controllers
             };
             return View(garmentsOrderHistoryViewModel);
         }
+        #endregion
 
+        #region Order Details
         public ActionResult Details(long orderId)
         {
             var HProd= _inventoryOrderHistoryService.GetByOrderId(orderId).Where(u=>u.GarmentsId== Convert.ToInt64(User.Identity.GetUserId()));
             return View(HProd);
         }
+        #endregion
+
+        #region Total Amount calculation
         public decimal TotalAmount(long orderId)
         {
             var HProd = _inventoryOrderHistoryService.GetByOrderId(orderId).Where(u => u.GarmentsId == Convert.ToInt64(User.Identity.GetUserId()));
@@ -76,6 +85,7 @@ namespace IMS.Web.Areas.Garmentss.Controllers
             }
             return price;
         }
-        
+        #endregion
+
     }
 }

@@ -161,6 +161,7 @@ namespace IMS.Web.Controllers
                 deptarment.Status = 0;
                 deptarment.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());               
                 _department.UpdateDept(id, deptarment);
+                TempData["success"] = "Status Updated Successfully";
                 return RedirectToAction("Index", "Department");
             }
             return View();
@@ -211,6 +212,7 @@ namespace IMS.Web.Controllers
                 deptarment.Status = 1;
                 deptarment.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                 _department.UpdateDept(id, deptarment);
+                TempData["success"] = "Status Updated Successfully";
                 return RedirectToAction("Deactivate", "Department");
             }
             return View();

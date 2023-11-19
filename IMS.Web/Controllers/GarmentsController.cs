@@ -93,6 +93,7 @@ namespace IMS.Web.Controllers
 
                 // Save the product in your service
                 _garmentsService.CreateGarmentsProduct(model);
+                TempData["success"] = "Product Added Successfully";
 
                 return RedirectToAction("Index");
             }
@@ -224,6 +225,7 @@ namespace IMS.Web.Controllers
                 garmentsProduct.Department = _departmentService.GetDeptById((long)garmentsProduct.DepartmentId);
                 garmentsProduct.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                 _garmentsService.UpdateGarmentsProduct(id, garmentsProduct);
+                TempData["success"] = "Product Updated Successfully";
                 return RedirectToAction("ProductList", "Garments");
             }
             var departments = _departmentService.GetAllDept();
@@ -252,6 +254,7 @@ namespace IMS.Web.Controllers
             {
                 product.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                 _garmentsService.UpdateStatus(id, product);
+                TempData["success"] = "Status Updated Successfully";
                 return RedirectToAction("ProductList");
             }
             return View(product);
@@ -288,6 +291,7 @@ namespace IMS.Web.Controllers
             {
                 prod.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                 _garmentsService.ActivateStatus(id, prod);
+                TempData["success"] = "Status Updated Successfully";
                 return RedirectToAction("DeactivatedList", "Garments");
             }
             return View(prod);

@@ -284,8 +284,8 @@ namespace IMS.Web.Controllers
                         UserId= user.Id,
                         Status=1
                     };
-                   _customerService.AddCustomer(customer);
-                   await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                   _customerService.AddCustomer(customer);                  
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                     return RedirectToAction("Index", "Product", new { area = "" });
                 }
@@ -395,7 +395,7 @@ namespace IMS.Web.Controllers
                     };
                     _employeeService.AddEmployee(employee);
                     //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-
+                    TempData["success"] = "Employee Registered Successfully!";
                     return RedirectToAction("ERegister", "Account", new { area = "" });
                 }
                 AddErrors(result);
@@ -451,7 +451,7 @@ namespace IMS.Web.Controllers
                     };
                     _employeeService.AddEmployee(employee);
                     //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-
+                    TempData["success"] = "Staff Registered Successfully!";
                     return RedirectToAction("StaffRegister", "Account", new { area = "" });
                 }
                 AddErrors(result);

@@ -543,6 +543,7 @@
     <Content Include="Views\CustomerShopping\OrderConfirmation.cshtml" />
     <Content Include="Views\Product\RejectedProductList.cshtml" />
     <Content Include="Views\CustomerShopping\InvoiceForCustomer.cshtml" />
+    <Content Include="Views\Shared\_Notification.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -552,7 +553,6 @@
     <Folder Include="Areas\Manager\Data\" />
     <Folder Include="Areas\Staff\Data\" />
     <Folder Include="Views\Base\" />
-    <Folder Include="Views\CustomerBase\" />
     <Folder Include="Views\InventoryBase\" />
   </ItemGroup>
   <ItemGroup>

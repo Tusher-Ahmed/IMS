@@ -121,7 +121,7 @@ namespace IMS.Web.Controllers
                         GarmentsId = gProduct.GarmentsId
                     };
                     _product.Add(product);
-
+                    
                 }
                 foreach (var order in Order)
                 {
@@ -228,10 +228,12 @@ namespace IMS.Web.Controllers
                 prod.ModificationDate = DateTime.Now;
                 prod.VersionNumber = 1;
                 _product.UpdateProduct(prod);
+                TempData["success"] = "Product Approved Successfully!";
             }
             return RedirectToAction("ApproveProduct");
         }
         #endregion
+
         #region Reject the product by staff
         [Authorize(Roles = "Staff,Admin")]
         public ActionResult RejectByStaff(long id)
@@ -245,16 +247,21 @@ namespace IMS.Web.Controllers
                 prod.ModificationDate = DateTime.Now;
                 prod.VersionNumber = 1;
                 _product.UpdateProduct(prod);
+                TempData["success"] = "Product has been Rejected!";
             }
             return RedirectToAction("ApproveProduct");
         }
         #endregion
+
+        #region Rejected Product List
         [Authorize(Roles = "Staff,Admin")]
         public ActionResult RejectedProductList()
         {
             var prod = _product.GetAllProduct().Where(u => u.Approved == false && u.Rejected==true).ToList();
             return View(prod);
         }
+        #endregion
+
         #region Update Price and Status by Manager
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult ManagePrice()
@@ -310,6 +317,7 @@ namespace IMS.Web.Controllers
                     existingProduct.Status = 1;
                     existingProduct.VersionNumber = existingProduct.VersionNumber + 1;
                     _product.UpdateProduct(existingProduct);
+                    TempData["success"] = "Product Added to Inventory Successfully!";
                     _product.DeleteProduct(prod);
                     return RedirectToAction("ManagePrice");
                 }
@@ -332,12 +340,13 @@ namespace IMS.Web.Controllers
                     prod.VersionNumber = prod.VersionNumber + 1;
 
                     _product.UpdateProduct(prod);
+                    TempData["success"] = "Product Added to Inventory Successfully!";
                     return RedirectToAction("ManagePrice");
                 }
 
             }
 
-
+            TempData["error"] = "Product is not added to inventory!";
             return RedirectToAction("ManagePrice");
         }
 

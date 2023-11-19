@@ -31,6 +31,8 @@ namespace IMS.Web.Areas.Customer.Controllers
             _customerShopping=new CustomerShoppingService { Session=session};
            
         }
+
+        #region Customer Dashboard
         // GET: Customer/CustomerHome
         public ActionResult Index()
         {
@@ -56,7 +58,9 @@ namespace IMS.Web.Areas.Customer.Controllers
             
             return View(viewModel);
         }
+        #endregion
 
+        #region Order Details
         public ActionResult OrderDetails(string status)
         {
             long userId = Convert.ToInt64(User.Identity.GetUserId());
@@ -94,5 +98,6 @@ namespace IMS.Web.Areas.Customer.Controllers
 
             
         }
+        #endregion
     }
 }

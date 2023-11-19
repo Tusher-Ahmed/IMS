@@ -153,6 +153,7 @@ namespace IMS.Web.Controllers
                 productType.Status = 0;
                 productType.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                 _productType.UpdateProductType(id, productType);
+                TempData["success"] = "Status Updated Successfully!";
                 return RedirectToAction("Index", "ProductType");
             }
             return View();
@@ -203,6 +204,7 @@ namespace IMS.Web.Controllers
                 ProductType.Status = 1;
                 ProductType.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                 _productType.UpdateProductType(id, ProductType);
+                TempData["success"] = "Status Updated Successfully!";
                 return RedirectToAction("Deactivate", "ProductType");
             }
             return View();

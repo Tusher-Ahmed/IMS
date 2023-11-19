@@ -119,6 +119,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                 orderHeader.TrackingNumber= customerInvoiceViewModel.OrderHeader.TrackingNumber;
             }
             _orderHeaderService.Update(orderHeader);
+            TempData["success"] = "Order Details Updated Successfully!";
             return RedirectToAction("Edit", "CustomerOrder", new {id=customerInvoiceViewModel.OrderHeader.Id});
         }
         #endregion
@@ -129,6 +130,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         public ActionResult StartProcessing(CustomerInvoiceViewModel customerInvoiceViewModel)
         {
             _orderHeaderService.UpdateStatus(customerInvoiceViewModel.OrderHeader.Id, ShoppingHelper.StatusInProces, customerInvoiceViewModel.OrderHeader.PaymentStatus);
+            TempData["success"] = "Order status change successfully!";
             return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
         }
         #endregion
@@ -144,6 +146,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             orderHeader.OrderStatus = ShoppingHelper.StatusShipped;
             orderHeader.ShippingDate=DateTime.Now;
             _orderHeaderService.Update(orderHeader);
+            TempData["success"] = "Order status change successfully!";
             return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
         }
         #endregion
@@ -154,6 +157,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         public ActionResult DeliveredOrder(CustomerInvoiceViewModel customerInvoiceViewModel)
         {
             _orderHeaderService.UpdateStatus(customerInvoiceViewModel.OrderHeader.Id, ShoppingHelper.StatusDelivered, customerInvoiceViewModel.OrderHeader.PaymentStatus);
+            TempData["success"] = "Order status change successfully!";
             return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
         }
         #endregion
@@ -191,6 +195,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             };
             _orderHeaderService.UpdateStatus(orderHeader.Id, ShoppingHelper.StatusCancelled, orderHeader.PaymentStatus);
             _cancelReasonService.AddReason(cancelReason);
+            TempData["success"] = "Order Cancelled!";
             return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
         }
         #endregion
@@ -211,8 +216,8 @@ namespace IMS.Web.Areas.Manager.Controllers
                 };
                 var service = new RefundService();
                 Refund refund = service.Create(options);
-                _orderHeaderService.UpdateStatus(orderHeader.Id, ShoppingHelper.StatusCancelled, ShoppingHelper.StatusRefunded);                
-
+                _orderHeaderService.UpdateStatus(orderHeader.Id, ShoppingHelper.StatusCancelled, ShoppingHelper.StatusRefunded);
+                TempData["success"] = "Payment Refunded Successfully!";
                 var orderDetails=_orderDetailService.getAllOrderDetails().Where(u=>u.OrderHeader.Id==orderHeader.Id).ToList();
                 foreach (var item in orderDetails)
                 {

@@ -40,41 +40,41 @@
 
 
 @section Scripts {
-    <script>
-        var messageTimer;
+        <script>
+            var messageTimer;
 
-        function updateDivDept(data) {
-            var divElement = document.getElementById("DivDept");
-            if (data && data.message) {
-                var messageElement = document.createElement("div");
-                messageElement.innerHTML = data.message;
+            function updateDivDept(data) {
+                var divElement = document.getElementById("DivDept");
+                if (data && data.message) {
+                    var messageElement = document.createElement("div");
+                    messageElement.innerHTML = data.message;
 
-                if (data.success) {
+                    if (data.success) {
 
-                    messageElement.classList.add("message");
-                } else {
+                        messageElement.classList.add("message");
+                    } else {
 
-                    messageElement.classList.add("messageError");
+                        messageElement.classList.add("messageError");
+                    }
+
+                    divElement.appendChild(messageElement);
+
+                    messageTimer = setTimeout(function () {
+                        messageElement.remove();
+                    }, 2000);
                 }
-
-                divElement.appendChild(messageElement);
-
-                messageTimer = setTimeout(function () {
-                    messageElement.remove();
-                }, 2000);
             }
-        }
 
-        // AJAX form submission complete callback
-        function ClearFields(ajaxContext) {
-            updateDivDept(ajaxContext.responseJSON);
-            document.getElementById("dName").value = "";
+            // AJAX form submission complete callback
+            function ClearFields(ajaxContext) {
+                updateDivDept(ajaxContext.responseJSON);
+                document.getElementById("dName").value = "";
 
-        }
-    </script>
+            }
+        </script>
 
-    @Scripts.Render("~/bundles/jqueryval")
-}
+        @Scripts.Render("~/bundles/jqueryval")
+    }
 <script src="~/Scripts/jquery-3.4.1.min.js"></script>
 <script src="~/Scripts/jquery.validate.min.js"></script>
 <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

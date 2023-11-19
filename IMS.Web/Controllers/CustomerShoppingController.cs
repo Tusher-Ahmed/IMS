@@ -263,6 +263,7 @@ namespace IMS.Web.Controllers
                 OrderDetails= OrderDetails,
                 Products= products
             };
+            TempData["success"] = "Order Placed Successfully!";
             return View(customerInvoiceViewModel);
             
         }

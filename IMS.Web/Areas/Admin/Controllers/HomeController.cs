@@ -137,6 +137,7 @@ namespace IMS.Web.Areas.Admin.Controllers
                 prod.VersionNumber = prod.VersionNumber + 1;
 
                 _product.UpdateProduct(prod);
+                TempData["success"] = "Product Updated Successfully!";
                 return RedirectToAction("ProductList");
             }
             return View(product);
@@ -223,6 +224,7 @@ namespace IMS.Web.Areas.Admin.Controllers
                 prod.Status = 0;
                 prod.ModifyBy = userId;
                 _product.UpdateProduct(prod);
+                TempData["success"] = "Status Updated Successfully!";
                 return RedirectToAction("ProductList");
             }
             return View();
@@ -278,6 +280,7 @@ namespace IMS.Web.Areas.Admin.Controllers
                 prod.Status = 1;
                 prod.ModifyBy = userId;
                 _product.UpdateProduct(prod);
+                TempData["success"] = "Status Updated Successfully!";
                 return RedirectToAction("ProductList");
             }
             return View();
@@ -395,7 +398,7 @@ namespace IMS.Web.Areas.Admin.Controllers
             {                               
                 employee.Status = 0;
                 _employeeService.UpdateEmployee(employee);
-
+                TempData["success"] = "Employee Deactivation Completed Successfully!";
                 return RedirectToAction("Employees");
             }
             else
@@ -496,7 +499,7 @@ namespace IMS.Web.Areas.Admin.Controllers
             {               
                 customer.Status = 0;
                 _customerService.UpdateCustomer(customer);
-
+                TempData["success"] = "Customer Deactivated Successfully!";
                 return RedirectToAction("Shop");
             }
             else
@@ -546,6 +549,7 @@ namespace IMS.Web.Areas.Admin.Controllers
             return View(usersDetails);
         }
         #endregion
+
         #region Order History Product Details
 
         public ActionResult ProductDetails(long orderId)
