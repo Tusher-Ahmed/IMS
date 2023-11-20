@@ -1,0 +1,37 @@
+﻿@model IEnumerable<IMS.Models.OrderHeader>
+
+<table id="reportTable" class="table table-striped mt-4">
+    <thead>
+        <tr>
+            <th>Order Id</th>
+            <th>Shop Name</th>
+            <th>Payment Status</th>
+            <th>Order Date</th>
+            <th>Order Total($)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.PaymentStatus</td>
+                <td>@item.OrderDate.ToString().AsDateTime().ToShortDateString()</td>
+                <td>@item.OrderTotal.ToString("C")</td>
+            </tr>
+        }
+        <tr class="bg-dark text-white">
+            <td class="fw-bold text-white">Total :</td>
+            <td colspan="3"></td>
+            @{
+                decimal totalAmount = 0;
+            }
+            @foreach (var item in Model)
+            {
+                totalAmount += @item.OrderTotal;
+            }
+            <td class="fw-bold text-white">@totalAmount.ToString("C")</td>
+        </tr>
+    </tbody>
+</table>

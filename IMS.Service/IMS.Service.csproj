@@ -215,6 +215,7 @@
     <Compile Include="GarmentsService.cs" />
     <Compile Include="IInventoryOrderHistoryService.cs" />
     <Compile Include="InventoryShoppingService.cs" />
+    <Compile Include="ManageProductService.cs" />
     <Compile Include="NHibernateHelper.cs" />
     <Compile Include="OrderDetailService.cs" />
     <Compile Include="OrderHeaderService.cs" />

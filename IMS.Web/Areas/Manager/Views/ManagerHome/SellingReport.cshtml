@@ -9,14 +9,14 @@
         <h4 class="text-uppercase">Selling Report</h4>
     </div>
 </div>
-@using (Html.BeginForm("SellingReport", "ManagerHome", FormMethod.Get))
+@using (Html.BeginForm("", "", FormMethod.Post))
 {
     <div class="row">
         <div class="col">
-            <input type="date" class="form-control" id="startDate" name="startDate" value="@(Request.QueryString["startDate"] ?? "")" />
+            <input type="date" class="form-control" id="startDate" name="startDate" value="@ViewBag.StartDateValue" />
         </div>
         <div class="col">
-            <input type="date" class="form-control" id="finalDate" name="endDate" value="@(Request.QueryString["endDate"] ?? "")" />
+            <input type="date" class="form-control" id="finalDate" name="endDate" value="@ViewBag.EndDateValue" />
         </div>
         <div class="col">
             <input type="text" class="form-control" id="search" name="searchText" placeholder="Write order id or shop name..." value="@(Request.QueryString["searchText"] ?? "")" />
@@ -26,91 +26,65 @@
         </div>
     </div>
 }
-<div class="pt-3 pb-3 rounded-1">
-    @{
-        DateTime? start = string.IsNullOrEmpty(Request.QueryString["startDate"]) ? (DateTime?)null : Request.QueryString["startDate"].AsDateTime();
-        DateTime? end = string.IsNullOrEmpty(Request.QueryString["endDate"]) ? (DateTime?)null : Request.QueryString["endDate"].AsDateTime();
-        int duration = 7;
-        string searchText = Request.QueryString["searchText"] ?? "";
-        string status = "";
 
-        if (start.HasValue && end.HasValue)
-        {
-            TimeSpan difference = end.Value - start.Value;
-            duration = (int)difference.TotalDays+1;
-            if (string.IsNullOrEmpty(searchText))
-            {
-                <div class="bg-dark text-white p-2 rounded-1 w-25">
-                    Records:  @duration <span>days</span>
-                </div>
-            }
-        }
-        else if (start.HasValue && !end.HasValue)
-        {
-            TimeSpan difference = DateTime.Now - start.Value;
-            duration = (int)difference.TotalDays+1;
-            if (string.IsNullOrEmpty(searchText))
-            {
-                <div class="bg-dark text-white p-2 rounded-1 w-25">
-                    Records:  @duration <span>days</span>
-                </div>
-            }
-        }
-        else if (!start.HasValue && end.HasValue)
-        {
-            status = "All records before " + end.Value.ToString("MM/dd/yyyy");
-            if (string.IsNullOrEmpty(searchText))
-            {
-                <div class="bg-dark text-white p-2 rounded-1 w-25">
-                    Records:   @status
-                </div>
-            }
-        }
-        else
-        {
-            if (string.IsNullOrEmpty(searchText))
-            {
-                <div class="bg-dark text-white p-2 rounded-1 w-25">
-                    Records: Last 7 days
-                </div>
-            }
-        }
-    }
-</div>
-<table id="reportTable" class="table table-striped mt-4">
-    <thead>
-        <tr>
-            <th>Order Id</th>
-            <th>Shop Name</th>
-            <th>Payment Status</th>
-            <th>Order Date</th>
-            <th>Shipping Date</th>
-            <th>Order Total($)</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div id="tableContainer">
+    <table id="reportTable" class="table table-striped mt-4">
+        <thead>
             <tr>
-                <td>@item.Id</td>
-                <td>@item.Name</td>
-                <td>@item.PaymentStatus</td>
-                <td>@item.OrderDate.ToString().AsDateTime().ToShortDateString()</td>
-                <td>@item.ShippingDate.ToString().AsDateTime().ToShortDateString()</td>
-                <td>@item.OrderTotal.ToString("C")</td>
+                <th>Order Id</th>
+                <th>Shop Name</th>
+                <th>Payment Status</th>
+                <th>Order Date</th>
+                <th>Order Total($)</th>
             </tr>
-        }
-        <tr class="bg-dark text-white">
-            <td class="fw-bold text-white">Total :</td>
-            <td colspan="4"></td>
-            @{
-                decimal totalAmount = 0;
-            }
+        </thead>
+        <tbody>
             @foreach (var item in Model)
             {
-                totalAmount += @item.OrderTotal;
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Name</td>
+                    <td>@item.PaymentStatus</td>
+                    <td>@item.OrderDate.ToString().AsDateTime().ToShortDateString()</td>
+                    <td>@item.OrderTotal.ToString("C")</td>
+                </tr>
             }
-            <td class="fw-bold text-white">@totalAmount.ToString("C")</td>
-        </tr>
-    </tbody>
-</table>
+            <tr class="bg-dark text-white">
+                <td class="fw-bold text-white">Total :</td>
+                <td colspan="3"></td>
+                @{
+                    decimal totalAmount = 0;
+                }
+                @foreach (var item in Model)
+                {
+                    totalAmount += @item.OrderTotal;
+                }
+                <td class="fw-bold text-white">@totalAmount.ToString("C")</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(document).on('click', '#btnView', function (e) {
+                e.preventDefault();
+                $("#tableContainer").html("");
+                let startDate = $("#startDate").val();
+                let endDate = $("#finalDate").val();
+                let searchText = $("#search").val();
+
+                $.ajax({
+                    url: `@Url.Action("LoadSellingRecord", "ManagerHome")`,
+                    data: { startDate: startDate, endDate: endDate, searchText: searchText },
+                    success: function (result) {
+                        console.log(result);
+                        $("#tableContainer").html(result);
+                    }
+                });
+
+            })
+        })
+    </script>
+}

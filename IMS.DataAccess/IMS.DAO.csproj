@@ -75,8 +75,10 @@
     <Compile Include="Mapping\ProductTypeMap.cs" />
     <Compile Include="Mapping\ShoppingCartMap.cs" />
     <Compile Include="Mapping\SupplierMap.cs" />
+    <Compile Include="OrderHistoryDao.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseDAO.cs" />
+    <Compile Include="SellingReportDAO.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IMS.Models\IMS.Models.csproj">

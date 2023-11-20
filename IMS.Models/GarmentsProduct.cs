@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using IMS.Models.ViewModel;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -28,7 +29,7 @@ namespace IMS.Models
         public virtual decimal Price { get; set; }
 
         [Required(ErrorMessage = "SKU is required")]
-        public virtual string SKU { get; set; }
+        public virtual string SKU { get; set; }      
 
         [Required(ErrorMessage = "Product Description is required.")]
         [AllowHtml]

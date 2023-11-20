@@ -4,7 +4,8 @@
     ViewBag.Title = "Create";
 }
 
-<h2 class="text-uppercase">Add Garments Product</h2>
+
+<h2 class="text-uppercase">Add Product</h2>
 <br />
 @using (Html.BeginForm("Create", "Garments", FormMethod.Post, new { enctype = "multipart/form-data", @class = "pb-4 pt-2" }))
 {
@@ -22,7 +23,18 @@
     </div>
     <br />
     <div class="form-group">
-        @Html.TextBoxFor(model => model.SKU, new { placeholder = "SKU", @class = "form-control" })
+        <label class="pb-2">SKU Options:</label>
+        <div class="form-check d-block p-0">
+            @foreach (var skuOption in new List<string> { "S", "M", "L", "XL", "XXL" })
+            {
+                <div class="form-check p-0" style="display:inline-block; margin-right:10px;">
+                    @Html.CheckBox("SelectedSKUs", false, new { value = skuOption, style = "width: 15px; height: 15px; " })
+                    @Html.Label(skuOption, new { @class = "form-check-label" })
+                </div>
+            }
+        </div>
+
+        @Html.HiddenFor(model => model.SKU)
         @Html.ValidationMessageFor(model => model.SKU, "", new { @class = "text-danger" })
     </div>
     <br />
@@ -38,14 +50,9 @@
     </div>
     <br />
     <div class="form-group">
-        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4",id="tiny" })
+        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
         @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
     </div>
-    <br />
-    @*<div class="form-group">
-            <input type="file" name="imageFile" id="imageFile" class="form-control" />
-        </div>*@
-
     <br />
     <button type="submit" id="btnAdd" class="btn btn-outline-primary">Add Product</button>
     @Html.ActionLink("Back to List", "ProductList", null, new { @class = "btn btn-outline-info" })
@@ -89,12 +96,19 @@
 
             ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
         });
+        $('input[name="SelectedSKUs"]').on('change', function () {
+            var selectedSKUs = $('input[name="SelectedSKUs"]:checked').map(function () {
+                return this.value;
+            }).get().join(',');
 
-        //$(document).on("click", "#btnAdd", function (e) {
-        //    e.preventDefault();
-        //    let a = $("#Description").val();
-        //    console.log(a);
-        //})
+            $('#SKU').val(selectedSKUs);
+        });
+
+                //$(document).on("click", "#btnAdd", function (e) {
+                //    e.preventDefault();
+                //    let a = $("#Description").val();
+                //    console.log(a);
+                //})
     </script>
 }
 <script src="~/Scripts/jquery-3.4.1.min.js"></script>

@@ -1,4 +1,5 @@
 ﻿using IMS.DAO;
+using IMS.DataAccess;
 using IMS.Models;
 using NHibernate;
 using System;
@@ -17,20 +18,23 @@ namespace IMS.Service
         void Update(OrderHeader orderHeader);
         void UpdateStatus(long id, string orderStatus, string PaymentStatus=null);
         void UpdateStripeSessionAndIntent(long id, string sessionId,string paymentIntentId);
+        List<OrderHeader> GetSellingReports(DateTime? start = null, DateTime? end = null, string searchText="");
     }
     public class OrderHeaderService:IOrderHeaderService
     {
         private readonly BaseDAO<OrderHeader> _repository;
+        private readonly ISellingReportDAO _sellingReportDAO;
         private ISession _session;
 
         public ISession Session
         {
             get { return _session; }
-            set { _session = value; _repository.Session = value; }
+            set { _session = value; _repository.Session = value; _sellingReportDAO.Session = value; }
         }
         public OrderHeaderService()
         {
             _repository = new BaseDAO<OrderHeader>();
+            _sellingReportDAO = new SellingReportDAO();
         }
 
         public void AddOrderHeader(OrderHeader orderHeader)
@@ -128,6 +132,11 @@ namespace IMS.Service
         public IEnumerable<OrderHeader> GetAllOrderHeaders()
         {
             return _repository.GetAll();
+        }
+
+        public List<OrderHeader> GetSellingReports(DateTime? start = null, DateTime? end = null, string searchText = "")
+        {
+            return _sellingReportDAO.SellingRecords(start, end, searchText);
         }
     }
 }

@@ -36,7 +36,7 @@ namespace IMS.Web.Controllers
 
         }
 
-        #region Get All Product
+        #region Product page
         // GET: Product
         [AllowAnonymous]
         public ActionResult Index(ProductViewModel product)

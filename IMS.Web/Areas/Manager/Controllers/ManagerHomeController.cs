@@ -30,6 +30,8 @@ namespace IMS.Web.Areas.Manager.Controllers
         private readonly ISupplierService _supplierService;
         private readonly IOrderHeaderService _orderHeaderService;
         private readonly IGarmentsService _garmentsService;
+        private readonly IManageProductService _manageProductService;
+
         public ManagerHomeController(ISession session) : base(session)
         {
             _product = new ProductService { Session = session };
@@ -38,6 +40,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             _supplierService = new SupplierService { Session = session };
             _orderHeaderService = new OrderHeaderService { Session = session };
             _garmentsService = new GarmentsService { Session = session };
+            _manageProductService = new ManageProductService { Session = session };
         }
 
         #region Manager Dashboard
@@ -88,7 +91,12 @@ namespace IMS.Web.Areas.Manager.Controllers
         public ActionResult Edit(long id, Product product)
         {
             var prod = _product.GetProductById(id);
-            var (processedDescription, primaryImageUrl) = ProcessDescription(product.Description);
+            var targetFolderPath = Server.MapPath("~/Images");
+            var (processedDescription, primaryImageUrl, error) = _manageProductService.ProcessDescription(product.Description,targetFolderPath);
+            if (!string.IsNullOrEmpty(error))
+            {
+                ModelState.AddModelError("Image", error);
+            }
             long userId = Convert.ToInt64(User.Identity.GetUserId());
             if (prod != null)
             {
@@ -113,61 +121,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             }
             return View(product);
         }
-        private (string, string) ProcessDescription(string description)
-        {
-
-            string pattern = "<img.*?src=[\"'](.*?)[\"'].*?>";
-            var match = Regex.Match(description, pattern);
-
-            if (match.Success)
-            {
-                string dataUri = match.Groups[1].Value;
-
-                if (dataUri.StartsWith("data:image/"))
-                {
-                    byte[] imageBytes = Convert.FromBase64String(dataUri.Split(',')[1]);
-
-                    // Check the image size here
-                    if (imageBytes.Length > 5 * 1024 * 1024)
-                    {
-                        ModelState.AddModelError("Image", "Image size cannot exceed 5 MB.");
-                        return (description, null);
-                    }
-                    string imageUrl = SaveDataUriAsImage(dataUri);
-
-                    // Remove the embedded image from the description
-                    string processedDescription = description.Replace(match.Value, string.Empty);
-
-                    // Remove extra line breaks and white spaces
-                    processedDescription = processedDescription.Trim();
-
-                    return (processedDescription, imageUrl);
-                }
-            }
-
-            // No embedded image found
-            return (description, null);
-        }
-
-        private string SaveDataUriAsImage(string dataUri)
-        {
-            // Extract the file extension from the data URI
-            string extension = dataUri.Split(';')[0].Split('/')[1];
-
-            // Create a unique file name
-            string fileName = Guid.NewGuid() + "." + extension;
-
-            // Get the base64-encoded image data
-            string base64Data = dataUri.Split(',')[1];
-
-            // Decode and save the image as a file
-            byte[] imageBytes = Convert.FromBase64String(base64Data);
-            string imagePath = Path.Combine(Server.MapPath("~/Images"), fileName); // Change this path to where you want to save the image
-            System.IO.File.WriteAllBytes(imagePath, imageBytes);
-
-            // Return the URL to the saved image
-            return fileName; // Adjust the path as needed
-        }
+       
         #endregion
 
         #region Status
@@ -272,6 +226,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
             var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
             string roleNames = "Staff";
+
             var roleIds = roleManager.Roles
                 .Where(r => roleNames.Contains(r.Name))
                 .Select(r => r.Id)
@@ -280,7 +235,9 @@ namespace IMS.Web.Areas.Manager.Controllers
             var usersWithDetails = context.Users
                 .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
                 .ToList();
+
             List<Employee> staffs = new List<Employee>();
+
             foreach (var user in usersWithDetails)
             {
                 var employee = _employeeService.GetEmployeeByUserId(user.Id);
@@ -290,6 +247,7 @@ namespace IMS.Web.Areas.Manager.Controllers
 
                 }
             }
+
             return staffs.Count();
         }
         #endregion
@@ -515,115 +473,83 @@ namespace IMS.Web.Areas.Manager.Controllers
         #endregion
 
         #region Selling Report
+
         [Authorize(Roles = "Manager,Admin")]
-        public ActionResult SellingReport(DateTime? startDate, DateTime? endDate, string searchText)
+        public ActionResult SellingReport()
         {
-            var orderHeader = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus != ShoppingHelper.StatusCancelled);
-            if (string.IsNullOrEmpty(searchText))
-            {
-                if (!startDate.HasValue && !endDate.HasValue)
-                {
-                    // If no dates provided, set default date range to the last 7 days
-                    endDate = DateTime.Now;
-                    startDate = endDate.Value.AddDays(-7);
-                    orderHeader = orderHeader.Where(u => (u.ShippingDate >= startDate && u.ShippingDate <= endDate));
-                }
-            }
+            var startDate = DateTime.Now.AddDays(-7);
+            var endDate = DateTime.Now;
+            var orderHeader = _orderHeaderService.GetSellingReports(startDate, endDate);
 
-            if (startDate.HasValue && endDate.HasValue)
-            {
-                orderHeader = orderHeader.Where(u => (u.ShippingDate >= startDate && u.ShippingDate <= endDate.Value.AddDays(1)));
-            }
-            if (startDate.HasValue && !endDate.HasValue)
-            {
-                orderHeader = orderHeader.Where(u => (u.ShippingDate >= startDate));
-            }
-
-            if (!startDate.HasValue && endDate.HasValue)
-            {
-                orderHeader = orderHeader.Where(u => (u.ShippingDate <= endDate.Value.AddDays(1)));
-            }
-            if (!string.IsNullOrEmpty(searchText))
-            {
-                orderHeader = orderHeader
-                                 .Where(x =>
-                                     x.Id.ToString().Equals(searchText) || // Exact numeric match for ID
-                                     (
-                                         x.Id.ToString().Contains(searchText) && // Contains numeric match for ID
-                                         x.Id.ToString().IndexOf(searchText, StringComparison.OrdinalIgnoreCase) == 0
-                                     ) ||
-                                     x.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) == 0
-                                 )
-                                 .ToList();
-            }
+            ViewBag.StartDateValue = startDate.ToString("yyyy-MM-dd");
+            ViewBag.EndDateValue = endDate.ToString("yyyy-MM-dd");
 
             return View(orderHeader);
         }
+
+        public ActionResult LoadSellingRecord(DateTime? startDate, DateTime? endDate, string searchText)
+        {
+            List<OrderHeader> orders = new List<OrderHeader>();
+            orders = _orderHeaderService.GetSellingReports(startDate, endDate, searchText);
+
+            return PartialView("Partial/_SellingReport", orders);
+        }
+
         #endregion
 
         #region Buying Report
+
         [Authorize(Roles = "Manager,Admin")]
-        public ActionResult BuyingReport(DateTime? startDate, DateTime? endDate, string searchText)
+        public ActionResult BuyingReport()
         {
             var context = new ApplicationDbContext();
             var product = _product.GetAllProduct().Where(u=>u.Rejected!=true);
             List<OrderHistory> history = new List<OrderHistory>();
-            foreach(var item in product)
-            {
-                var his = _inventoryOrderHistoryService.GetById(item.OrderHistoryId);
-                history.Add(his);
-            }
-            //var history = _inventoryOrderHistoryService.GetAll().GroupBy(u => u.OrderId).Select(u => u.First()).ToList();
-      
-            if (string.IsNullOrEmpty(searchText))
-            {
-                if (!startDate.HasValue && !endDate.HasValue)
-                {
-                    // If no dates provided, set default date range to the last 7 days
-                    endDate = DateTime.Now;
-                    startDate = endDate.Value.AddDays(-7);
-                    history = history.Where(x => x.CreationDate >= startDate && x.CreationDate <= endDate).ToList();
-                }
-            }
-            if (startDate != null && endDate != null)
-            {
-                history = history.Where(x => x.CreationDate >= startDate && x.CreationDate <= endDate.Value.AddDays(1)).ToList();
-            }
-            if (startDate != null)
-            {
-                history = history.Where(x => x.CreationDate >= startDate).ToList();
-            }
-
-            if (endDate != null)
-            {
-                history = history.Where(x => x.CreationDate <= endDate.Value.AddDays(1)).ToList();
-            }
-            if (!string.IsNullOrEmpty(searchText))
-            {
-                history = history
-                             .Where(x =>
-                                 x.OrderId.ToString().Equals(searchText) || // Exact numeric match for Order ID
-                                 (
-                                     x.OrderId.ToString().Contains(searchText) && // Contains numeric match for Order ID
-                                     x.OrderId.ToString().IndexOf(searchText, StringComparison.OrdinalIgnoreCase) == 0
-                                 ) ||
-                                 GetEmployeeNameByHistoryId(x.EmployeeId).IndexOf(searchText, StringComparison.OrdinalIgnoreCase) == 0
-                             )
-                             .ToList();
-            }
             Dictionary<long,string> managers = new Dictionary<long, string>();
-            foreach(var item in history.GroupBy(u=>u.OrderId).Select(t=>t.First()))
+            var startDate = DateTime.Now.AddDays(-7);
+            var endDate = DateTime.Now;
+
+            history = _inventoryOrderHistoryService.GetHistories(product.Select(x => x.OrderHistoryId).ToList(), startDate, endDate);
+            foreach (var item in history.GroupBy(u=>u.OrderId).Select(t=>t.First()))
             {
                 string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
                 managers.Add(item.OrderId,manager);
             }
+
             BuyingReportViewModel viewModel = new BuyingReportViewModel
             {
                 History = history,
                 Name = managers
             };
+
+            ViewBag.StartDateValue = startDate.ToString("yyyy-MM-dd");
+            ViewBag.EndDateValue = endDate.ToString("yyyy-MM-dd");
+
             return View(viewModel);
         }
+
+        public ActionResult LoadReports(DateTime? startDate, DateTime? endDate, string searchText)
+        {
+            var context = new ApplicationDbContext();
+            var product = _product.GetAllProduct().Where(u => u.Rejected != true);
+            List<OrderHistory> history = new List<OrderHistory>();
+            history= _inventoryOrderHistoryService.GetHistories(product.Select(x => x.OrderHistoryId).ToList(), startDate, endDate, searchText);
+            Dictionary<long, string> managers = new Dictionary<long, string>();
+            foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
+            {
+                string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
+                managers.Add(item.OrderId, manager);
+            }
+
+            BuyingReportViewModel viewModel = new BuyingReportViewModel
+            {
+                History = history,
+                Name = managers
+            };
+
+            return PartialView("Partial/_OrderHistory", viewModel);
+        }
+
         #endregion
 
         #region Product Shortage

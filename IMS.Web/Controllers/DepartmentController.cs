@@ -67,15 +67,13 @@ namespace IMS.Web.Controllers
                 {
                     dept.CreatedBy= Convert.ToInt64(User.Identity.GetUserId());
                     _department.AddDept(dept);
-                    TempData["data"] = "Department Created Successfully.";
-                    //return Json(new { message = TempData["data"] });
+                    TempData["data"] = "Department Created Successfully.";                    
                     return Json(new { success = true, message = TempData["data"] });
 
                 }
                 catch
                 {
                     TempData["data"] = "Data is not inserted!!"; ;
-                    //return Json(new { message = TempData["data"] });
                     return Json(new { success = false, message = TempData["data"] });
 
                 }

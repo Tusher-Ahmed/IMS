@@ -3,6 +3,7 @@ using IMS.Models.ViewModel;
 using IMS.Service;
 using Microsoft.AspNet.Identity;
 using NHibernate;
+using Stripe;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,11 +21,13 @@ namespace IMS.Web.Controllers
         private readonly IGarmentsService _garmentsService;
         private readonly IDepartmentService _departmentService;
         private readonly IProductTypeService _productTypeService;
+        private readonly IManageProductService _manageProductService;
         public GarmentsController(ISession session) : base(session)
         {
             _garmentsService = new GarmentsService { Session = session };
             _departmentService = new DepartmentService { Session = session };
             _productTypeService = new ProductTypeService { Session = session };
+            _manageProductService=new ManageProductService { Session = session };
         }
         // GET: Garments
 
@@ -59,17 +62,19 @@ namespace IMS.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var (processedDescription, primaryImageUrl) = ProcessDescription(model.Description);
+
+                var targetFolderPath = Server.MapPath("~/Images");
+                var (processedDescription, primaryImageUrl, error) = _manageProductService.ProcessDescription(model.Description, targetFolderPath);
+                if (!string.IsNullOrEmpty(error))
+                {
+                    ModelState.AddModelError("Image", error);
+                }
 
                 // Set the model.Description to the processed description
                 model.Description = processedDescription;
                 if (string.IsNullOrEmpty(model.Description))
                 {
                     ModelState.AddModelError("Description", "Product Description Is Required.");
-                    var dept = _departmentService.GetAllDept();
-                    var prodType = _productTypeService.GetAllType();
-                    ViewBag.Departments = new SelectList(dept, "Id", "Name");
-                    ViewBag.ProductTypes = new SelectList(prodType, "Id", "Name");
                     return View(model);
                 }
                 model.Image = primaryImageUrl;
@@ -79,10 +84,6 @@ namespace IMS.Web.Controllers
                 if (string.IsNullOrEmpty(model.Image))
                 {
                     ModelState.AddModelError("Image", "Image Is Required.");
-                    var dept = _departmentService.GetAllDept();
-                    var prodType = _productTypeService.GetAllType();
-                    ViewBag.Departments = new SelectList(dept, "Id", "Name");
-                    ViewBag.ProductTypes = new SelectList(prodType, "Id", "Name");
                     return View(model);
                 }
 
@@ -106,61 +107,7 @@ namespace IMS.Web.Controllers
 
             return View(model);
         }
-        private (string, string) ProcessDescription(string description)
-        {
-
-            string pattern = "<img.*?src=[\"'](.*?)[\"'].*?>";
-            var match = Regex.Match(description, pattern);
-
-            if (match.Success)
-            {
-                string dataUri = match.Groups[1].Value;
-
-                if (dataUri.StartsWith("data:image/"))
-                {
-                    byte[] imageBytes = Convert.FromBase64String(dataUri.Split(',')[1]);
-
-                    // Check the image size here
-                    if (imageBytes.Length > 5 * 1024 * 1024)
-                    {
-                        ModelState.AddModelError("Image", "Image size cannot exceed 5 MB.");
-                        return (description, null);
-                    }
-                    string imageUrl = SaveDataUriAsImage(dataUri);
-
-                    // Remove the embedded image from the description
-                    string processedDescription = description.Replace(match.Value, string.Empty);
-
-                    // Remove extra line breaks and white spaces
-                    processedDescription = processedDescription.Trim();
-
-                    return (processedDescription, imageUrl);
-                }
-            }
-
-            // No embedded image found
-            return (description, null);
-        }
-
-        private string SaveDataUriAsImage(string dataUri)
-        {
-            // Extract the file extension from the data URI
-            string extension = dataUri.Split(';')[0].Split('/')[1];
-
-            // Create a unique file name
-            string fileName = Guid.NewGuid() + "." + extension;
-
-            // Get the base64-encoded image data
-            string base64Data = dataUri.Split(',')[1];
-
-            // Decode and save the image as a file
-            byte[] imageBytes = Convert.FromBase64String(base64Data);
-            string imagePath = Path.Combine(Server.MapPath("~/Images"), fileName); // Change this path to where you want to save the image
-            System.IO.File.WriteAllBytes(imagePath, imageBytes);
-
-            // Return the URL to the saved image
-            return fileName; // Adjust the path as needed
-        }
+       
         #endregion
 
         #region Product List
@@ -191,49 +138,94 @@ namespace IMS.Web.Controllers
             var productTypes = _productTypeService.GetAllType();
             ViewBag.Departments = new SelectList(departments, "Id", "Name", product.Department.Id);
             ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name", product.ProductType.Id);
-            return View(product);
+
+            var skus = string.IsNullOrEmpty(product.SKU)
+                                    ? new List<string>()
+                                    : product.SKU.Split(',').ToList();
+
+            GarmentsEditViewModel garmentsEditView = new GarmentsEditViewModel
+            {
+                GarmentsProduct = product,
+                SelectedSKUs = skus
+            };
+
+            return View(garmentsEditView);
         }
         [HttpPost]
         [Authorize(Roles = "Supplier")]
-        public ActionResult Edit(long id, GarmentsProduct garmentsProduct)
+        public ActionResult Edit(long id, GarmentsEditViewModel gv)
         {
-            var product = _garmentsService.GetGarmentsProductById(id);
-            garmentsProduct.Image = product.Image;
 
+            var product = _garmentsService.GetGarmentsProductById(id);
+
+            if (gv.SelectedSKUs!=null)
+            {
+                gv.GarmentsProduct.SKU = string.Join(",", gv.SelectedSKUs);
+            }
+            else
+            {
+                ModelState.AddModelError("SKU", "SKU is required!!");
+
+                var dept = _departmentService.GetAllDept();
+                var productT = _productTypeService.GetAllType();
+                ViewBag.Departments = new SelectList(dept, "Id", "Name", product.Department.Id);
+                ViewBag.ProductTypes = new SelectList(productT, "Id", "Name", product.ProductType.Id);
+
+                var skus = new List<string>();
+
+                GarmentsEditViewModel garmentsEditView = new GarmentsEditViewModel
+                {
+                    GarmentsProduct = product,
+                    SelectedSKUs = skus
+                };
+
+                return View(garmentsEditView);
+            }
+            
+            gv.GarmentsProduct.Image = product.Image;
             if (ModelState.IsValid)
             {
-                var (processedDescription, primaryImageUrl) = ProcessDescription(garmentsProduct.Description);
-                garmentsProduct.Description = processedDescription;
-                if (string.IsNullOrEmpty(garmentsProduct.Description))
+                var targetFolderPath = Server.MapPath("~/Images");
+                var (processedDescription, primaryImageUrl, error) = _manageProductService.ProcessDescription(gv.GarmentsProduct.Description, targetFolderPath);
+
+                if (!string.IsNullOrEmpty(error))
+                {
+                    ModelState.AddModelError("Image", error);
+                    return View(gv.GarmentsProduct);
+                }
+
+                gv.GarmentsProduct.Description = processedDescription;
+
+                if (string.IsNullOrEmpty(gv.GarmentsProduct.Description))
                 {
                     ModelState.AddModelError("Description", "Product Description Is Required.");
-                    var dept = _departmentService.GetAllDept();
-                    var prodType = _productTypeService.GetAllType();
-                    ViewBag.Departments = new SelectList(dept, "Id", "Name");
-                    ViewBag.ProductTypes = new SelectList(prodType, "Id", "Name");
-                    return View(garmentsProduct);
+                    return View(gv.GarmentsProduct);
                 }
                 if (string.IsNullOrEmpty(primaryImageUrl))
                 {
-                    garmentsProduct.Image = product.Image;
+                    gv.GarmentsProduct.Image = product.Image;
                 }
                 else
                 {
-                    garmentsProduct.Image = primaryImageUrl;
+                    gv.GarmentsProduct.Image = primaryImageUrl;
                 }
-                garmentsProduct.ProductType = _productTypeService.GetProductTypeById((long)garmentsProduct.ProductTypeId);
-                garmentsProduct.Department = _departmentService.GetDeptById((long)garmentsProduct.DepartmentId);
-                garmentsProduct.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
-                _garmentsService.UpdateGarmentsProduct(id, garmentsProduct);
+
+                gv.GarmentsProduct.ProductType = _productTypeService.GetProductTypeById((long)gv.GarmentsProduct.ProductTypeId);
+                gv.GarmentsProduct.Department = _departmentService.GetDeptById((long)gv.GarmentsProduct.DepartmentId);
+                gv.GarmentsProduct.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                _garmentsService.UpdateGarmentsProduct(id, gv.GarmentsProduct);
                 TempData["success"] = "Product Updated Successfully";
+
                 return RedirectToAction("ProductList", "Garments");
             }
+
             var departments = _departmentService.GetAllDept();
             var productTypes = _productTypeService.GetAllType();
             ViewBag.Departments = new SelectList(departments, "Id", "Name");
             ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
-            garmentsProduct.Image = product.Image;
-            return View(garmentsProduct);
+            gv.GarmentsProduct.Image = product.Image;
+
+            return View(gv.GarmentsProduct);
         }
         #endregion
 

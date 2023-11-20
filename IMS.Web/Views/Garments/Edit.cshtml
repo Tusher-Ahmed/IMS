@@ -1,4 +1,4 @@
-﻿@model IMS.Models.GarmentsProduct
+﻿@model IMS.Models.ViewModel.GarmentsEditViewModel
 
 @{
     ViewBag.Title = "Edit";
@@ -6,58 +6,70 @@
 
 <h4 class="text-uppercase pb-4">Edit Product</h4>
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("Edit", "Garments", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
 
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.GarmentsProduct.Id)
 
         <div class="row">
             <div class="col-10">
                 <div class="form-group">
-                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    @Html.EditorFor(model => model.GarmentsProduct.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.GarmentsProduct.Name, "", new { @class = "text-danger" })
                 </div>
                 <br />
                 <div class="form-group">
 
-                    @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+                    @Html.EditorFor(model => model.GarmentsProduct.Price, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.GarmentsProduct.Price, "", new { @class = "text-danger" })
                 </div>
                 <br />
                 <div class="form-group">
+                    <label class="pb-2">SKU Options:</label>
+                    <div class="form-check d-block p-0">
+                        @foreach (var skuOption in new List<string> { "S", "M", "L", "XL", "XXL" })
+                        {
+                            <div class="form-check p-0" style="display:inline-block; margin-right:10px;">
+                                @{
+                                    bool isChecked = Model.SelectedSKUs != null && Model.SelectedSKUs.Contains(skuOption);
+                                }
+                                <input type="checkbox" id="@($"SelectedSKUs_{skuOption}")" name="SelectedSKUs" value="@skuOption" @(isChecked ? "checked" : "") style="width: 15px; height: 15px; " />
+                                <label for="@($"SelectedSKUs_{skuOption}")" class="form-check-label">@skuOption</label>
+                            </div>
+                        }
+                    </div>
+                        @Html.HiddenFor(model => model.GarmentsProduct.SKU)
+                        @Html.ValidationMessageFor(model => model.SelectedSKUs, "", new { @class = "text-danger" })
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        @Html.DropDownListFor(model => model.GarmentsProduct.DepartmentId, (SelectList)ViewBag.Departments, "Select Department", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.GarmentsProduct.DepartmentId, "", new { @class = "text-danger" })
+                    </div>
+                    <br />
 
-                    @Html.EditorFor(model => model.SKU, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.SKU, "", new { @class = "text-danger" })
-                </div>
-                <br />
-                <div class="form-group">
-                    @Html.DropDownListFor(model => model.DepartmentId, (SelectList)ViewBag.Departments, "Select Department", new { @class = "form-control" })
-                    @Html.ValidationMessageFor(model => model.DepartmentId, "", new { @class = "text-danger" })
-                </div>
-                <br />
-
-                <div class="form-group">
-                    @Html.DropDownListFor(model => model.ProductTypeId, (SelectList)ViewBag.ProductTypes, "Select Product Type", new { @class = "form-control" })
-                    @Html.ValidationMessageFor(model => model.ProductTypeId, "", new { @class = "text-danger" })
-                </div>
-                <br />
-                <div class="form-group">
-                    @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
-                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-                </div>
-                <br />
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Save Changes" class="btn btn-outline-success" />
-                        @Html.ActionLink("Back to List", "ProductList", null, new { @class = "btn btn-outline-info" })
+                    <div class="form-group">
+                        @Html.DropDownListFor(model => model.GarmentsProduct.ProductTypeId, (SelectList)ViewBag.ProductTypes, "Select Product Type", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.GarmentsProduct.ProductTypeId, "", new { @class = "text-danger" })
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        @Html.TextAreaFor(model => model.GarmentsProduct.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
+                        @Html.ValidationMessageFor(model => model.GarmentsProduct.Description, "", new { @class = "text-danger" })
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Save Changes" class="btn btn-outline-success" />
+                            @Html.ActionLink("Back to List", "ProductList", null, new { @class = "btn btn-outline-info" })
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-2">  <img src="@Url.Content("~/Images/" + Model.Image)" alt="Product Image" class="img-fluid" style="box-shadow: 0 5px 10px -5px rgba(0, 0, 0, 0.2) "> </div>
+            <div class="col-2">  <img src="@Url.Content("~/Images/" + Model.GarmentsProduct.Image)" alt="Product Image" class="img-fluid" style="box-shadow: 0 5px 10px -5px rgba(0, 0, 0, 0.2) "> </div>
         </div>
 
     </div>
@@ -65,7 +77,7 @@
 
 @section Scripts{
     <script>
-    tinymce.init({
+        tinymce.init({
             selector: 'textarea#tiny',
             plugins: 'ai mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
             toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
@@ -100,7 +112,9 @@
             },
 
             ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
-        });</script>
+        });
+
+    </script>
 }
 <script src="~/Scripts/jquery-3.4.1.min.js"></script>
 <script src="~/Scripts/jquery.validate.min.js"></script>

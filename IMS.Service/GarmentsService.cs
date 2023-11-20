@@ -57,7 +57,7 @@ namespace IMS.Service
             }
            
 
-            int pageSize = 8;
+            int pageSize = 12;
             int totalCount = query.Count();
 
             IEnumerable<GarmentsProduct> products = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();

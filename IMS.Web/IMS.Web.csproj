@@ -458,6 +458,8 @@
     <Content Include="Areas\Manager\Views\CustomerOrder\CancelReasonPage.cshtml" />
     <Content Include="Areas\Manager\Views\CustomerOrder\ShowReason.cshtml" />
     <Content Include="Areas\Manager\Views\ManagerHome\RejectedOrder.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\Partial\_OrderHistory.cshtml" />
+    <Content Include="Areas\Manager\Views\ManagerHome\Partial\_SellingReport.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
