@@ -11,8 +11,13 @@ namespace IMS.Web.Controllers
     {
 
         // GET: Error
-        public ActionResult NotFound()
+        public ActionResult Index()
         {
+            return View();
+        }
+        public ActionResult NotFound(string returnUrl)
+        {
+            ViewBag.ReturnUrl=returnUrl;
             Response.StatusCode = 404;
             return View("NotFound");
         }

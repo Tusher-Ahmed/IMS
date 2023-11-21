@@ -18,6 +18,7 @@ namespace IMS.Web.Controllers
 
     public class GarmentsController : BaseController
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly IGarmentsService _garmentsService;
         private readonly IDepartmentService _departmentService;
         private readonly IProductTypeService _productTypeService;
@@ -28,6 +29,7 @@ namespace IMS.Web.Controllers
             _departmentService = new DepartmentService { Session = session };
             _productTypeService = new ProductTypeService { Session = session };
             _manageProductService=new ManageProductService { Session = session };
+            log4net.Config.XmlConfigurator.Configure();
         }
         // GET: Garments
 
@@ -35,13 +37,22 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Admin,Manager,Supplier")]
         public ActionResult Index(int pageNumber = 1)
         {
-            long supplierId=0;
-            if (User.IsInRole("Supplier"))
+            try
             {
-                supplierId = Convert.ToInt64(User.Identity.GetUserId());
+                long supplierId = 0;
+                if (User.IsInRole("Supplier"))
+                {
+                    supplierId = Convert.ToInt64(User.Identity.GetUserId());
+                }
+                var viewModel = _garmentsService.GetAllProduct(pageNumber, supplierId);
+                return View(viewModel);
             }
-            var viewModel = _garmentsService.GetAllProduct(pageNumber,supplierId);
-            return View(viewModel);
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+           
         }
         #endregion
 
@@ -49,63 +60,81 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Supplier")]
         public ActionResult Create()
         {
-            var departments = _departmentService.GetAllDept();
-            var productTypes = _productTypeService.GetAllType();
-            ViewBag.Departments = new SelectList(departments, "Id", "Name");
-            ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
-            return View();
+            try
+            {
+                var departments = _departmentService.GetAllDept();
+                var productTypes = _productTypeService.GetAllType();
+                ViewBag.Departments = new SelectList(departments, "Id", "Name");
+                ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
+                return View();
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         [HttpPost]
         [Authorize(Roles = "Supplier")]
         [ValidateInput(false)] // Allow HTML input
         public ActionResult Create([Bind(Exclude = "ImageFile")] GarmentsProduct model)
         {
-            if (ModelState.IsValid)
+            try
             {
-
-                var targetFolderPath = Server.MapPath("~/Images");
-                var (processedDescription, primaryImageUrl, error) = _manageProductService.ProcessDescription(model.Description, targetFolderPath);
-                if (!string.IsNullOrEmpty(error))
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("Image", error);
+
+                    var targetFolderPath = Server.MapPath("~/Images");
+                    var (processedDescription, primaryImageUrl, error) = _manageProductService.ProcessDescription(model.Description, targetFolderPath);
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        ModelState.AddModelError("Image", error);
+                    }
+
+                    // Set the model.Description to the processed description
+                    model.Description = processedDescription;
+                    if (string.IsNullOrEmpty(model.Description))
+                    {
+                        ModelState.AddModelError("Description", "Product Description Is Required.");
+                        return View(model);
+                    }
+                    model.Image = primaryImageUrl;
+
+                    // Set the primary image URL
+
+                    if (string.IsNullOrEmpty(model.Image))
+                    {
+                        ModelState.AddModelError("Image", "Image Is Required.");
+                        return View(model);
+                    }
+
+                    // Set other product-related properties
+                    model.ProductType = _productTypeService.GetProductTypeById((long)model.ProductTypeId);
+                    model.Department = _departmentService.GetDeptById((long)model.DepartmentId);
+                    model.GarmentsId = Convert.ToInt64(User.Identity.GetUserId());
+
+                    // Save the product in your service
+                    _garmentsService.CreateGarmentsProduct(model);
+                    TempData["success"] = "Product Added Successfully";
+
+                    return RedirectToAction("Index");
                 }
 
-                // Set the model.Description to the processed description
-                model.Description = processedDescription;
-                if (string.IsNullOrEmpty(model.Description))
-                {
-                    ModelState.AddModelError("Description", "Product Description Is Required.");
-                    return View(model);
-                }
-                model.Image = primaryImageUrl;
+                // If ModelState is not valid, re-populate the dropdowns
+                var departments = _departmentService.GetAllDept();
+                var productTypes = _productTypeService.GetAllType();
+                ViewBag.Departments = new SelectList(departments, "Id", "Name");
+                ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
 
-                // Set the primary image URL
-
-                if (string.IsNullOrEmpty(model.Image))
-                {
-                    ModelState.AddModelError("Image", "Image Is Required.");
-                    return View(model);
-                }
-
-                // Set other product-related properties
-                model.ProductType = _productTypeService.GetProductTypeById((long)model.ProductTypeId);
-                model.Department = _departmentService.GetDeptById((long)model.DepartmentId);
-                model.GarmentsId = Convert.ToInt64(User.Identity.GetUserId());
-
-                // Save the product in your service
-                _garmentsService.CreateGarmentsProduct(model);
-                TempData["success"] = "Product Added Successfully";
-
-                return RedirectToAction("Index");
+                return View(model);
             }
-
-            // If ModelState is not valid, re-populate the dropdowns
-            var departments = _departmentService.GetAllDept();
-            var productTypes = _productTypeService.GetAllType();
-            ViewBag.Departments = new SelectList(departments, "Id", "Name");
-            ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
-
-            return View(model);
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
        
         #endregion
@@ -114,9 +143,18 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Supplier")]
         public ActionResult ProductList()
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            var product = _garmentsService.GetAllP().Where(u => u.Status == 1 && u.GarmentsId == userId);
-            return View(product);
+            try
+            {
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                var product = _garmentsService.GetAllP().Where(u => u.Status == 1 && u.GarmentsId == userId);
+                return View(product);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
@@ -124,8 +162,17 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Supplier")]
         public ActionResult Details(long id)
         {
-            var product = _garmentsService.GetGarmentsProductById(id);
-            return View(product);
+            try
+            {
+                var product = _garmentsService.GetGarmentsProductById(id);
+                return View(product);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
@@ -133,45 +180,17 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Supplier")]
         public ActionResult Edit(long id)
         {
-            var product = _garmentsService.GetGarmentsProductById(id);
-            var departments = _departmentService.GetAllDept();
-            var productTypes = _productTypeService.GetAllType();
-            ViewBag.Departments = new SelectList(departments, "Id", "Name", product.Department.Id);
-            ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name", product.ProductType.Id);
-
-            var skus = string.IsNullOrEmpty(product.SKU)
-                                    ? new List<string>()
-                                    : product.SKU.Split(',').ToList();
-
-            GarmentsEditViewModel garmentsEditView = new GarmentsEditViewModel
+            try
             {
-                GarmentsProduct = product,
-                SelectedSKUs = skus
-            };
+                var product = _garmentsService.GetGarmentsProductById(id);
+                var departments = _departmentService.GetAllDept();
+                var productTypes = _productTypeService.GetAllType();
+                ViewBag.Departments = new SelectList(departments, "Id", "Name", product.Department.Id);
+                ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name", product.ProductType.Id);
 
-            return View(garmentsEditView);
-        }
-        [HttpPost]
-        [Authorize(Roles = "Supplier")]
-        public ActionResult Edit(long id, GarmentsEditViewModel gv)
-        {
-
-            var product = _garmentsService.GetGarmentsProductById(id);
-
-            if (gv.SelectedSKUs!=null)
-            {
-                gv.GarmentsProduct.SKU = string.Join(",", gv.SelectedSKUs);
-            }
-            else
-            {
-                ModelState.AddModelError("SKU", "SKU is required!!");
-
-                var dept = _departmentService.GetAllDept();
-                var productT = _productTypeService.GetAllType();
-                ViewBag.Departments = new SelectList(dept, "Id", "Name", product.Department.Id);
-                ViewBag.ProductTypes = new SelectList(productT, "Id", "Name", product.ProductType.Id);
-
-                var skus = new List<string>();
+                var skus = string.IsNullOrEmpty(product.SKU)
+                                        ? new List<string>()
+                                        : product.SKU.Split(',').ToList();
 
                 GarmentsEditViewModel garmentsEditView = new GarmentsEditViewModel
                 {
@@ -181,51 +200,97 @@ namespace IMS.Web.Controllers
 
                 return View(garmentsEditView);
             }
-            
-            gv.GarmentsProduct.Image = product.Image;
-            if (ModelState.IsValid)
+            catch (Exception ex)
             {
-                var targetFolderPath = Server.MapPath("~/Images");
-                var (processedDescription, primaryImageUrl, error) = _manageProductService.ProcessDescription(gv.GarmentsProduct.Description, targetFolderPath);
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
+        }
+        [HttpPost]
+        [Authorize(Roles = "Supplier")]
+        public ActionResult Edit(long id, GarmentsEditViewModel gv)
+        {
+            try
+            {
+                var product = _garmentsService.GetGarmentsProductById(id);
 
-                if (!string.IsNullOrEmpty(error))
+                if (gv.SelectedSKUs != null)
                 {
-                    ModelState.AddModelError("Image", error);
-                    return View(gv.GarmentsProduct);
-                }
-
-                gv.GarmentsProduct.Description = processedDescription;
-
-                if (string.IsNullOrEmpty(gv.GarmentsProduct.Description))
-                {
-                    ModelState.AddModelError("Description", "Product Description Is Required.");
-                    return View(gv.GarmentsProduct);
-                }
-                if (string.IsNullOrEmpty(primaryImageUrl))
-                {
-                    gv.GarmentsProduct.Image = product.Image;
+                    gv.GarmentsProduct.SKU = string.Join(",", gv.SelectedSKUs);
                 }
                 else
                 {
-                    gv.GarmentsProduct.Image = primaryImageUrl;
+                    ModelState.AddModelError("SKU", "SKU is required!!");
+
+                    var dept = _departmentService.GetAllDept();
+                    var productT = _productTypeService.GetAllType();
+                    ViewBag.Departments = new SelectList(dept, "Id", "Name", product.Department.Id);
+                    ViewBag.ProductTypes = new SelectList(productT, "Id", "Name", product.ProductType.Id);
+
+                    var skus = new List<string>();
+
+                    GarmentsEditViewModel garmentsEditView = new GarmentsEditViewModel
+                    {
+                        GarmentsProduct = product,
+                        SelectedSKUs = skus
+                    };
+
+                    return View(garmentsEditView);
                 }
 
-                gv.GarmentsProduct.ProductType = _productTypeService.GetProductTypeById((long)gv.GarmentsProduct.ProductTypeId);
-                gv.GarmentsProduct.Department = _departmentService.GetDeptById((long)gv.GarmentsProduct.DepartmentId);
-                gv.GarmentsProduct.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
-                _garmentsService.UpdateGarmentsProduct(id, gv.GarmentsProduct);
-                TempData["success"] = "Product Updated Successfully";
+                gv.GarmentsProduct.Image = product.Image;
+                if (ModelState.IsValid)
+                {
+                    var targetFolderPath = Server.MapPath("~/Images");
+                    var (processedDescription, primaryImageUrl, error) = _manageProductService.ProcessDescription(gv.GarmentsProduct.Description, targetFolderPath);
 
-                return RedirectToAction("ProductList", "Garments");
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        ModelState.AddModelError("Image", error);
+                        return View(gv.GarmentsProduct);
+                    }
+
+                    gv.GarmentsProduct.Description = processedDescription;
+
+                    if (string.IsNullOrEmpty(gv.GarmentsProduct.Description))
+                    {
+                        ModelState.AddModelError("Description", "Product Description Is Required.");
+                        return View(gv.GarmentsProduct);
+                    }
+                    if (string.IsNullOrEmpty(primaryImageUrl))
+                    {
+                        gv.GarmentsProduct.Image = product.Image;
+                    }
+                    else
+                    {
+                        gv.GarmentsProduct.Image = primaryImageUrl;
+                    }
+
+                    gv.GarmentsProduct.ProductType = _productTypeService.GetProductTypeById((long)gv.GarmentsProduct.ProductTypeId);
+                    gv.GarmentsProduct.Department = _departmentService.GetDeptById((long)gv.GarmentsProduct.DepartmentId);
+                    gv.GarmentsProduct.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                    _garmentsService.UpdateGarmentsProduct(id, gv.GarmentsProduct);
+                    TempData["success"] = "Product Updated Successfully";
+
+                    return RedirectToAction("ProductList", "Garments");
+                }
+
+                var departments = _departmentService.GetAllDept();
+                var productTypes = _productTypeService.GetAllType();
+                ViewBag.Departments = new SelectList(departments, "Id", "Name");
+                ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
+                gv.GarmentsProduct.Image = product.Image;
+
+                return View(gv.GarmentsProduct);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
             }
 
-            var departments = _departmentService.GetAllDept();
-            var productTypes = _productTypeService.GetAllType();
-            ViewBag.Departments = new SelectList(departments, "Id", "Name");
-            ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
-            gv.GarmentsProduct.Image = product.Image;
-
-            return View(gv.GarmentsProduct);
+            
         }
         #endregion
 
@@ -233,23 +298,41 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Supplier")]
         public ActionResult Status(long id)
         {
-            var product = _garmentsService.GetGarmentsProductById(id);
-            return View(product);
+            try
+            {
+                var product = _garmentsService.GetGarmentsProductById(id);
+                return View(product);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
 
         [HttpPost]
         [Authorize(Roles = "Supplier")]
         public ActionResult Status(long id, GarmentsProduct garmentsProduct)
         {
-            var product = _garmentsService.GetGarmentsProductById(id);
-            if (product != null)
+            try
             {
-                product.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
-                _garmentsService.UpdateStatus(id, product);
-                TempData["success"] = "Status Updated Successfully";
-                return RedirectToAction("ProductList");
+                var product = _garmentsService.GetGarmentsProductById(id);
+                if (product != null)
+                {
+                    product.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                    _garmentsService.UpdateStatus(id, product);
+                    TempData["success"] = "Status Updated Successfully";
+                    return RedirectToAction("ProductList");
+                }
+                return View(product);
             }
-            return View(product);
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
@@ -257,9 +340,18 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Supplier")]
         public ActionResult DeactivatedList()
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            var prod = _garmentsService.GetAllP().Where(u => u.Status == 0 && u.GarmentsId == userId);
-            return View(prod);
+            try
+            {
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                var prod = _garmentsService.GetAllP().Where(u => u.Status == 0 && u.GarmentsId == userId);
+                return View(prod);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+           
         }
         #endregion
 
@@ -267,26 +359,44 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Supplier")]
         public ActionResult ActiveStatus(long id)
         {
-            var prod = _garmentsService.GetGarmentsProductById(id);
-            if (prod != null)
+            try
             {
-                return View(prod);
+                var prod = _garmentsService.GetGarmentsProductById(id);
+                if (prod != null)
+                {
+                    return View(prod);
+                }
+                return RedirectToAction("DeactivatedList");
             }
-            return RedirectToAction("DeactivatedList");
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         [HttpPost]
         [Authorize(Roles = "Supplier")]
         public ActionResult ActiveStatus(long id, GarmentsProduct garmentsProduct)
         {
-            var prod = _garmentsService.GetGarmentsProductById(id);
-            if (prod != null)
+            try
             {
-                prod.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
-                _garmentsService.ActivateStatus(id, prod);
-                TempData["success"] = "Status Updated Successfully";
-                return RedirectToAction("DeactivatedList", "Garments");
+                var prod = _garmentsService.GetGarmentsProductById(id);
+                if (prod != null)
+                {
+                    prod.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                    _garmentsService.ActivateStatus(id, prod);
+                    TempData["success"] = "Status Updated Successfully";
+                    return RedirectToAction("DeactivatedList", "Garments");
+                }
+                return View(prod);
             }
-            return View(prod);
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 

@@ -14,35 +14,53 @@ namespace IMS.Web.Controllers
     public class DepartmentController : BaseController
     {
         // GET: Department
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly IDepartmentService _department;
         public DepartmentController(ISession session):base(session)
         {
             _department = new DepartmentService { Session=session};
-           
-            
+            log4net.Config.XmlConfigurator.Configure();
         }
 
         #region Index
         public ActionResult Index()
         {
-            var data=_department.GetAllDept().Where(u=>u.Status==1);
-            return View(data);
+            try
+            {
+                var data = _department.GetAllDept().Where(u => u.Status == 1);
+                return View(data);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         [HttpPost]
         public ActionResult Index(string dept)
         {
-            if (string.IsNullOrEmpty(dept) == false)
+            try
             {
-                var data = _department.GetAllDept();
-                var searchItem=data.Where(u=>u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status==1).ToList();
-                return PartialView("_SearchDepartment",searchItem);
-            }
-            else
-            {
+                if (string.IsNullOrEmpty(dept) == false)
+                {
+                    var data = _department.GetAllDept();
+                    var searchItem = data.Where(u => u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 1).ToList();
+                    return PartialView("_SearchDepartment", searchItem);
+                }
+                else
+                {
 
-                var data = _department.GetAllDept();
-                return PartialView("_SearchDepartment",data);
+                    var data = _department.GetAllDept();
+                    return PartialView("_SearchDepartment", data);
+                }
             }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
@@ -54,83 +72,110 @@ namespace IMS.Web.Controllers
         [HttpPost]
         public ActionResult Create(Department dept)
         {
-            TempData["data"] = "";
-            var data = _department.GetAllDept().Where(u => u.Name == dept.Name);
-            if (data.Any())
+            try
             {
-                ModelState.AddModelError("Name", "Department name is already in use.");
-            }
-
-            if (ModelState.IsValid)
-            {               
-                try
+                TempData["data"] = "";
+                var data = _department.GetAllDept().Where(u => u.Name == dept.Name);
+                if (data.Any())
                 {
-                    dept.CreatedBy= Convert.ToInt64(User.Identity.GetUserId());
-                    _department.AddDept(dept);
-                    TempData["data"] = "Department Created Successfully.";                    
-                    return Json(new { success = true, message = TempData["data"] });
-
-                }
-                catch
-                {
-                    TempData["data"] = "Data is not inserted!!"; ;
-                    return Json(new { success = false, message = TempData["data"] });
-
+                    ModelState.AddModelError("Name", "Department name is already in use.");
                 }
 
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        dept.CreatedBy = Convert.ToInt64(User.Identity.GetUserId());
+                        _department.AddDept(dept);
+                        TempData["data"] = "Department Created Successfully.";
+                        return Json(new { success = true, message = TempData["data"] });
+
+                    }
+                    catch
+                    {
+                        TempData["data"] = "Data is not inserted!!"; ;
+                        return Json(new { success = false, message = TempData["data"] });
+
+                    }
+
+                }
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return Json(new { success = false, message = errors, errors = errors });
             }
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-            return Json(new { success = false, message = errors, errors = errors });
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
         #region Edit
         public ActionResult Edit(long id)
         {
-            if (id == 0)
+            try
             {
-                return HttpNotFound();
+                if (id == 0)
+                {
+                    return HttpNotFound();
+                }
+                var dept = _department.GetDeptById(id);
+                if (dept != null)
+                {
+                    return View(dept);
+                }
+                return RedirectToAction("Index");
             }
-            var dept=_department.GetDeptById(id);
-            if (dept != null)
+            catch (Exception ex)
             {
-                return View(dept);
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
             }
-            return RedirectToAction("Index");
+            
         }
         [HttpPost]
         public ActionResult Edit(long id,Department dept)
         {
-            if (dept == null)
+            try
             {
-                return HttpNotFound();
-            }
-            var data = _department.GetAllDept().Where(u => u.Name == dept.Name);
+                if (dept == null)
+                {
+                    return HttpNotFound();
+                }
+                var data = _department.GetAllDept().Where(u => u.Name == dept.Name);
 
-            if (data.Any())
+                if (data.Any())
+                {
+                    ModelState.AddModelError("Name", "Department name is already in use.");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        var deptData = _department.GetDeptById(id);
+                        if (deptData.Status != null) { dept.Status = deptData.Status; }
+                        dept.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                        _department.UpdateDept(id, dept);
+                        TempData["data"] = "Department Updated Successfully.";
+                        return Json(new { success = true, message = TempData["data"] });
+                    }
+                    catch
+                    {
+                        TempData["data"] = "Data is not Updated!!";
+                        return Json(new { success = false, message = TempData["data"] });
+                    }
+                }
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return Json(new { success = false, message = errors, errors = errors });
+            }
+            catch (Exception ex)
             {
-                ModelState.AddModelError("Name", "Department name is already in use.");
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
             }
-
-            if (ModelState.IsValid)
-            {  
-                try
-                {
-                    var deptData = _department.GetDeptById(id);
-                    if(deptData.Status!=null) { dept.Status = deptData.Status; }
-                    dept.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
-                    _department.UpdateDept(id,dept);
-                    TempData["data"] = "Department Updated Successfully.";
-                    return Json(new { success = true, message = TempData["data"] });
-                }
-                catch
-                {
-                    TempData["data"] = "Data is not Updated!!";
-                    return Json(new { success = false, message = TempData["data"] });
-                }
-            }
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-            return Json(new { success = false, message = errors, errors = errors });
+           
 
         }
         #endregion
@@ -138,82 +183,136 @@ namespace IMS.Web.Controllers
         #region Deactivate Status
         public ActionResult Status(long id)
         {
-            if (id == 0)
+            try
             {
-                return HttpNotFound();
+                if (id == 0)
+                {
+                    return HttpNotFound();
+                }
+                var dept = _department.GetDeptById(id);
+                if (dept != null)
+                {
+                    return View(dept);
+                }
+                return RedirectToAction("Index");
             }
-            var dept = _department.GetDeptById(id);
-            if (dept != null)
+            catch (Exception ex)
             {
-                return View(dept);
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
             }
-            return RedirectToAction("Index");
+            
         }
 
         [HttpPost]
         public ActionResult Status(long id,Department dept)
         {
-            var deptarment = _department.GetDeptById(id);
-            if (deptarment != null)
+            try
             {
-                deptarment.Status = 0;
-                deptarment.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());               
-                _department.UpdateDept(id, deptarment);
-                TempData["success"] = "Status Updated Successfully";
-                return RedirectToAction("Index", "Department");
+                var deptarment = _department.GetDeptById(id);
+                if (deptarment != null)
+                {
+                    deptarment.Status = 0;
+                    deptarment.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                    _department.UpdateDept(id, deptarment);
+                    TempData["success"] = "Status Updated Successfully";
+                    return RedirectToAction("Index", "Department");
+                }
+                return View();
             }
-            return View();
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+           
         }
         #endregion
 
         #region All Deactivate Status
         public ActionResult Deactivate()
         {
-            var data = _department.GetAllDept().Where(u => u.Status == 0);
-            return View(data);
+            try
+            {
+                var data = _department.GetAllDept().Where(u => u.Status == 0);
+                return View(data);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         [HttpPost]
         public ActionResult Deactivate(string dept)
         {
-            if (string.IsNullOrEmpty(dept) == false)
+            try
             {
-                var data = _department.GetAllDept();
-                var searchItem = data.Where(u => u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 0).ToList();
-                return PartialView("_SearchDepartment", searchItem);
-            }
-            else
-            {
+                if (string.IsNullOrEmpty(dept) == false)
+                {
+                    var data = _department.GetAllDept();
+                    var searchItem = data.Where(u => u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 0).ToList();
+                    return PartialView("_SearchDepartment", searchItem);
+                }
+                else
+                {
 
-                var data = _department.GetAllDept().Where(u=>u.Status==0);
-                return PartialView("_SearchDepartment", data);
+                    var data = _department.GetAllDept().Where(u => u.Status == 0);
+                    return PartialView("_SearchDepartment", data);
+                }
             }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
         #region Active Status
         public ActionResult Active(long id)
         {
-            var dept=_department.GetDeptById(id);
-            if (dept != null)
+            try
             {
-                return View(dept);
+                var dept = _department.GetDeptById(id);
+                if (dept != null)
+                {
+                    return View(dept);
+                }
+                return RedirectToAction("Deactivate", "Department");
             }
-            return RedirectToAction("Deactivate", "Department");
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+           
         }
 
         [HttpPost]
         public ActionResult Active(long id,Department dept)
         {
-            var deptarment = _department.GetDeptById(id);
-            if (deptarment != null)
+            try
             {
-                deptarment.Status = 1;
-                deptarment.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
-                _department.UpdateDept(id, deptarment);
-                TempData["success"] = "Status Updated Successfully";
-                return RedirectToAction("Deactivate", "Department");
+                var deptarment = _department.GetDeptById(id);
+                if (deptarment != null)
+                {
+                    deptarment.Status = 1;
+                    deptarment.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                    _department.UpdateDept(id, deptarment);
+                    TempData["success"] = "Status Updated Successfully";
+                    return RedirectToAction("Deactivate", "Department");
+                }
+                return View();
             }
-            return View();
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
     }

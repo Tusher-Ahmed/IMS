@@ -18,6 +18,7 @@ namespace IMS.Web.Areas.Customer.Controllers
     
     public class CustomerHomeController : BaseController
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly IOrderHeaderService _orderHeaderService;
         private readonly ICustomerService _customerService;
         private readonly IOrderDetailService _orderDetailService;
@@ -29,73 +30,89 @@ namespace IMS.Web.Areas.Customer.Controllers
             _orderDetailService=new OrderDetailService { Session=session};
             _customerService=new CustomerService { Session=session};
             _customerShopping=new CustomerShoppingService { Session=session};
-           
+            log4net.Config.XmlConfigurator.Configure();
         }
 
         #region Customer Dashboard
         // GET: Customer/CustomerHome
         public ActionResult Index()
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            var orderHeaders = _orderHeaderService.GetAllOrderHeaders().Where(u => u.CustomerId == userId);
-            List<OrderDetail> orders = new List<OrderDetail>();
-            foreach(var item in orderHeaders)
+            try
             {
-                var ODetail = _orderDetailService.GetOrderDetailByOrderHeaderId(item.Id);
-                orders.Add(ODetail);
-            }
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                var orderHeaders = _orderHeaderService.GetAllOrderHeaders().Where(u => u.CustomerId == userId);
+                List<OrderDetail> orders = new List<OrderDetail>();
+                foreach (var item in orderHeaders)
+                {
+                    var ODetail = _orderDetailService.GetOrderDetailByOrderHeaderId(item.Id);
+                    orders.Add(ODetail);
+                }
 
                 //OrderDetails=_orderDetailService.getAllOrderDetails().
-            CustomerDashboardViewModel viewModel = new CustomerDashboardViewModel
+                CustomerDashboardViewModel viewModel = new CustomerDashboardViewModel
+                {
+                    OrderHeaders = orderHeaders,
+                    OrderDetails = orders,
+                    TotalOrders = orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusDelivered).Count(),
+                    NewArrival = orderHeaders.Where(u => u.OrderStatus != ShoppingHelper.StatusShipped &&
+                          u.OrderStatus != ShoppingHelper.StatusCancelled && u.OrderStatus != ShoppingHelper.StatusRefunded).Count(),
+                    TotalCanceledOrder = orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled).Count()
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
             {
-              OrderHeaders=orderHeaders,
-              OrderDetails=orders,
-              TotalOrders=orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusShipped).Count(),
-              NewArrival=orderHeaders.Where(u=>u.OrderStatus!=ShoppingHelper.StatusShipped &&
-                    u.OrderStatus!=ShoppingHelper.StatusCancelled && u.OrderStatus != ShoppingHelper.StatusRefunded).Count(),
-              TotalCanceledOrder= orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled).Count()
-            };
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
             
-            return View(viewModel);
         }
         #endregion
 
         #region Order Details
         public ActionResult OrderDetails(string status)
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            var orderHeader = _orderHeaderService.GetAllOrderHeaders().Where(u=>u.CustomerId==userId);
-            if (status == "Approved")
+            try
             {
-                return View(orderHeader.Where(u => u.OrderStatus == "Approved"));
-            }
-            else if (status == "Shipped")
-            {
-                return View(orderHeader.Where(u => u.OrderStatus == "Shipped"));
-            }
-            else if (status == "InProcess")
-            {
-                return View(orderHeader.Where(u => u.OrderStatus == "InProcess"));
-            }
-            else if (status == "Delivered")
-            {
-                return View(orderHeader.Where(u => u.OrderStatus == "Delivered"));
-            }
-            else if (status == "Cancelled")
-            {
-                return View(orderHeader.Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus != ShoppingHelper.StatusRefunded));
-            }
-            else if (status == "Refunded")
-            {
-                return View(orderHeader.Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus == ShoppingHelper.StatusRefunded));
-            }
-            else if (status == "All")
-            {
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                var orderHeader = _orderHeaderService.GetAllOrderHeaders().Where(u => u.CustomerId == userId);
+                if (status == "Approved")
+                {
+                    return View(orderHeader.Where(u => u.OrderStatus == "Approved"));
+                }
+                else if (status == "Shipped")
+                {
+                    return View(orderHeader.Where(u => u.OrderStatus == "Shipped"));
+                }
+                else if (status == "InProcess")
+                {
+                    return View(orderHeader.Where(u => u.OrderStatus == "InProcess"));
+                }
+                else if (status == "Delivered")
+                {
+                    return View(orderHeader.Where(u => u.OrderStatus == "Delivered"));
+                }
+                else if (status == "Cancelled")
+                {
+                    return View(orderHeader.Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus != ShoppingHelper.StatusRefunded));
+                }
+                else if (status == "Refunded")
+                {
+                    return View(orderHeader.Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus == ShoppingHelper.StatusRefunded));
+                }
+                else if (status == "All")
+                {
+                    return View(orderHeader);
+                }
+
                 return View(orderHeader);
             }
-            
-            return View(orderHeader);
-
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }            
             
         }
         #endregion

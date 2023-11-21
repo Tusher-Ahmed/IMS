@@ -19,11 +19,11 @@
         <div class="col-md-9" id="result-container">
             <div class="row">
                 <div class="col-md-6 col-lg-4 col-xlg-6 pb-2">
-                    <a href="@Url.Action("OrderDetails", "CustomerHome", new {area="Customer"})" style="text-decoration:none;">
+                    <a href="@Url.Action("OrderDetails", "CustomerHome", new {area="Customer", status = "Delivered"})" style="text-decoration:none;">
                         <div class="box bg-primary text-center text-light p-3">
                             <i class="fa-solid fa-cart-flatbed-suitcase font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalOrders</h5>
-                            <small class="font-light">Total Orders</small>
+                            <small class="font-light">Total Received Orders</small>
                         </div>
                     </a>
                 </div>

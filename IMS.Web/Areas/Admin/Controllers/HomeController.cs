@@ -26,12 +26,9 @@ namespace IMS.Web.Areas.Admin.Controllers
     [Authorize(Roles ="Admin")]
     public class HomeController : BaseController
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly IProductService _product;
-        private readonly IDepartmentService _department;
-        private readonly IProductTypeService _productType;
-        private readonly IInventoryShoppingService _inventoryShoppingService;
         private readonly IInventoryOrderHistoryService _inventoryOrderHistoryService;
-        private readonly IGarmentsService _garmentsService;
         private readonly IEmployeeService _employeeService;
         private readonly ISupplierService _supplierService;
         private readonly ICustomerService _customerService;
@@ -42,17 +39,15 @@ namespace IMS.Web.Areas.Admin.Controllers
         // GET: Admin/Home
         public HomeController(ISession session):base(session)
         {
+
             _product = new ProductService { Session = session };
-            _department = new DepartmentService { Session = session };
-            _productType = new ProductTypeService { Session = session };
-            _inventoryShoppingService = new InventoryShoppingService { Session = session };
             _inventoryOrderHistoryService = new InventoryOrderHistoryService { Session = session };
-            _garmentsService = new GarmentsService { Session = session };
             _employeeService = new EmployeeService { Session = session };
             _supplierService = new SupplierService { Session = session };
             _customerService = new CustomerService { Session = session };
             _orderHeaderService=new OrderHeaderService { Session = session };
             _manageProductService = new ManageProductService { Session = session };
+            log4net.Config.XmlConfigurator.Configure();
         }
         public HomeController(ApplicationUserManager userManager, ISession session) : this(session)
         {
@@ -72,21 +67,29 @@ namespace IMS.Web.Areas.Admin.Controllers
         #region Dashboard View
         public ActionResult Index()
         {
-
-            AdminDashboardViewModel prod = new AdminDashboardViewModel
+            try
             {
-                Products = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true),
-                TotalProduct = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true).Count(),
-                TotalEmployee = GetEmployeeWithRoles(),
-                TotalShop = GetShopsWithRoles(),
-                orderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).ToList(),
-                TotalOrders =_orderHeaderService.GetAllOrderHeaders().Where(u=>u.OrderStatus==ShoppingHelper.StatusShipped || u.OrderStatus == ShoppingHelper.StatusDelivered).Count(),
-                TotalNewOrders= _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus != ShoppingHelper.StatusCancelled &&
-                    u.OrderStatus != ShoppingHelper.StatusRefunded && u.OrderStatus != ShoppingHelper.StatusShipped).Count(),
-                TotalCancelOrder= _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled && u.PaymentStatus==ShoppingHelper.StatusRefunded).Count()
+                AdminDashboardViewModel prod = new AdminDashboardViewModel
+                {
+                    Products = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true),
+                    TotalProduct = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true).Count(),
+                    TotalEmployee = GetEmployeeWithRoles(),
+                    TotalShop = GetShopsWithRoles(),
+                    orderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).ToList(),
+                    TotalOrders = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == ShoppingHelper.StatusShipped || u.OrderStatus == ShoppingHelper.StatusDelivered).Count(),
+                    TotalNewOrders = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus != ShoppingHelper.StatusCancelled &&
+                        u.OrderStatus != ShoppingHelper.StatusRefunded && u.OrderStatus != ShoppingHelper.StatusShipped).Count(),
+                    TotalCancelOrder = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled && u.PaymentStatus == ShoppingHelper.StatusRefunded).Count()
 
-            };
-            return View(prod);
+                };
+                return View(prod);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+           
         }
         #endregion
 
@@ -100,59 +103,86 @@ namespace IMS.Web.Areas.Admin.Controllers
         #region Product List
         public ActionResult ProductList()
         {
-            IEnumerable<Product> products = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true);
-            return View(products);
+            try
+            {
+                IEnumerable<Product> products = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true);
+                return View(products);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
         #region Edit
         public ActionResult Edit(long id)
         {
-            var prod = _product.GetProductById(id);
-            if (prod != null)
+            try
             {
-                return View(prod);
+                var prod = _product.GetProductById(id);
+                if (prod != null)
+                {
+                    return View(prod);
+                }
+                return RedirectToAction("ProductList");
             }
-            return RedirectToAction("ProductList");
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         [HttpPost]
         public ActionResult Edit(long id, Product product)
         {
-            var prod = _product.GetProductById(id);
-            var targetFolderPath = Server.MapPath("~/Images");
-            var (processedDescription, primaryImageUrl, error) = _manageProductService.ProcessDescription(product.Description, targetFolderPath);
-
-            if (!string.IsNullOrEmpty(error))
+            try
             {
-                ModelState.AddModelError("Image", error);
-            }
+                var prod = _product.GetProductById(id);
+                var targetFolderPath = Server.MapPath("~/Images");
+                var (processedDescription, primaryImageUrl, error) = _manageProductService.ProcessDescription(product.Description, targetFolderPath);
 
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-
-            if (prod != null)
-            {
-                prod.Price = product.Price;
-                prod.Name = product.Name;
-                prod.Description = processedDescription;
-
-                if (!string.IsNullOrEmpty(primaryImageUrl))
+                if (!string.IsNullOrEmpty(error))
                 {
-                    prod.Image = primaryImageUrl;
-                }
-                else
-                {
-                    prod.Image = prod.Image;
+                    ModelState.AddModelError("Image", error);
                 }
 
-                prod.ModifyBy = userId;//ManagerId
-                prod.Status = 1;
-                prod.VersionNumber = prod.VersionNumber + 1;
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
 
-                _product.UpdateProduct(prod);
-                TempData["success"] = "Product Updated Successfully!";
-                return RedirectToAction("ProductList");
+                if (prod != null)
+                {
+                    prod.Price = product.Price;
+                    prod.Name = product.Name;
+                    prod.Description = processedDescription;
+
+                    if (!string.IsNullOrEmpty(primaryImageUrl))
+                    {
+                        prod.Image = primaryImageUrl;
+                    }
+                    else
+                    {
+                        prod.Image = prod.Image;
+                    }
+
+                    prod.ModifyBy = userId;//ManagerId
+                    prod.Status = 1;
+                    prod.VersionNumber = prod.VersionNumber + 1;
+
+                    _product.UpdateProduct(prod);
+                    TempData["success"] = "Product Updated Successfully!";
+                    return RedirectToAction("ProductList");
+                }
+                return View(product);
             }
-            return View(product);
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
        
         #endregion
@@ -160,88 +190,142 @@ namespace IMS.Web.Areas.Admin.Controllers
         #region Status
         public ActionResult Status(long id)
         {
-            if (id == 0)
+            try
             {
-                return HttpNotFound();
+                if (id == 0)
+                {
+                    return HttpNotFound();
+                }
+                var prod = _product.GetProductById(id);
+                if (prod != null)
+                {
+                    return View(prod);
+                }
+                return RedirectToAction("ProductList");
             }
-            var prod = _product.GetProductById(id);
-            if (prod != null)
+            catch (Exception ex)
             {
-                return View(prod);
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
             }
-            return RedirectToAction("ProductList");
+            
         }
 
         [HttpPost]
         public ActionResult Status(long id, Product product)
         {
-            var prod = _product.GetProductById(id);
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            if (prod != null)
+            try
             {
-                prod.Status = 0;
-                prod.ModifyBy = userId;
-                _product.UpdateProduct(prod);
-                TempData["success"] = "Status Updated Successfully!";
-                return RedirectToAction("ProductList");
+                var prod = _product.GetProductById(id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                if (prod != null)
+                {
+                    prod.Status = 0;
+                    prod.ModifyBy = userId;
+                    _product.UpdateProduct(prod);
+                    TempData["success"] = "Status Updated Successfully!";
+                    return RedirectToAction("ProductList");
+                }
+                return View();
             }
-            return View();
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+           
         }
         #endregion
 
         #region Details
         public ActionResult Details(long id)
         {
-            if (id != 0)
+            try
             {
-                var prod = _product.GetProductById(id);
-                return View(prod);
+                if (id != 0)
+                {
+                    var prod = _product.GetProductById(id);
+                    return View(prod);
+                }
+                return RedirectToAction("ProductList");
             }
-            return RedirectToAction("ProductList");
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+           
         }
         #endregion
 
         #region Deactivated List
         public ActionResult DeactivatedList()
         {
-            var prod = _product.GetAllProduct().Where(u => u.Status == 0 && u.Approved == true && u.IsPriceAdded == true);
-            if (prod != null)
+            try
             {
-                return View(prod);
+                var prod = _product.GetAllProduct().Where(u => u.Status == 0 && u.Approved == true && u.IsPriceAdded == true);
+                if (prod != null)
+                {
+                    return View(prod);
 
+                }
+                return RedirectToAction("ProductList");
             }
-            return RedirectToAction("ProductList");
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
         #region Change Status
         public ActionResult ChangeStatus(long id)
         {
-            if (id == 0)
+            try
             {
-                return HttpNotFound();
+                if (id == 0)
+                {
+                    return HttpNotFound();
+                }
+                var prod = _product.GetProductById(id);
+                if (prod != null)
+                {
+                    return View(prod);
+                }
+                return RedirectToAction("ProductList");
             }
-            var prod = _product.GetProductById(id);
-            if (prod != null)
+            catch (Exception ex)
             {
-                return View(prod);
-            }
-            return RedirectToAction("ProductList");
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }           
+           
         }
         [HttpPost]
         public ActionResult ChangeStatus(long id, Product product)
         {
-            var prod = _product.GetProductById(id);
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            if (prod != null)
+            try
             {
-                prod.Status = 1;
-                prod.ModifyBy = userId;
-                _product.UpdateProduct(prod);
-                TempData["success"] = "Status Updated Successfully!";
-                return RedirectToAction("ProductList");
+                var prod = _product.GetProductById(id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                if (prod != null)
+                {
+                    prod.Status = 1;
+                    prod.ModifyBy = userId;
+                    _product.UpdateProduct(prod);
+                    TempData["success"] = "Status Updated Successfully!";
+                    return RedirectToAction("ProductList");
+                }
+                return View();
             }
-            return View();
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
@@ -255,52 +339,12 @@ namespace IMS.Web.Areas.Admin.Controllers
         #region Get total employee and store
         public int GetEmployeeWithRoles()
         {
-            #region last effort
-            //var context = new ApplicationDbContext();
-            //var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-            //var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-
-            //// Define the role names you want to filter on.
-            //string[] roleNames = { "Manager", "Staff" }; // Replace with your actual role names.
-
-            //// Get a list of users who have any of the specified roles.
-            //// Get the role IDs for the specified role names.
-            //var roleIds = roleManager.Roles
-            //    .Where(r => roleNames.Contains(r.Name))
-            //    .Select(r => r.Id)
-            //    .ToList();
-
-            //// Get a list of users who have any of the specified roles.
-            //var usersWithRoles = context.Users
-            //    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-            //    .ToList();
-
-            //return usersWithRoles.Count();
-            #endregion
             var employee = _employeeService.GetAllEmployee().Where(u=>u.Status==1).ToList();
             return employee.Count();
         }
 
         public int GetShopsWithRoles()
-        {
-            #region last effort
-            //var context = new ApplicationDbContext();
-            //var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-            //var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-
-            //string roleName = "Customer"; 
-            //var roleIds = roleManager.Roles
-            //    .Where(r => roleName.Contains(r.Name))
-            //    .Select(r => r.Id);
-
-
-            //// Get a list of users who have any of the specified roles.
-            //var usersWithRoles = context.Users
-            //    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-            //    .ToList();
-
-            //return usersWithRoles.Count();
-            #endregion
+        {         
             var shops = _customerService.GetAllCustomer().Where(u => u.Status == 1).ToList();
             return shops.Count();
         }
@@ -309,60 +353,84 @@ namespace IMS.Web.Areas.Admin.Controllers
         #region Employee
         public ActionResult Employees()
         {
-            var context = new ApplicationDbContext();
-            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-            var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-            string[] roleNames = { "Manager", "Staff" };
-            var roleIds = roleManager.Roles
-                .Where(r => roleNames.Contains(r.Name))
-                .Select(r => r.Id)
-                .ToList();
-
-            var usersWithDetails = context.Users
-                .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-                .ToList();
-            List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
-            foreach (var user in usersWithDetails)
+            try
             {
-                var employee = _employeeService.GetEmployeeByUserId(user.Id);
-                if(employee.Status != 0)
+                var context = new ApplicationDbContext();
+                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
+                string[] roleNames = { "Manager", "Staff" };
+
+                var roleIds = roleManager.Roles
+                    .Where(r => roleNames.Contains(r.Name))
+                    .Select(r => r.Id)
+                    .ToList();
+
+                var usersWithDetails = context.Users
+                    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
+                    .ToList();
+
+                List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
+
+                foreach (var user in usersWithDetails)
                 {
-                    UserDetailViewModel userDetails = new UserDetailViewModel
+                    var employee = _employeeService.GetEmployeeByUserId(user.Id);
+
+                    if (employee.Status != 0)
                     {
-                        Id = user.Id,
-                        Email = user.Email,
-                        Phone = user.PhoneNumber,
-                        City = employee.City,
-                        StreetAddress = employee.StreetAddress,
-                        Thana = employee.Thana,
-                        PostalCode = employee.PostalCode,
-                        ERole = userManager.GetRoles(user.Id).FirstOrDefault()
-                    };
-                    usersDetails.Add(userDetails);
+                        UserDetailViewModel userDetails = new UserDetailViewModel
+                        {
+                            Id = user.Id,
+                            Email = user.Email,
+                            Phone = user.PhoneNumber,
+                            City = employee.City,
+                            StreetAddress = employee.StreetAddress,
+                            Thana = employee.Thana,
+                            PostalCode = employee.PostalCode,
+                            ERole = userManager.GetRoles(user.Id).FirstOrDefault()
+                        };
+
+                        usersDetails.Add(userDetails);
+                    }
                 }
+                return View(usersDetails);
             }
-            return View(usersDetails);
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
         #region Deactivate Employee
         public ActionResult DeactivateEmployee(long id)
         {
-            var context = new ApplicationDbContext();
-            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-            var user = userManager.FindById(id);
-            var employee=_employeeService.GetEmployeeByUserId(user.Id);
-            if (user != null && employee!=null)
-            {                               
-                employee.Status = 0;
-                _employeeService.UpdateEmployee(employee);
-                TempData["success"] = "Employee Deactivation Completed Successfully!";
-                return RedirectToAction("Employees");
-            }
-            else
+            try
             {
-                return RedirectToAction("Employees");
+                var context = new ApplicationDbContext();
+                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                var user = userManager.FindById(id);
+                var employee = _employeeService.GetEmployeeByUserId(user.Id);
+
+                if (user != null && employee != null)
+                {
+                    employee.Status = 0;
+                    _employeeService.UpdateEmployee(employee);
+                    TempData["success"] = "Employee Deactivation Completed Successfully!";
+                    return RedirectToAction("Employees");
+                }
+                else
+                {
+                    return RedirectToAction("Employees");
+                }
             }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
             
         }
         #endregion
@@ -370,100 +438,134 @@ namespace IMS.Web.Areas.Admin.Controllers
         #region Deactivate Employee List
         public ActionResult DeactivatedEmployeeList()
         {
-            var context = new ApplicationDbContext();
-            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-            var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-            string[] roleNames = { "Manager", "Staff" };
-            var roleIds = roleManager.Roles
-                .Where(r => roleNames.Contains(r.Name))
-                .Select(r => r.Id)
-                .ToList();
-
-            var usersWithDetails = context.Users
-                .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-                .ToList();
-            List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
-            foreach (var user in usersWithDetails)
+            try
             {
-                var employee = _employeeService.GetEmployeeByUserId(user.Id);
-                if (employee.Status == 0)
+                var context = new ApplicationDbContext();
+                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
+                string[] roleNames = { "Manager", "Staff" };
+
+                var roleIds = roleManager.Roles
+                    .Where(r => roleNames.Contains(r.Name))
+                    .Select(r => r.Id)
+                    .ToList();
+
+                var usersWithDetails = context.Users
+                    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
+                    .ToList();
+
+                List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
+
+                foreach (var user in usersWithDetails)
                 {
-                    UserDetailViewModel userDetails = new UserDetailViewModel
+                    var employee = _employeeService.GetEmployeeByUserId(user.Id);
+                    if (employee.Status == 0)
                     {
-                        Id = user.Id,
-                        Email = user.Email,
-                        Phone = user.PhoneNumber,
-                        City = employee.City,
-                        StreetAddress = employee.StreetAddress,
-                        Thana = employee.Thana,
-                        PostalCode = employee.PostalCode,
-                        ERole = userManager.GetRoles(user.Id).FirstOrDefault()
-                    };
-                    usersDetails.Add(userDetails);
+                        UserDetailViewModel userDetails = new UserDetailViewModel
+                        {
+                            Id = user.Id,
+                            Email = user.Email,
+                            Phone = user.PhoneNumber,
+                            City = employee.City,
+                            StreetAddress = employee.StreetAddress,
+                            Thana = employee.Thana,
+                            PostalCode = employee.PostalCode,
+                            ERole = userManager.GetRoles(user.Id).FirstOrDefault()
+                        };
+                        usersDetails.Add(userDetails);
+                    }
                 }
+                return View(usersDetails);
             }
-            return View(usersDetails);
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
         #region Shop
         public ActionResult Shop()
         {
-            var context = new ApplicationDbContext();
-            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-            var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-            string roleNames = "Customer";
-            var roleIds = roleManager.Roles
-                .Where(r => roleNames.Contains(r.Name))
-                .Select(r => r.Id)
-                .ToList();
-
-            var usersWithDetails = context.Users
-                .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-                .ToList();
-            List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
-            foreach (var user in usersWithDetails)
+            try
             {
-                var customer = _customerService.GetCustomerByUserId(user.Id);
-                if(customer.Status != 0)
-                {
-                    var userDetails = new UserDetailViewModel
-                    {
-                        Id = user.Id,
-                        Email = user.Email,
-                        Phone = user.PhoneNumber,
-                        ShopName = customer.Name,
-                        City = customer.City,
-                        StreetAddress = customer.StreetAddress,
-                        Thana = customer.Thana,
-                        PostalCode = customer.PostalCode,
-                    };
-                    usersDetails.Add(userDetails);
-                }                
-            }
+                var context = new ApplicationDbContext();
+                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
+                string roleNames = "Customer";
 
-            return View(usersDetails);
+                var roleIds = roleManager.Roles
+                    .Where(r => roleNames.Contains(r.Name))
+                    .Select(r => r.Id)
+                    .ToList();
+
+                var usersWithDetails = context.Users
+                    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
+                    .ToList();
+
+                List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
+
+                foreach (var user in usersWithDetails)
+                {
+                    var customer = _customerService.GetCustomerByUserId(user.Id);
+                    if (customer.Status != 0)
+                    {
+                        var userDetails = new UserDetailViewModel
+                        {
+                            Id = user.Id,
+                            Email = user.Email,
+                            Phone = user.PhoneNumber,
+                            ShopName = customer.Name,
+                            City = customer.City,
+                            StreetAddress = customer.StreetAddress,
+                            Thana = customer.Thana,
+                            PostalCode = customer.PostalCode,
+                        };
+                        usersDetails.Add(userDetails);
+                    }
+                }
+
+                return View(usersDetails);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
         #region Deactivate Customer/Shop
         public ActionResult DeactivateCustomer(long id)
         {
-            var context = new ApplicationDbContext();
-            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-            var user = userManager.FindById(id);
-            var customer = _customerService.GetCustomerByUserId(user.Id);
-            if (user != null && customer != null)
-            {               
-                customer.Status = 0;
-                _customerService.UpdateCustomer(customer);
-                TempData["success"] = "Customer Deactivated Successfully!";
-                return RedirectToAction("Shop");
-            }
-            else
+            try
             {
-                return RedirectToAction("Shop");
+                var context = new ApplicationDbContext();
+                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                var user = userManager.FindById(id);
+                var customer = _customerService.GetCustomerByUserId(user.Id);
+
+                if (user != null && customer != null)
+                {
+                    customer.Status = 0;
+                    _customerService.UpdateCustomer(customer);
+                    TempData["success"] = "Customer Deactivated Successfully!";
+                    return RedirectToAction("Shop");
+                }
+                else
+                {
+                    return RedirectToAction("Shop");
+                }
             }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
             
         }
         #endregion
@@ -471,40 +573,53 @@ namespace IMS.Web.Areas.Admin.Controllers
         #region Deactivated Shop List
         public ActionResult DeactivatedCustomerList()
         {
-            var context = new ApplicationDbContext();
-            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-            var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-            string roleNames = "Customer";
-            var roleIds = roleManager.Roles
-                .Where(r => roleNames.Contains(r.Name))
-                .Select(r => r.Id)
-                .ToList();
-
-            var usersWithDetails = context.Users
-                .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-                .ToList();
-            List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
-            foreach (var user in usersWithDetails)
+            try
             {
-                var customer = _customerService.GetCustomerByUserId(user.Id);
-                if (customer.Status == 0)
-                {
-                    var userDetails = new UserDetailViewModel
-                    {
-                        Id = user.Id,
-                        Email = user.Email,
-                        Phone = user.PhoneNumber,
-                        ShopName = customer.Name,
-                        City = customer.City,
-                        StreetAddress = customer.StreetAddress,
-                        Thana = customer.Thana,
-                        PostalCode = customer.PostalCode,
-                    };
-                    usersDetails.Add(userDetails);
-                }
-            }
+                var context = new ApplicationDbContext();
+                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
+                string roleNames = "Customer";
 
-            return View(usersDetails);
+                var roleIds = roleManager.Roles
+                    .Where(r => roleNames.Contains(r.Name))
+                    .Select(r => r.Id)
+                    .ToList();
+
+                var usersWithDetails = context.Users
+                    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
+                    .ToList();
+
+                List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
+
+                foreach (var user in usersWithDetails)
+                {
+                    var customer = _customerService.GetCustomerByUserId(user.Id);
+                    if (customer.Status == 0)
+                    {
+                        var userDetails = new UserDetailViewModel
+                        {
+                            Id = user.Id,
+                            Email = user.Email,
+                            Phone = user.PhoneNumber,
+                            ShopName = customer.Name,
+                            City = customer.City,
+                            StreetAddress = customer.StreetAddress,
+                            Thana = customer.Thana,
+                            PostalCode = customer.PostalCode,
+                        };
+
+                        usersDetails.Add(userDetails);
+                    }
+                }
+
+                return View(usersDetails);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
 
@@ -512,34 +627,46 @@ namespace IMS.Web.Areas.Admin.Controllers
 
         public ActionResult ProductDetails(long orderId)
         {
-            var context = new ApplicationDbContext();
-
-            var History = _inventoryOrderHistoryService.GetByOrderId(orderId);
-            var firstOrderHistory = History.FirstOrDefault();
-
-            if (firstOrderHistory != null)
+            try
             {
-                var employeeId = firstOrderHistory.EmployeeId;
-                var GarmentsId = firstOrderHistory.GarmentsId;
-                var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
-                List<string> name = new List<string>();
-                foreach (var item in History)
+                var context = new ApplicationDbContext();
+
+                var History = _inventoryOrderHistoryService.GetByOrderId(orderId);
+                var firstOrderHistory = History.FirstOrDefault();
+
+                if (firstOrderHistory != null)
                 {
-                    var garments = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
-                    name.Add(garments);
-                }
-                if (manager != null )
-                {
-                    InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
+                    var employeeId = firstOrderHistory.EmployeeId;
+                    var GarmentsId = firstOrderHistory.GarmentsId;
+                    var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
+                    List<string> name = new List<string>();
+
+                    foreach (var item in History)
                     {
-                        orderHistories = History,
-                        GarmentsName = name,
-                        ManagerEmail = manager.Email,
-                    };
-                    return View(inventoryInvoiceViewModel);
+                        var garments = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                        name.Add(garments);
+                    }
+
+                    if (manager != null)
+                    {
+                        InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
+                        {
+                            orderHistories = History,
+                            GarmentsName = name,
+                            ManagerEmail = manager.Email,
+                        };
+                        return View(inventoryInvoiceViewModel);
+                    }
                 }
+
+                return RedirectToAction("InventoryOrder", "Home");
             }
-            return RedirectToAction("InventoryOrder", "Home");
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+            
         }
         #endregion
     }

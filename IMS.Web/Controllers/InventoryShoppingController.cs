@@ -14,12 +14,14 @@ namespace IMS.Web.Controllers
     
     public class InventoryShoppingController : BaseController
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly IGarmentsService _garmentsService;
         private readonly IInventoryShoppingService _inventoryShoppingService;
         public InventoryShoppingController(ISession session):base(session)
         {
             _inventoryShoppingService=new InventoryShoppingService { Session = session };
             _garmentsService=new GarmentsService { Session=session};
+            log4net.Config.XmlConfigurator.Configure();
         }
         // GET: InventoryShopping
 
@@ -28,48 +30,66 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Manager,Admin,Supplier")]
         public ActionResult ProductDetails(long ProductId)
         {
-            var garmentsProduct = _garmentsService.GetGarmentsProductById(ProductId);
-            if(garmentsProduct != null)
+            try
             {
-                InventoryOrderCart inventoryShoppingCart = new InventoryOrderCart
+                var garmentsProduct = _garmentsService.GetGarmentsProductById(ProductId);
+                if (garmentsProduct != null)
                 {
-                    GarmentsProduct = garmentsProduct,
-                    ProductId = ProductId,
-                    Count = 1
-                };
-                return View(inventoryShoppingCart);
+                    InventoryOrderCart inventoryShoppingCart = new InventoryOrderCart
+                    {
+                        GarmentsProduct = garmentsProduct,
+                        ProductId = ProductId,
+                        Count = 1
+                    };
+                    return View(inventoryShoppingCart);
+                }
+                return RedirectToAction("Index", "Garments");
             }
-            return RedirectToAction("Index", "Garments");
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+
 
         }
         [HttpPost]
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult ProductDetails( InventoryOrderCart inventoryOrderCart)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // Retrieve the GarmentsProduct based on the ProductId from your service
-                var garmentsProduct = _garmentsService.GetGarmentsProductById(inventoryOrderCart.ProductId);
-
-                if (garmentsProduct != null)
+                if (ModelState.IsValid)
                 {
-                    InventoryOrderCart inventoryOrder = new InventoryOrderCart
-                    {
-                        Count = inventoryOrderCart.Count,
-                        EmployeeId = Convert.ToInt64(User.Identity.GetUserId()),
-                        GarmentsId = garmentsProduct.GarmentsId,
-                        GarmentsProduct = garmentsProduct,
-                        ProductId=inventoryOrderCart.ProductId,
-                    };
+                    // Retrieve the GarmentsProduct based on the ProductId from your service
+                    var garmentsProduct = _garmentsService.GetGarmentsProductById(inventoryOrderCart.ProductId);
 
-                    // Add the inventoryOrder to the shopping cart
-                    _inventoryShoppingService.AddInventoryShoppingCart(inventoryOrder);                    
-                    return RedirectToAction("Index", "Garments");
+                    if (garmentsProduct != null)
+                    {
+                        InventoryOrderCart inventoryOrder = new InventoryOrderCart
+                        {
+                            Count = inventoryOrderCart.Count,
+                            EmployeeId = Convert.ToInt64(User.Identity.GetUserId()),
+                            GarmentsId = garmentsProduct.GarmentsId,
+                            GarmentsProduct = garmentsProduct,
+                            ProductId = inventoryOrderCart.ProductId,
+                        };
+
+                        // Add the inventoryOrder to the shopping cart
+                        _inventoryShoppingService.AddInventoryShoppingCart(inventoryOrder);
+                        return RedirectToAction("Index", "Garments");
+                    }
                 }
+
+                // Handle the case where the GarmentsProduct is not found or the model is invalid.
+                return View(inventoryOrderCart);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
             }
 
-            // Handle the case where the GarmentsProduct is not found or the model is invalid.
-            return View(inventoryOrderCart);
         }
         #endregion
 
@@ -77,17 +97,26 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult InventoryCart()
         {
-            long userId= Convert.ToInt64(User.Identity.GetUserId());
-            InventoryCartViewModel inventoryCartViewModel = new InventoryCartViewModel
+            try
             {
-                OrderCarts = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == userId).ToList()
-            };
-            foreach(var cart in inventoryCartViewModel.OrderCarts)
-            {
-                inventoryCartViewModel.TotalPrice += (cart.GarmentsProduct.Price * cart.Count);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                InventoryCartViewModel inventoryCartViewModel = new InventoryCartViewModel
+                {
+                    OrderCarts = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == userId).ToList()
+                };
+                foreach (var cart in inventoryCartViewModel.OrderCarts)
+                {
+                    inventoryCartViewModel.TotalPrice += (cart.GarmentsProduct.Price * cart.Count);
+                }
+
+                return View(inventoryCartViewModel);
             }
-           
-            return View(inventoryCartViewModel);
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+
         }
         #endregion
 
@@ -112,12 +141,21 @@ namespace IMS.Web.Controllers
 
         public ActionResult RemoveFromCart(long id)
         {
-            var cart = _inventoryShoppingService.GetproductById(id);
-            if (cart != null)
+            try
             {
-                _inventoryShoppingService.RemoveProduct(cart);
-            } 
-            return RedirectToAction("InventoryCart");
+                var cart = _inventoryShoppingService.GetproductById(id);
+                if (cart != null)
+                {
+                    _inventoryShoppingService.RemoveProduct(cart);
+                }
+                return RedirectToAction("InventoryCart");
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
+            }
+
         }
 
         private decimal CalculateTotalPrice()
