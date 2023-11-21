@@ -342,6 +342,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\CustomerShoppingController.cs" />
     <Compile Include="Controllers\DepartmentController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\GarmentsController.cs" />
     <Compile Include="Controllers\InventoryOrderHistoryController.cs" />
     <Compile Include="Controllers\InventoryShoppingController.cs" />
@@ -389,6 +390,7 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Images\404.jpg" />
     <Content Include="Images\dash.png" />
     <Content Include="Images\login.png" />
     <Content Include="Images\sort_asc.png" />
@@ -546,6 +548,8 @@
     <Content Include="Views\Product\RejectedProductList.cshtml" />
     <Content Include="Views\CustomerShopping\InvoiceForCustomer.cshtml" />
     <Content Include="Views\Shared\_Notification.cshtml" />
+    <Content Include="Views\Error\Index.cshtml" />
+    <Content Include="Views\Error\NotFound.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

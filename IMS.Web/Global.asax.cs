@@ -31,5 +31,23 @@ namespace IMS.Web
 
             ControllerBuilder.Current.SetControllerFactory(new CustomControllerFactory(session));
         }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            var exception = Server.GetLastError();
+
+            // Log the exception if needed
+
+            // Handle 404 errors more gracefully
+            if (exception is HttpException httpException && httpException.GetHttpCode() == 404)
+            {
+                Response.Clear();
+                Server.ClearError();
+
+                // Redirect to the custom 404 error page
+                Response.Redirect("~/Error/NotFound");
+            }
+            
+        }
     }
 }
