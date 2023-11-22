@@ -28,7 +28,7 @@ namespace IMS.Models
         [Required(ErrorMessage = "Product Price is required.")]
         public virtual decimal Price { get; set; }
 
-        [Required(ErrorMessage = "SKU is required")]
+        [Required(ErrorMessage = "Product Sizes are required")]
         public virtual string SKU { get; set; }      
 
         [Required(ErrorMessage = "Product Description is required.")]
@@ -43,12 +43,12 @@ namespace IMS.Models
         public virtual int? Rank { get; set; }
         public virtual int? VersionNumber { get; set; }
         public virtual string BusinessId { get; set; }
-        [Display(Name = "Select Depertment")]
-        [Required(ErrorMessage = "The Department is required.")]
+        [Display(Name = "Depertment")]
+        [Required(ErrorMessage = "Department is required.")]
         public virtual long? DepartmentId { get; set; }
         public virtual Department Department { get; set; }
-        [Display(Name = "Select Product Type")]
-        [Required(ErrorMessage = "The ProductType is required.")]
+        [Display(Name = "Product Type")]
+        [Required(ErrorMessage = "ProductType is required.")]
         public virtual long? ProductTypeId { get; set; }
         public virtual ProductType ProductType { get; set; }
     }

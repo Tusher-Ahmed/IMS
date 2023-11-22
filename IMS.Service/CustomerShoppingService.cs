@@ -38,12 +38,13 @@ namespace IMS.Service
         #region Add Customer Shopping Cart
         public void AddCutomerShoppingCart(ShoppingCart shoppingCart)
         {
+            var Existproduct = _session.Query<ShoppingCart>()
+       .FirstOrDefault(cart => cart.CustomerId == shoppingCart.CustomerId && cart.Product.Id == shoppingCart.ProductId);
             using (var transaction = _session.BeginTransaction())
             {
                 try
                 {
-                    var Existproduct = _session.Query<ShoppingCart>()
-                           .FirstOrDefault(cart => cart.CustomerId == shoppingCart.CustomerId && cart.Product.Id == shoppingCart.ProductId);
+
 
                     if (Existproduct != null)
                     {
@@ -66,20 +67,9 @@ namespace IMS.Service
         public int IncrementProductCount(ShoppingCart shoppingCart, int count)
         {
             shoppingCart.Count += count;
-            using (var transaction = _session.BeginTransaction())
-            {
-                try
-                {
+
                     _repository.Update(shoppingCart);
-                    transaction.Commit();
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
-                      
+        
             return shoppingCart.Count;
         }
         #endregion

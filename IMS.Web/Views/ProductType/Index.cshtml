@@ -9,8 +9,9 @@
         <h2 class="text-uppercase">Product Types</h2>
     </div>
     <div class="col-md-8 text-end">
-        <a href="@Url.Action("Create","ProductType",null)" class="btn btn-outline-success"><i class='fas fa-plus'></i> Add New</a>
+        <a href="@Url.Action("Create","ProductType",null)" class="btn btn-outline-primary"><i class='fas fa-plus'></i> Add New</a>
         <a href="@Url.Action("Deactivate","ProductType",null)" class="btn btn-outline-danger"> <i class="fas fa-times"></i> Deactivated Types</a>
+        <a href="@Url.Action("Index", "Home", new {area="Admin"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i>&nbsp; Back to Dashboard </a>
     </div>
 </div>
 @using (Ajax.BeginForm("Index", "ProductType", new AjaxOptions()

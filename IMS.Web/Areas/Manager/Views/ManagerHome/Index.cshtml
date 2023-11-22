@@ -12,10 +12,18 @@
             <a href="@Url.Action("Index", "ManagerHome")" class="btn btn-dark mb-2  w-100 text-start"><img src="~/Images/dash.png" style="width:25px;padding:0px 6px 0px 0px;" />&nbsp; Dashboard</a>
             <a href="@Url.Action("ProductList", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-store"></i>&nbsp; Product List</a>
             <a href="@Url.Action("ManagePrice", "Product", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-tag"></i>&nbsp; Manage Product</a>
+            <a href="@Url.Action("ApproveProduct", "Product", new {area=""})" class="btn btn-dark mb-2 w-100 text-start position-relative">
+
+                <i class="fa-solid fa-clipboard-check"></i>&nbsp; Product Approval
+                @if (ViewBag.InventoryCartItemCount != null && (int)ViewBag.NeedApproval > 0)
+                {
+                    <span class="position-absolute top-2 start-60 translate-middle badge rounded-pill bg-danger">@ViewBag.NeedApproval</span>
+                }
+
+            </a>
             <a href="@Url.Action("TotalStaff", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-user-group"></i>&nbsp; Manage Staff</a>
             <a href="@Url.Action("InventoryOrder", "ManagerHome")" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-cart-flatbed-suitcase"></i>&nbsp; Inventory Order History</a>
             <a href="@Url.Action("RejectedOrder", "ManagerHome")" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-truck-ramp-box"></i>&nbsp; Rejected Order History</a>
-            <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-dolly"></i>&nbsp; Customer Order</a>
             <a href="@Url.Action("SellingReport", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-chart-line"></i>&nbsp; Selling Report</a>
             <a href="@Url.Action("BuyingReport", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-chart-column"></i>&nbsp; Buying Report</a>
             <a href="@Url.Action("ProductShortage", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-arrow-down-wide-short"></i>&nbsp; Product Shortage</a>
@@ -77,7 +85,7 @@
                 <br />
                 <div class="col-md-6 col-lg-3 col-xlg-6 pb-2">
                     <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Shipped"})" style="text-decoration:none;">
-                        <div class="box text-center text-light p-3"style="background-color:#3d0583">
+                        <div class="box text-center text-light p-3" style="background-color:#3d0583">
                             <i class="fa-solid fa-truck-fast font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalShipped</h5>
                             <small class="font-light">Shipped</small>
@@ -87,7 +95,7 @@
                 <br />
                 <div class="col-md-6 col-lg-3 col-xlg-6 pb-2">
                     <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Cancelled"})" style="text-decoration:none;">
-                        <div class="box bg-danger text-center text-light p-3" >
+                        <div class="box bg-danger text-center text-light p-3">
                             <i class="fa-solid fa-xmark font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalCancel</h5>
                             <small class="font-light">Cancelled</small>
@@ -97,7 +105,7 @@
                 <br />
                 <div class="col-md-6 col-lg-3 col-xlg-6 pb-2">
                     <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="Refunded"})" style="text-decoration:none;">
-                        <div class="box text-center text-light p-3"style="background-color:#ff0000">
+                        <div class="box text-center text-light p-3" style="background-color:#ff0000">
                             <i class="fa-solid fa-money-bill-transfer font-16"></i>
                             <h5 class="mb-0 mt-1">@Model.TotalRefunded</h5>
                             <small class="font-light">Refunded</small>
@@ -112,7 +120,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title text-uppercase">Latest Sales</h4>
+                            <h4 class="card-title text-uppercase">Recent Sales</h4>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -130,9 +138,20 @@
                                 <tbody>
                                     @foreach (var item in Model.OrderHeaders.Take(5))
                                     {
+                                        int depth = item.Id.ToString().Length;
+                                        int dif = 6 - depth;
+                                        string num = item.Id.ToString();
+                                        if (dif>0)
+                                        {
+                                            string newId= new string('0', dif );
+                                            num = newId + num;
+                                        }
+
+
                                         <tr>
                                             <td>
-                                                @item.Id
+                                                
+                                                @num
                                             </td>
                                             <td>@item.Name</td>
                                             <td>@item.OrderTotal.ToString("C")</td>
@@ -161,7 +180,7 @@
 
                                             </td>
                                             <td>
-                                                @if ( item.PaymentStatus==IMS.Utility.ShoppingHelper.StatusRefunded)
+                                                @if (item.PaymentStatus == IMS.Utility.ShoppingHelper.StatusRefunded)
                                                 {
                                                     <span class="badge bg-danger">@item.PaymentStatus</span>
                                                 }
@@ -207,7 +226,7 @@
 
                                             </td>
                                         </tr>
-                                    }                                  
+                                    }
 
                                 </tbody>
                             </table>

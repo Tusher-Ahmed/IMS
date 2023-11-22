@@ -10,7 +10,7 @@
                     <p class="card-title text-uppercase" style="font-weight:bold;font-size:14px;">@product.Name</p>
                     <p class="card-text" style="font-size:12px;">Sizes: @product.SKU</p>
                     <p class="card-text" style="font-size:12px;">Price: @product.Price.ToString("C")</p>
-                    @Html.ActionLink("Product Details", "ProductDetails", "InventoryShopping",new {ProductId=product.Id }, new {@class="btn btn-success"})
+                    @Html.ActionLink("Product Details", "ProductDetails", "InventoryShopping",new {ProductId=product.Id ,count=1}, new {@class="btn btn-success"})
                 </div>
             </div>
         </div>

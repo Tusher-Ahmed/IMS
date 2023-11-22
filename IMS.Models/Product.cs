@@ -33,6 +33,7 @@ namespace IMS.Models
         public virtual string Description { get; set; }
         public virtual int ProductCode { get; set; }
         public virtual long OrderHistoryId { get; set; }
+        [Display(Name = "Buying Price")]
         public virtual decimal BuyingPrice { get; set; }
         public virtual bool IsPriceAdded { get; set; }
         public virtual long? CreatedBy { get; set; }

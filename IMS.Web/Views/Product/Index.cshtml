@@ -16,13 +16,13 @@
 
         <div class="col-md-3">
             <div class="form-group">
-                @Html.DropDownList("SearchDepartmentId", new SelectList(Model.Departments, "Id", "Name"), "Select Department", new { @class = "form-control" })
+                @Html.DropDownList("SearchDepartmentId", new SelectList(Model.Departments, "Id", "Name"), "-- Select Department --", new { @class = "form-control" })
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="form-group">
-                @Html.DropDownList("SearchProductTypeId", new SelectList(Model.ProductTypes, "Id", "Name"), "Select Product Type", new { @class = "form-control" })
+                @Html.DropDownList("SearchProductTypeId", new SelectList(Model.ProductTypes, "Id", "Name"), "-- Select Product Type --", new { @class = "form-control" })
             </div>
         </div>
 

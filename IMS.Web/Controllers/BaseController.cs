@@ -13,10 +13,12 @@ namespace IMS.Web.Controllers
     {
         private readonly ICustomerShoppingService _customerShopping;
         private readonly IInventoryShoppingService _inventoryShoppingService;
+        private readonly IProductService _productService;
         public BaseController(ISession session)
         {
             _customerShopping = new CustomerShoppingService { Session = session };
             _inventoryShoppingService = new InventoryShoppingService {  Session = session };
+            _productService = new ProductService {  Session = session };
         }
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
@@ -28,6 +30,9 @@ namespace IMS.Web.Controllers
 
             int InventoryCartCount = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == Convert.ToInt64(User.Identity.GetUserId())).Count();
             ViewBag.InventoryCartItemCount= InventoryCartCount;
+
+            int NeedApprovalCount= _productService.GetAllProduct().Where(u => u.Approved == null).Count();
+            ViewBag.NeedApproval = NeedApprovalCount;
         }
     }
 }

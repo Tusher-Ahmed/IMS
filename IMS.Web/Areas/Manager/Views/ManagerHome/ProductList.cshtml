@@ -11,12 +11,23 @@
     </div>
     <div class="col-md-6 text-end">
         <a href="@Url.Action("DeactivatedList", "ManagerHome", null)" class="btn btn-outline-danger"><i class="fa-solid fa-circle-xmark"></i> Deactivated products</a>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <a href="@Url.Action("Index", "Home", new {area="Admin"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i>&nbsp; Back to Dashboard </a>
+        }
+
+        @if (User.IsInRole("Manager"))
+        {
+            <a href="@Url.Action("Index", "ManagerHome", new {area="Manager"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i>&nbsp; Back to Dashboard </a>
+        }
     </div>
 </div>
 
 <table id="productTable" class="table table-hover table-striped">
     <thead>
         <tr>
+            <th>No.</th>
             <th>Image</th>
             <th>Name</th>
             <th>Quantity</th>
@@ -26,9 +37,13 @@
         </tr>
     </thead>
     <tbody>
+        @{ 
+            int i = 1;
+        }
         @foreach (var item in Model)
         {
             <tr>
+                <td>@i</td>
                 <td>
                     <img src="@Url.Content("~/Images/" + item.Image)" width="40" alt="img" />
                 </td>
@@ -49,13 +64,19 @@
 
                 </td>
             </tr>
+            i++;
         }
     </tbody>
 </table>
 
 @section Scripts {
     <script>$(document).ready(function () {
-            $("#productTable").DataTable();
+    $("#productTable").DataTable({
+        "columnDefs": [
+            { "orderable": false, "targets": [1,6] },
+            { "orderable": true, "targets": [0, 2, 3,4,5] }
+        ]
+    });
         })</script>
 }
 

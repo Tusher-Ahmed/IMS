@@ -15,6 +15,7 @@
                         <i class="fas fa-shopping-cart"></i> &nbsp; Order Summary
                     </div>
                     <div class="col-md-2 text-end">
+
                         @if (User.IsInRole("Manager"))
                         {
                             <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
@@ -27,6 +28,7 @@
                         {
                             <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
                         }
+
                     </div>
                 </div>
             </div>
@@ -42,6 +44,7 @@
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.Name)</div>
                                 <div class="col-9">
+
                                     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                     {
                                         @Html.TextBoxFor(model => model.OrderHeader.Name, new { @class = "form-control" })
@@ -56,6 +59,7 @@
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.PhoneNumber)</div>
                                 <div class="col-9">
+
                                     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                     {
                                         @Html.TextBoxFor(model => model.OrderHeader.PhoneNumber, new { @class = "form-control" })
@@ -64,11 +68,13 @@
                                     {
                                         @Html.TextBoxFor(model => model.OrderHeader.PhoneNumber, new { @class = "form-control", @disabled = "disabled" })
                                     }
+
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.StreetAddress)</div>
                                 <div class="col-9">
+
                                     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                     {
                                         @Html.TextBoxFor(model => model.OrderHeader.StreetAddress, new { @class = "form-control" })
@@ -83,6 +89,7 @@
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.City)</div>
                                 <div class="col-9">
+
                                     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                     {
                                         @Html.TextBoxFor(model => model.OrderHeader.City, new { @class = "form-control" })
@@ -97,6 +104,7 @@
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.Thana)</div>
                                 <div class="col-9">
+
                                     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                     {
                                         @Html.TextBoxFor(model => model.OrderHeader.Thana, new { @class = "form-control" })
@@ -111,6 +119,7 @@
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.PostalCode)</div>
                                 <div class="col-9">
+
                                     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                     {
                                         @Html.TextBoxFor(model => model.OrderHeader.PostalCode, new { @class = "form-control" })
@@ -125,6 +134,7 @@
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.Email)</div>
                                 <div class="col-9">
+
                                     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                     {
                                         @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
@@ -151,13 +161,14 @@
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.Carrier)</div>
                                 <div class="col-9">
+
                                     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                     {
                                         @Html.TextBoxFor(model => model.OrderHeader.Carrier, new { @class = "form-control", id = "carrier" })
                                     }
                                     else
                                     {
-                                        @Html.TextBoxFor(model => model.OrderHeader.Carrier, new { @class = "form-control", @disabled = "disabled" })
+                                        @Html.TextBoxFor(model => model.OrderHeader.Carrier, new { @class = "form-control", @disabled = "disabled" , placeholder = "Order is not shipped yet!" })
                                     }
 
                                 </div>
@@ -165,32 +176,35 @@
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.TrackingNumber)</div>
                                 <div class="col-9">
-                                    @Html.TextBoxFor(model => model.OrderHeader.TrackingNumber, new { @class = "form-control", @disabled = "disabled" })
+                                    @Html.TextBoxFor(model => model.OrderHeader.TrackingNumber, new { @class = "form-control", @disabled = "disabled", placeholder="Order is not shipped yet!" })
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">@Html.LabelFor(model => model.OrderHeader.ShippingDate)</div>
                                 <div class="col-9">
+
                                     @if (Model.OrderHeader.ShippingDate != null)
                                     {
-                                        <input type="text" value="@Model.OrderHeader.ShippingDate.ToString().AsDateTime().ToShortDateString()" class="form-control" disabled />
+                                        <input type="text" value="@Model.OrderHeader.ShippingDate.ToString().AsDateTime().ToShortDateString()"  class="form-control" disabled />
                                     }
                                     else
                                     {
-                                        @Html.EditorFor(model => model.OrderHeader.ShippingDate, new { htmlAttributes = new { @class = "form-control", @value = "", disabled = "disabled" } })
+                                        @Html.EditorFor(model => model.OrderHeader.ShippingDate, new { htmlAttributes = new { @class = "form-control", @value = "", disabled = "disabled", placeholder = "mm/dd/yyyy" } })
                                     }
 
                                 </div>
                             </div>
+
                             @if (User.IsInRole("Customer") && (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped || Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled))
                             {
                                 <div class="row my-1">
                                     <div class="col-3">Arrival Date</div>
                                     <div class="col-9">
-                                        <input type="text" value="@Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(3).ToShortDateString()" class="form-control" disabled />
+                                        <input type="text" value="@Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(3).ToShortDateString()" class="form-control"  disabled />
                                     </div>
                                 </div>
                             }
+
                             @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                             {
                                 <div class="row my-1">
@@ -207,6 +221,7 @@
                                     @Html.TextBoxFor(model => model.OrderHeader.PaymentStatus, new { @class = "form-control", @disabled = "disabled" })
                                 </div>
                             </div>
+
                             @if (Model.OrderHeader.ShippingDate == null && (User.IsInRole("Admin") || User.IsInRole("Manager")))
                             {
                                 if (Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
@@ -221,6 +236,7 @@
                             <h4 class="d-flex justify-content-between align-items-center mb-3">
                                 <span class="text-dark text-uppercase">Order Summary</span>
                             </h4>
+
                             @if (Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
                             {
                                 <label class="btn btn-outline-dark form-control my-2" id="status-@Model.OrderHeader.Id">Order Status - @Model.OrderHeader.OrderStatus</label>
@@ -231,7 +247,9 @@
                             }
 
                             <ul class="list-group mb-3">
+
                                 @{ int i = 0;}
+
                                 @foreach (var item in Model.Products)
                                 {
                                     <li class="list-group-item d-flex justify-content-between p-2">
@@ -262,6 +280,7 @@
                                     </div>
                                 </li>
                             </ul>
+
                             @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                             {
                                 if (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
@@ -273,10 +292,12 @@
                                     <input type="submit" class="btn btn-primary form-control my-1 text-uppercase" value="Ship Order" formaction="@Url.Action("ShipOrder", "CustomerOrder", new { area = "Manager" })" onclick="return validateCarrierNumber();" />
                                 }
                             }
+
                             @if (@Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(3) <= DateTime.Now && (User.IsInRole("Admin") || User.IsInRole("Manager")) && Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
                             {
                                 <input type="submit" class="btn btn-dark form-control my-1 text-uppercase" value="Delivered Order" formaction="@Url.Action("DeliveredOrder", "CustomerOrder", new { area = "Manager" })" />
                             }
+
                             @if (Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusRefunded &&
                                 Model.OrderHeader.OrderStatus != IMS.Utility.ShoppingHelper.StatusCancelled)
                             {
@@ -292,6 +313,7 @@
                                     <input type="submit" class="btn btn-danger form-control my-1 text-uppercase" formaction="@Url.Action("CancelReasonPage", "CustomerOrder", new { area = "Manager",orderId=Model.OrderHeader.Id })" value="Return Order" />
                                 }
                             }
+
                             @if (User.IsInRole("Customer") && Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusApproved)
                             {
                                 <div>
@@ -299,13 +321,13 @@
                                 </div>
                             }
 
-                                @if (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
-                                {
-                                    <div class="form-group">
-                                        <label for="@Model.CancelReason.Reason" class="form-label text-danger">Cancel Reason:</label>
-                                        @Html.TextAreaFor(model => model.CancelReason.Reason, new { @class = "form-control", rows = "4", @disabled = "disabled" })
-                                    </div>
-                                }
+                            @if (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled)
+                            {
+                                <div class="form-group">
+                                    <label for="@Model.CancelReason.Reason" class="form-label text-danger">Cancel Reason:</label>
+                                    @Html.TextAreaFor(model => model.CancelReason.Reason, new { @class = "form-control", rows = "4", @disabled = "disabled" })
+                                </div>
+                            }
                             
 
                         </div>
@@ -321,12 +343,19 @@
 
             var carrierField = document.getElementById("carrier");
             if (carrierField.value.trim() === "") {
-                alert("Carrier Name is required.");
-                return false; // Prevent form submission
+                /*alert("Carrier Name is required.");*/
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Carrier name is missing, write the carrier name before shipping the order!",
+                });
+                return false; 
             }
-
-            return true; // Allow form submission
+            var form = document.forms[0];
+            form.submit();
+            return true; 
         }       
 
     </script>
 }
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -10,6 +10,7 @@
     </div>
     <div class="col-md-6 text-end">
         <a href="@Url.Action("RejectedProductList", "Product", new {area=""})" class="btn btn-outline-danger"><i class="fa-solid fa-right-from-bracket"></i>&nbsp; Rejected Orders</a>
+        <a href="@Url.Action("Index", "StaffHome", new {area="Staff"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i>&nbsp; Back to Dashboard </a>
     </div>
 </div>
 
@@ -49,6 +50,11 @@
 </table>
 @section Scripts {
     <script>$(document).ready(function () {
-            $("#approveTable").DataTable();
+    $("#approveTable").DataTable({
+        "columnDefs": [
+            { "orderable": false, "targets": [1] },
+            { "orderable": true, "targets": [0, 2, 3, 4, 5, 6] }
+        ]
+    });
         })</script>
 }

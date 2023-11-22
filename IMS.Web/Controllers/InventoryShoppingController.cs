@@ -28,7 +28,7 @@ namespace IMS.Web.Controllers
 
         #region Product details with add to cart
         [Authorize(Roles = "Manager,Admin,Supplier")]
-        public ActionResult ProductDetails(long ProductId)
+        public ActionResult ProductDetails(long ProductId,int count=1)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace IMS.Web.Controllers
                     {
                         GarmentsProduct = garmentsProduct,
                         ProductId = ProductId,
-                        Count = 1
+                        Count = count
                     };
                     return View(inventoryShoppingCart);
                 }

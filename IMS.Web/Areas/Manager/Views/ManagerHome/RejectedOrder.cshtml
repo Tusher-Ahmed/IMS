@@ -9,8 +9,17 @@
     <div class="col-md-6">
         <h4 class="text-uppercase">Rejected Product List</h4>
     </div>
-    <div class="col-md-6 text-end">
-        <a href="@Url.Action("Index", "ManagerHome", new {area="Manager"})" class="btn btn-outline-success"><i class="fa-solid fa-right-from-bracket"></i>&nbsp; Back To Dashboard</a>
+    <div class="col-6 text-end">
+
+        @if (User.IsInRole("Admin"))
+        {
+            <a href="@Url.Action("Index", "Home", new {area="Admin"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i> Back To Dashboard</a>
+        }
+
+        @if (User.IsInRole("Manager"))
+        {
+            <a href="@Url.Action("Index", "ManagerHome", new {area="Manager"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i> Back To Dashboard</a>
+        }
     </div>
 </div>
 <br />
@@ -52,6 +61,11 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $("#approveTable").DataTable();
+            $("#approveTable").DataTable({
+                "columnDefs": [
+                    { "orderable": false, "targets": [1] },
+                    { "orderable": true, "targets": [0, 2, 3, 4, 5, 6, 7, 8, 9] }
+                ]
+            });
         })</script>
 }

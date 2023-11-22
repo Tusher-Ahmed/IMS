@@ -4,7 +4,21 @@
     ViewBag.Title = "Edit";
 }
 
-<h4 class="text-uppercase pb-4">Edit Product</h4>
+
+<div class="row">
+    <div class="col-6">
+        <h4 class="text-uppercase pb-4">Edit Product</h4>
+    </div>
+    <div class="col-6 text-end pb-4">
+
+        @if (User.IsInRole("Supplier"))
+        {
+            <a href="@Url.Action("Index", "GarmentsHome", new {area="Garmentss"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i> Back To Dashboard</a>
+        }
+
+        
+    </div>
+</div>
 
 @using (Html.BeginForm("Edit", "Garments", FormMethod.Post))
 {
@@ -18,18 +32,19 @@
         <div class="row">
             <div class="col-10">
                 <div class="form-group">
+                    @Html.LabelFor(model => model.GarmentsProduct.Name, htmlAttributes: new { @class = "control-label col-md-12" })
                     @Html.EditorFor(model => model.GarmentsProduct.Name, new { htmlAttributes = new { @class = "form-control" } })
                     @Html.ValidationMessageFor(model => model.GarmentsProduct.Name, "", new { @class = "text-danger" })
                 </div>
                 <br />
                 <div class="form-group">
-
+                    @Html.LabelFor(model => model.GarmentsProduct.Price, htmlAttributes: new { @class = "control-label col-md-12" })
                     @Html.EditorFor(model => model.GarmentsProduct.Price, new { htmlAttributes = new { @class = "form-control" } })
                     @Html.ValidationMessageFor(model => model.GarmentsProduct.Price, "", new { @class = "text-danger" })
                 </div>
                 <br />
                 <div class="form-group">
-                    <label class="pb-2">SKU Options:</label>
+                    <label class="pb-2">Size Options:</label>
                     <div class="form-check d-block p-0">
                         @foreach (var skuOption in new List<string> { "S", "M", "L", "XL", "XXL" })
                         {
@@ -47,17 +62,20 @@
                     </div>
                     <br />
                     <div class="form-group">
+                        @Html.LabelFor(model => model.GarmentsProduct.DepartmentId, htmlAttributes: new { @class = "control-label col-md-12" })
                         @Html.DropDownListFor(model => model.GarmentsProduct.DepartmentId, (SelectList)ViewBag.Departments, "Select Department", new { @class = "form-control" })
                         @Html.ValidationMessageFor(model => model.GarmentsProduct.DepartmentId, "", new { @class = "text-danger" })
                     </div>
                     <br />
 
                     <div class="form-group">
+                        @Html.LabelFor(model => model.GarmentsProduct.ProductTypeId, htmlAttributes: new { @class = "control-label col-md-12" })
                         @Html.DropDownListFor(model => model.GarmentsProduct.ProductTypeId, (SelectList)ViewBag.ProductTypes, "Select Product Type", new { @class = "form-control" })
                         @Html.ValidationMessageFor(model => model.GarmentsProduct.ProductTypeId, "", new { @class = "text-danger" })
                     </div>
                     <br />
                     <div class="form-group">
+                        @Html.LabelFor(model => model.GarmentsProduct.Description, htmlAttributes: new { @class = "control-label col-md-12" })
                         @Html.TextAreaFor(model => model.GarmentsProduct.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
                         @Html.ValidationMessageFor(model => model.GarmentsProduct.Description, "", new { @class = "text-danger" })
                     </div>
@@ -81,6 +99,7 @@
             selector: 'textarea#tiny',
             plugins: 'ai mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
             toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            menubar: false,
             image_title: true,
             automatic_uploads: true,
 

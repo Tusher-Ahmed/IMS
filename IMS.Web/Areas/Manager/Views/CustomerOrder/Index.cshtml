@@ -40,10 +40,24 @@
     }
 }
 <div class="row pb-4 pt-2 mb-4">
-    <div class="col-md-4">
+    <div class="col-md-6 pb-3">
         <h4 class="text-uppercase">Customer Order List</h4>
     </div>
-    <div class="col-md-8 text-end">
+
+    <div class="col-6 text-end pb-3">
+
+        @if (User.IsInRole("Admin"))
+        {
+            <a href="@Url.Action("Index", "Home", new {area="Admin"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i> Back To Dashboard</a>
+        }
+
+        @if (User.IsInRole("Manager"))
+        {
+            <a href="@Url.Action("Index", "ManagerHome", new {area="Manager"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i> Back To Dashboard</a>
+        }
+    </div>
+
+    <div class="col-md-12 text-end pt-2">
         <a href="@Url.Action("Index", "CustomerOrder", new { area = "Manager", status = "Approved" })" class="btn btn-outline-secondary @approved rounded-0">
             Approved
         </a>
@@ -83,9 +97,17 @@
     <tbody>
         @foreach (var item in Model)
         {
+            int depth = item.Id.ToString().Length;
+            int dif = 6 - depth;
+            string num = item.Id.ToString();
+            if (dif > 0)
+            {
+                string newId = new string('0', dif);
+                num = newId + num;
+            }
             <tr>
                 <td>
-                    @item.Id
+                    @num
                 </td>
                 <td>@item.Name</td>
                 <td>@item.OrderTotal.ToString("C")</td>
@@ -152,6 +174,10 @@
     <script>
         $(document).ready(function () {
             $("#customerOrderTable").DataTable({
+                "columnDefs": [
+                    { "orderable": false, "targets": [6] },
+                    { "orderable": true, "targets": [0, 1, 2, 3, 4,5] }
+                ],
                 order: [[0, 'desc']]
             });
         })</script>

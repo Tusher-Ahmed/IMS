@@ -4,8 +4,16 @@
 }
 
 <div class="row">
-    <div class="col-6">
+    <div class="col-6 pb-4">
         <h4 class="text-uppercase">Order History Details</h4>
+    </div>
+    <div class="col-6 text-end pb-4">
+
+        @if (User.IsInRole("Supplier"))
+        {
+            <a href="@Url.Action("Index", "GarmentsHome", new {area="Garmentss"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i> Back To Dashboard</a>
+        }
+
     </div>
 </div>
 <div class="p-4">

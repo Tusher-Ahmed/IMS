@@ -658,13 +658,14 @@ namespace IMS.Web.Areas.Manager.Controllers
             try
             {
                 var context = new ApplicationDbContext();
-                var product = _product.GetAllProduct().Where(u => u.Rejected != true);
+                var product = _product.GetAllProduct();
                 List<OrderHistory> history = new List<OrderHistory>();
                 Dictionary<long, string> managers = new Dictionary<long, string>();
                 var startDate = DateTime.Now.AddDays(-7);
                 var endDate = DateTime.Now;
 
                 history = _inventoryOrderHistoryService.GetHistories(product.Select(x => x.OrderHistoryId).ToList(), startDate, endDate);
+
                 foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
                 {
                     string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;

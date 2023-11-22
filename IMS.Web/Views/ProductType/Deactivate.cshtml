@@ -4,7 +4,14 @@
     ViewBag.Title = "Deactivate";
 }
 
-<h2 class="text-uppercase">Deactivate Product Type</h2>
+<div class="row">
+    <div class="col-6">
+        <h4 class="text-uppercase">Deactivate Product Type</h4>
+    </div>
+    <div class="col-6 text-end">
+        <a href="@Url.Action("Index", "Home", new {area="Admin"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i>&nbsp; Back to Dashboard </a>
+    </div>
+</div>
 
 @using (Ajax.BeginForm("Deactivate", "ProductType", new AjaxOptions()
 {

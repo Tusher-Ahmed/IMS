@@ -8,7 +8,18 @@
     <div class="col-6">
         <h4 class="text-uppercase">Inventory Order History</h4>
     </div>
+    <div class="col-6 text-end">
 
+        @if (User.IsInRole("Admin"))
+        {
+            <a href="@Url.Action("Index", "Home", new {area="Admin"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i> Back To Dashboard</a>
+        }
+
+        @if (User.IsInRole("Manager"))
+        {
+            <a href="@Url.Action("Index", "ManagerHome", new {area="Manager"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i> Back To Dashboard</a>
+        }
+    </div>
 </div>
 <div class="row pt-2 pb-4 mb-4">
     <div class="col-3">
@@ -50,6 +61,10 @@
             let pageSize = 10;
 
             $("#historyOrder").DataTable({
+                "columnDefs": [
+                    { "orderable": false, "targets": [4] },
+                    { "orderable": true, "targets": [0, 1, 2, 3] }
+                ],
                 destroy: true,
                 "order": false,
                 searching: false,

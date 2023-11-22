@@ -12,6 +12,7 @@
     <div class="col-md-6 text-end">
         <a href="@Url.Action("Register", "Account", new {area=""})" class="btn btn-outline-success"><i class='fas fa-plus'></i> Add Shop</a>        
         <a href="@Url.Action("DeactivatedCustomerList", "Home", new {area="Admin"})" class="btn btn-outline-danger"><i class="fa-solid fa-right-from-bracket"></i> Deactivated Customers</a>
+        <a href="@Url.Action("Index", "Home", new {area="Admin"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i>&nbsp; Back to Dashboard </a>
     </div>
 </div>
 
@@ -53,7 +54,12 @@
 
 @section Scripts {
     <script>$(document).ready(function () {
-            $("#shopTable").DataTable();
+    $("#shopTable").DataTable({
+        "columnDefs": [
+            { "orderable": false, "targets": [8] },
+            { "orderable": true, "targets": [0, 1, 2, 3, 4, 5, 6, 7] }
+        ]
+    });
         })</script>
 }
 

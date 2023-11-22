@@ -12,19 +12,21 @@
     @Html.AntiForgeryToken()
     @Html.ValidationSummary("", new { @class = "text-danger" });
 
-    <div class="form-group">
-        @Html.TextBoxFor(model => model.Name, new { placeholder = "Product Name", @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-    </div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-12" })
+    @Html.TextBoxFor(model => model.Name, new { placeholder = "Product Name", @class = "form-control" })
+    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+</div>
     <br />
     <div class="form-group">
+        @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-12" })
         @Html.TextBoxFor(model => model.Price, new { placeholder = "Price", @class = "form-control" })
         @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
     </div>
     <br />
     <div class="form-group">
-        <label class="pb-2">SKU Options:</label>
-        <div class="form-check d-block p-0">
+        <label class="pb-2">Size Options:</label>
+        <div class="form-check d-block p-0">            
             @foreach (var skuOption in new List<string> { "S", "M", "L", "XL", "XXL" })
             {
                 <div class="form-check p-0" style="display:inline-block; margin-right:10px;">
@@ -39,17 +41,19 @@
     </div>
     <br />
     <div class="form-group">
+        @Html.LabelFor(model => model.DepartmentId, htmlAttributes: new { @class = "control-label col-md-12" })
         @Html.DropDownListFor(model => model.DepartmentId, (SelectList)ViewBag.Departments, "Select Department", new { @class = "form-control" })
         @Html.ValidationMessageFor(model => model.DepartmentId, "", new { @class = "text-danger" })
     </div>
     <br />
     <div class="form-group">
-
+        @Html.LabelFor(model => model.ProductTypeId, htmlAttributes: new { @class = "control-label col-md-12" })
         @Html.DropDownListFor(model => model.ProductTypeId, (SelectList)ViewBag.ProductTypes, "Select Product Type", new { @class = "form-control" })
         @Html.ValidationMessageFor(model => model.ProductTypeId, "", new { @class = "text-danger" })
     </div>
     <br />
     <div class="form-group">
+        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-12" })
         @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
         @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
     </div>
@@ -64,6 +68,7 @@
             selector: 'textarea#tiny',
             plugins: 'ai mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
             toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            menubar: false,
             image_title: true,
             automatic_uploads: true,
 

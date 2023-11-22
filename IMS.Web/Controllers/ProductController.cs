@@ -253,7 +253,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Staff Product Approval
-        [Authorize(Roles = "Staff,Admin")]
+        [Authorize(Roles = "Staff,Admin,Manager")]
         public ActionResult ApproveProduct()
         {
             try
@@ -268,7 +268,7 @@ namespace IMS.Web.Controllers
             }
 
         }
-        [Authorize(Roles = "Staff,Admin")]
+        [Authorize(Roles = "Staff,Admin,Manager")]
         public ActionResult EditByStaff(long id)
         {
 
@@ -293,7 +293,7 @@ namespace IMS.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Staff,Admin")]
+        [Authorize(Roles = "Staff,Admin,Manager")]
         public ActionResult EditByStaff(long id, Product product)
         {
             try

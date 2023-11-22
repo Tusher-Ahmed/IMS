@@ -22,14 +22,12 @@ namespace IMS.Web.Areas.Manager.Controllers
         private readonly IProductService _product;
         private readonly IOrderHeaderService _orderHeaderService;
         private readonly IOrderDetailService _orderDetailService;
-        private readonly ICustomerService _customerService;
         private readonly ICancelReasonService _cancelReasonService;
         public CustomerOrderController(ISession session):base(session)
         {
             _product = new IMS.Service.ProductService { Session = session };
             _orderHeaderService = new OrderHeaderService { Session = session };
             _orderDetailService = new OrderDetailService { Session = session };
-            _customerService = new IMS.Service.CustomerService { Session = session };
             _cancelReasonService = new CancelReasonService { Session = session };
             log4net.Config.XmlConfigurator.Configure();
         }
@@ -195,7 +193,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                 orderHeader.OrderStatus = ShoppingHelper.StatusShipped;
                 orderHeader.ShippingDate = DateTime.Now;
                 _orderHeaderService.Update(orderHeader);
-                TempData["success"] = "Order status change successfully!";
+                TempData["success"] = "Order has been shipped successfully!";
 
                 return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
             }

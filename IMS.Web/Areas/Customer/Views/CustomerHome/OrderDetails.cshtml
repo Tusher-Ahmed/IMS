@@ -194,6 +194,10 @@
     <script>
         $(document).ready(function () {
             $("#customerOrderTable").DataTable({
+                "columnDefs": [
+                    { "orderable": false, "targets": [6] },
+                    { "orderable": true, "targets": [0, 1, 2, 3, 4, 5] }
+                ],
                 order: [[0, 'desc']]
             });
         })</script>

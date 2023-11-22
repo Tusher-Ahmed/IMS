@@ -23,6 +23,9 @@
                         <div class="row pl-2">
                             <p class="text-secondary"><span class="text-dark fw-bold">Product Type:</span> @Model.GarmentsProduct.ProductType.Name</p>
                         </div>
+                        <div class="row pl-2">
+                            <p class="text-secondary"><span class="text-dark fw-bold">Product Sizes:</span> @Model.GarmentsProduct.SKU</p>
+                        </div>
                         <div class="row pl-2 pb-2">
                             <p class="text-secondary"><span class="text-dark fw-bold">Product Description:</span><br />@Html.Raw(Model.GarmentsProduct.Description) </p>
                         </div>

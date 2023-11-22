@@ -9,7 +9,7 @@ namespace IMS.Models.ViewModel
 {
     public class GarmentsEditViewModel
     {
-        [Required(ErrorMessage = "SKU is required")]
+        [Required(ErrorMessage = "Product Sizes are required")]
         public List<string> SelectedSKUs { get; set; }
 
         public GarmentsProduct GarmentsProduct { get; set; }

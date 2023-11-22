@@ -69,15 +69,20 @@
 @section Scripts{
     <script>
         function validateCarrierNumber() {
-
             var carrierField = document.getElementById("reason");
-            if (carrierField.value.trim() === "") {
-                alert("Cancel reason is required.");
-                return false; // Prevent form submission
+            if (carrierField.value.trim() === "") {               
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Write the cancel reason for cancel the order!",       
+                });
+                return false;
             }
-
-            return true; // Allow form submission
+            var form = document.forms[0]; 
+            form.submit();
+            return true; 
         }
 
     </script>
 }
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
