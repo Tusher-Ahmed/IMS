@@ -137,34 +137,28 @@ namespace IMS.Web.Areas.Admin.Controllers
             
         }
         [HttpPost]
-        public ActionResult Edit(long id, Product product)
+        public ActionResult Edit(long id, Product product, HttpPostedFileBase ImageFile)
         {
             try
             {
                 var prod = _product.GetProductById(id);
-                var targetFolderPath = Server.MapPath("~/Images");
-                var (processedDescription, primaryImageUrl, error) = _manageProductService.ProcessDescription(product.Description, targetFolderPath);
-
-                if (!string.IsNullOrEmpty(error))
-                {
-                    ModelState.AddModelError("Image", error);
-                }
-
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
 
                 if (prod != null)
                 {
                     prod.Price = product.Price;
                     prod.Name = product.Name;
-                    prod.Description = processedDescription;
+                    prod.Description = product.Description;
 
-                    if (!string.IsNullOrEmpty(primaryImageUrl))
+                    if (ImageFile != null && ImageFile.ContentLength > 0)
                     {
-                        prod.Image = primaryImageUrl;
-                    }
-                    else
-                    {
-                        prod.Image = prod.Image;
+
+                        var fileName = Path.GetFileName(ImageFile.FileName);
+                        var path = Path.Combine(Server.MapPath("~/Images"), fileName);
+                        ImageFile.SaveAs(path);
+
+
+                        prod.Image = fileName;
                     }
 
                     prod.ModifyBy = userId;//ManagerId

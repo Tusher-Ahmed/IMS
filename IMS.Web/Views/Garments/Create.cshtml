@@ -12,11 +12,11 @@
     @Html.AntiForgeryToken()
     @Html.ValidationSummary("", new { @class = "text-danger" });
 
-<div class="form-group">
-    @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-12" })
-    @Html.TextBoxFor(model => model.Name, new { placeholder = "Product Name", @class = "form-control" })
-    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-</div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-12" })
+        @Html.TextBoxFor(model => model.Name, new { placeholder = "Product Name", @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+    </div>
     <br />
     <div class="form-group">
         @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-12" })
@@ -26,7 +26,7 @@
     <br />
     <div class="form-group">
         <label class="pb-2">Size Options:</label>
-        <div class="form-check d-block p-0">            
+        <div class="form-check d-block p-0">
             @foreach (var skuOption in new List<string> { "S", "M", "L", "XL", "XXL" })
             {
                 <div class="form-check p-0" style="display:inline-block; margin-right:10px;">
@@ -53,6 +53,14 @@
     </div>
     <br />
     <div class="form-group">
+        @Html.LabelFor(model => model.ImageFile, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-12">
+            <input type="file" name="ImageFile" id="ImageFile" class="form-control" />
+            @Html.ValidationMessageFor(model => model.ImageFile, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <br />
+    <div class="form-group">
         @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-12" })
         @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
         @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
@@ -66,8 +74,8 @@
     <script>
         tinymce.init({
             selector: 'textarea#tiny',
-            plugins: 'ai mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            plugins: 'ai mentions anchor autolink charmap codesample emoticons image link lists searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image  table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
             menubar: false,
             image_title: true,
             automatic_uploads: true,
@@ -109,11 +117,11 @@
             $('#SKU').val(selectedSKUs);
         });
 
-                //$(document).on("click", "#btnAdd", function (e) {
-                //    e.preventDefault();
-                //    let a = $("#Description").val();
-                //    console.log(a);
-                //})
+                    //$(document).on("click", "#btnAdd", function (e) {
+                    //    e.preventDefault();
+                    //    let a = $("#Description").val();
+                    //    console.log(a);
+                    //})
     </script>
 }
 <script src="~/Scripts/jquery-3.4.1.min.js"></script>

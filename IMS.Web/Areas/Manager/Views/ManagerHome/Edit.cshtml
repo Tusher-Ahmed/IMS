@@ -7,7 +7,7 @@
 
 <h4 class="text-uppercase">Set Price For each Product</h4>
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("Edit","ManagerHome", FormMethod.Post, new { enctype = "multipart/form-data", @class = "pb-4 pt-2" }))
 {
     @Html.AntiForgeryToken()
 
@@ -20,36 +20,52 @@
             <div class="col-10">
                 <div class="row">
                     <div class="form-group mb-3">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-12 mb-1" })
                         @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", @placeholder = "Product Name..." } })
                         @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                     </div>
                     <br />
                     <div class="form-group col-6 mb-3">
+                        @Html.LabelFor(model => model.BuyingPrice, htmlAttributes: new { @class = "control-label col-md-12 mb-1" })
                         @Html.EditorFor(model => model.BuyingPrice, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
                     </div>
                     <br />
                     <div class="form-group col-6 mb-3">
+                        @Html.LabelFor(model => model.Quantity, htmlAttributes: new { @class = "control-label col-md-12 mb-1" })
                         @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
                     </div>
                     <br />
                     <div class="form-group col-6 mb-3">
+                        @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-12 mb-1" })
                         @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control", @placeholder = "Write Your Selling Price..." } })
                         @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
                     </div>
                     <br />
                     <div class="form-group col-6 mb-3">
+                        @Html.LabelFor(model => model.SKU, htmlAttributes: new { @class = "control-label col-md-12 mb-1" })
                         @Html.EditorFor(model => model.SKU, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
                     </div>
                     <br />
                     <div class="form-group col-6 mb-3">
+                        @Html.LabelFor(model => model.Department.Name, htmlAttributes: new { @class = "control-label col-md-12 mb-1" })
                         @Html.EditorFor(model => model.Department.Name, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
                     </div>
                     <br />
                     <div class="form-group col-6 mb-3">
+                        @Html.LabelFor(model => model.ProductType.Name, htmlAttributes: new { @class = "control-label col-md-12 mb-1" })
                         @Html.EditorFor(model => model.ProductType.Name, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
                     </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Image, htmlAttributes: new { @class = "control-label col-md-2 mb-1" })
+                        <div class="col-md-12">
+                            <input type="file" name="ImageFile" id="ImageFile" class="form-control" />
+                            @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
                     <br />
-                    <div class="form-group mb-3">
+                    <br />
+                    <div class="form-group mt-3 mb-3">
+                        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-12 mb-1" })
                         @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
                         @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
                     </div>
@@ -75,9 +91,10 @@
 
         tinymce.init({
             selector: 'textarea#tiny',
-            plugins: 'ai mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            plugins: 'ai mentions anchor autolink charmap codesample emoticons image link lists searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
             image_title: true,
+            menubar:false,
             automatic_uploads: true,
 
             file_picker_types: 'image',

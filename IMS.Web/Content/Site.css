@@ -40,3 +40,7 @@ textarea {
         display: none;
     }
 }
+
+#ProductDescription ul{
+    margin-left:30px;
+}

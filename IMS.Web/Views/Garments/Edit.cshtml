@@ -20,7 +20,7 @@
     </div>
 </div>
 
-@using (Html.BeginForm("Edit", "Garments", FormMethod.Post))
+@using (Html.BeginForm("Edit", "Garments", FormMethod.Post, new { enctype = "multipart/form-data", @class = "pb-4 pt-2" }))
 {
     @Html.AntiForgeryToken()
 
@@ -57,36 +57,44 @@
                             </div>
                         }
                     </div>
-                        @Html.HiddenFor(model => model.GarmentsProduct.SKU)
-                        @Html.ValidationMessageFor(model => model.SelectedSKUs, "", new { @class = "text-danger" })
-                    </div>
-                    <br />
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.GarmentsProduct.DepartmentId, htmlAttributes: new { @class = "control-label col-md-12" })
-                        @Html.DropDownListFor(model => model.GarmentsProduct.DepartmentId, (SelectList)ViewBag.Departments, "Select Department", new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.GarmentsProduct.DepartmentId, "", new { @class = "text-danger" })
-                    </div>
-                    <br />
+                    @Html.HiddenFor(model => model.GarmentsProduct.SKU)
+                    @Html.ValidationMessageFor(model => model.SelectedSKUs, "", new { @class = "text-danger" })
+                </div>
+                <br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.GarmentsProduct.DepartmentId, htmlAttributes: new { @class = "control-label col-md-12" })
+                    @Html.DropDownListFor(model => model.GarmentsProduct.DepartmentId, (SelectList)ViewBag.Departments, "Select Department", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.GarmentsProduct.DepartmentId, "", new { @class = "text-danger" })
+                </div>
+                <br />
 
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.GarmentsProduct.ProductTypeId, htmlAttributes: new { @class = "control-label col-md-12" })
-                        @Html.DropDownListFor(model => model.GarmentsProduct.ProductTypeId, (SelectList)ViewBag.ProductTypes, "Select Product Type", new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.GarmentsProduct.ProductTypeId, "", new { @class = "text-danger" })
-                    </div>
-                    <br />
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.GarmentsProduct.Description, htmlAttributes: new { @class = "control-label col-md-12" })
-                        @Html.TextAreaFor(model => model.GarmentsProduct.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
-                        @Html.ValidationMessageFor(model => model.GarmentsProduct.Description, "", new { @class = "text-danger" })
-                    </div>
-                    <br />
-                    <div class="form-group">
-                        <div class="col-md-offset-2 col-md-10">
-                            <input type="submit" value="Save Changes" class="btn btn-outline-success" />
-                            @Html.ActionLink("Back to List", "ProductList", null, new { @class = "btn btn-outline-info" })
-                        </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.GarmentsProduct.ProductTypeId, htmlAttributes: new { @class = "control-label col-md-12" })
+                    @Html.DropDownListFor(model => model.GarmentsProduct.ProductTypeId, (SelectList)ViewBag.ProductTypes, "Select Product Type", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.GarmentsProduct.ProductTypeId, "", new { @class = "text-danger" })
+                </div>
+                <br/>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.GarmentsProduct.Image, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-12">
+                        <input type="file" name="ImageFile" id="ImageFile" class="form-control" />
+                        @Html.ValidationMessageFor(model => model.GarmentsProduct.Image, "", new { @class = "text-danger" })
                     </div>
                 </div>
+                <br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.GarmentsProduct.Description, htmlAttributes: new { @class = "control-label col-md-12" })
+                    @Html.TextAreaFor(model => model.GarmentsProduct.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
+                    @Html.ValidationMessageFor(model => model.GarmentsProduct.Description, "", new { @class = "text-danger" })
+                </div>
+                <br />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save Changes" class="btn btn-outline-success" />
+                        @Html.ActionLink("Back to List", "ProductList", null, new { @class = "btn btn-outline-info" })
+                    </div>
+                </div>
+            </div>
             <div class="col-2">  <img src="@Url.Content("~/Images/" + Model.GarmentsProduct.Image)" alt="Product Image" class="img-fluid" style="box-shadow: 0 5px 10px -5px rgba(0, 0, 0, 0.2) "> </div>
         </div>
 
@@ -97,8 +105,8 @@
     <script>
         tinymce.init({
             selector: 'textarea#tiny',
-            plugins: 'ai mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            plugins: 'ai mentions anchor autolink charmap codesample emoticons image link lists  searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
             menubar: false,
             image_title: true,
             automatic_uploads: true,

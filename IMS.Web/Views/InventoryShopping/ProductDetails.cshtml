@@ -26,7 +26,7 @@
                         <div class="row pl-2">
                             <p class="text-secondary"><span class="text-dark fw-bold">Product Sizes:</span> @Model.GarmentsProduct.SKU</p>
                         </div>
-                        <div class="row pl-2 pb-2">
+                        <div class="row pl-2 pb-2" id="ProductDescription">
                             <p class="text-secondary"><span class="text-dark fw-bold">Product Description:</span><br />@Html.Raw(Model.GarmentsProduct.Description) </p>
                         </div>
                         @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
@@ -47,7 +47,7 @@
 
                     </div>
                     <div class="col-12 col-lg-3 offset-lg-1 text-center">
-                        <img src="@Url.Content("~/Images/" + Model.GarmentsProduct.Image)" height="200" class="rounded" style="box-shadow: 0 10px 5px -5px rgba(0, 0, 0, 0.2) " alt="Product Image">
+                        <img src="@Url.Content("~/Images/" + Model.GarmentsProduct.Image)" height="300" class="rounded" style="box-shadow: 0 10px 5px -5px rgba(0, 0, 0, 0.2) " alt="Product Image">
                     </div>
                 </div>
             </div>

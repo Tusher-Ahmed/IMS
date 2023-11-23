@@ -78,34 +78,26 @@ namespace IMS.Web.Controllers
         [HttpPost]
         [Authorize(Roles = "Supplier")]
         [ValidateInput(false)] // Allow HTML input
-        public ActionResult Create([Bind(Exclude = "ImageFile")] GarmentsProduct model)
+        public ActionResult Create([Bind(Exclude = "ImageFile")] GarmentsProduct model, HttpPostedFileBase ImageFile)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
 
-                    var targetFolderPath = Server.MapPath("~/Images");
-                    var (processedDescription, primaryImageUrl, error) = _manageProductService.ProcessDescription(model.Description, targetFolderPath);
-                    if (!string.IsNullOrEmpty(error))
+                    if (ImageFile != null && ImageFile.ContentLength > 0)
                     {
-                        ModelState.AddModelError("Image", error);
+
+                        var fileName = Path.GetFileName(ImageFile.FileName);
+                        var path = Path.Combine(Server.MapPath("~/Images"), fileName);
+                        ImageFile.SaveAs(path);
+
+
+                        model.Image = fileName;
                     }
-
-                    // Set the model.Description to the processed description
-                    model.Description = processedDescription;
-                    if (string.IsNullOrEmpty(model.Description))
+                    else
                     {
-                        ModelState.AddModelError("Description", "Product Description Is Required.");
-                        return View(model);
-                    }
-                    model.Image = primaryImageUrl;
-
-                    // Set the primary image URL
-
-                    if (string.IsNullOrEmpty(model.Image))
-                    {
-                        ModelState.AddModelError("Image", "Image Is Required.");
+                        ModelState.AddModelError("Image", "Image is required");
                         return View(model);
                     }
 
@@ -209,7 +201,7 @@ namespace IMS.Web.Controllers
         }
         [HttpPost]
         [Authorize(Roles = "Supplier")]
-        public ActionResult Edit(long id, GarmentsEditViewModel gv)
+        public ActionResult Edit(long id, GarmentsEditViewModel gv, HttpPostedFileBase ImageFile)
         {
             try
             {
@@ -242,29 +234,15 @@ namespace IMS.Web.Controllers
                 gv.GarmentsProduct.Image = product.Image;
                 if (ModelState.IsValid)
                 {
-                    var targetFolderPath = Server.MapPath("~/Images");
-                    var (processedDescription, primaryImageUrl, error) = _manageProductService.ProcessDescription(gv.GarmentsProduct.Description, targetFolderPath);
+                    if (ImageFile != null && ImageFile.ContentLength > 0)
+                    {
 
-                    if (!string.IsNullOrEmpty(error))
-                    {
-                        ModelState.AddModelError("Image", error);
-                        return View(gv.GarmentsProduct);
-                    }
+                        var fileName = Path.GetFileName(ImageFile.FileName);
+                        var path = Path.Combine(Server.MapPath("~/Images"), fileName);
+                        ImageFile.SaveAs(path);
 
-                    gv.GarmentsProduct.Description = processedDescription;
 
-                    if (string.IsNullOrEmpty(gv.GarmentsProduct.Description))
-                    {
-                        ModelState.AddModelError("Description", "Product Description Is Required.");
-                        return View(gv.GarmentsProduct);
-                    }
-                    if (string.IsNullOrEmpty(primaryImageUrl))
-                    {
-                        gv.GarmentsProduct.Image = product.Image;
-                    }
-                    else
-                    {
-                        gv.GarmentsProduct.Image = primaryImageUrl;
+                        gv.GarmentsProduct.Image = fileName;
                     }
 
                     gv.GarmentsProduct.ProductType = _productTypeService.GetProductTypeById((long)gv.GarmentsProduct.ProductTypeId);
@@ -280,7 +258,7 @@ namespace IMS.Web.Controllers
                 var productTypes = _productTypeService.GetAllType();
                 ViewBag.Departments = new SelectList(departments, "Id", "Name");
                 ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
-                gv.GarmentsProduct.Image = product.Image;
+                
 
                 return View(gv.GarmentsProduct);
             }
