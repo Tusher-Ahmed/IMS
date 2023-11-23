@@ -733,10 +733,13 @@ namespace IMS.Web.Areas.Manager.Controllers
                 var products = _product.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded == true).ToList();
                 List<int> shortage = new List<int>();
                 List<long> productIds = new List<long>();
+                Dictionary<long,bool> IsInOrder=new Dictionary<long, bool>();
                 foreach (var product in products)
                 {
                     int count = 0 - product.Quantity;
                     long prodId = _garmentsService.GetGarmentsProductByProductCode(product.ProductCode).Id;
+                    bool IsItInOrder=_product.GetAllProductByProductCode(product.ProductCode).Any(u => u.Approved == null || (u.IsPriceAdded==false && u.Rejected==null) );
+                    IsInOrder.Add(prodId, IsItInOrder);
                     productIds.Add(prodId);
                     shortage.Add(count);
                 }
@@ -745,6 +748,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                     products = products,
                     ShortageCounts = shortage,
                     ProductIds = productIds,
+                    IsInOrders= IsInOrder,
                 };
                 return View(productShortageViewModel);
             }

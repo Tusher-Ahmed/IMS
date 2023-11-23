@@ -1,6 +1,7 @@
 ﻿using IMS.Models;
 using IMS.Models.ViewModel;
 using IMS.Service;
+using IMS.Web.Models;
 using log4net;
 using Microsoft.AspNet.Identity;
 using NHibernate;
@@ -26,6 +27,7 @@ namespace IMS.Web.Controllers
         private readonly IInventoryOrderHistoryService _inventoryOrderHistoryService;
         private readonly IGarmentsService _garmentsService;
         private readonly ICustomerShoppingService _customerShopping;
+        private readonly ISupplierService _supplier;
         public ProductController(ISession session) : base(session)
         {
             _product = new ProductService { Session = session };
@@ -35,6 +37,7 @@ namespace IMS.Web.Controllers
             _inventoryOrderHistoryService = new InventoryOrderHistoryService { Session = session };
             _garmentsService = new GarmentsService { Session = session };
             _customerShopping = new CustomerShoppingService { Session = session };
+            _supplier = new SupplierService { Session = session };
             log4net.Config.XmlConfigurator.Configure();
 
         }
@@ -154,7 +157,7 @@ namespace IMS.Web.Controllers
                     }
 
                 }
-
+                Session.Remove("InventoryCartItemCount");
                 return RedirectToAction("Invoice", "ManagerHome", new { area = "Manager", orderId = orderId });
             }
             catch (Exception ex)
@@ -256,10 +259,22 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Staff,Admin,Manager")]
         public ActionResult ApproveProduct()
         {
+            var product = _product.GetAllProduct().Where(u => u.Approved == null).ToList();
+            Dictionary<long, string> garments= new Dictionary<long, string>();
+            foreach(var item in product)
+            {
+                string garment = _supplier.GetSupplierByUserId(item.GarmentsId).Name;
+                garments.Add(item.Id, garment);
+            }
+
             try
             {
-                var product = _product.GetAllProduct().Where(u => u.Approved == null).ToList();
-                return View(product);
+                ApprovedProductViewModel approvedProductViewModel = new ApprovedProductViewModel
+                {
+                    Products = product,
+                    Gname = garments
+                };
+                return View(approvedProductViewModel);
             }
             catch (Exception ex)
             {
@@ -320,7 +335,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Reject the product by staff
-        [Authorize(Roles = "Staff,Admin")]
+        [Authorize(Roles = "Staff,Admin,Manager")]
         public ActionResult RejectByStaff(long id)
         {
             try
@@ -369,10 +384,22 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult ManagePrice()
         {
+            var product = _product.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).ToList();
+            Dictionary<long, string> garments = new Dictionary<long, string>();
+            foreach (var item in product)
+            {
+                string garment = _supplier.GetSupplierByUserId(item.GarmentsId).Name;
+                garments.Add(item.Id, garment);
+            }
+
             try
             {
-                var product = _product.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0);
-                return View(product);
+                ApprovedProductViewModel approvedProductViewModel = new ApprovedProductViewModel
+                {
+                    Products = product,
+                    Gname = garments
+                };
+                return View(approvedProductViewModel);
             }
             catch (Exception ex)
             {

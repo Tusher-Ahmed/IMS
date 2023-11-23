@@ -326,7 +326,7 @@ namespace IMS.Web.Controllers
                 };
 
                 TempData["success"] = "Order Placed Successfully!";
-
+                Session.Remove("CartItemCount");
                 return View(customerInvoiceViewModel);
             }
             catch (Exception ex)

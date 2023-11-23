@@ -1,6 +1,7 @@
-﻿@model IEnumerable<IMS.Models.Product>
+﻿@model IMS.Models.ViewModel.ApprovedProductViewModel
 @{
-    ViewBag.Title = "ApproveProduct";}
+    ViewBag.Title = "ApproveProduct";
+}
 
 <div class="row">
     <div class="col-6">
@@ -38,7 +39,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Products)
         {
             <tr>
                 <td>@item.OrderHistoryId</td>
@@ -48,7 +49,7 @@
                 <td>@item.Name</td>
                 <td>@item.SKU</td>
                 <td>@item.Quantity</td>
-                <td>@item.GarmentsId</td>
+                <td>@Model.Gname[item.Id]</td>
                 <td>
                     <a href="@Url.Action("EditByStaff", "Product", new { id = item.Id })" class="btn btn-outline-primary">
                         <i class="fas fa-edit"></i>

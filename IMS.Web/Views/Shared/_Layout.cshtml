@@ -46,9 +46,9 @@
                         <li>
                             <a href="@Url.Action("InventoryCart", "InventoryShopping", new {area=""})" class="nav-link position-relative">
                                 <i class="fas fa-shopping-cart"></i>
-                                @if (ViewBag.InventoryCartItemCount != null && (int)ViewBag.InventoryCartItemCount > 0)
+                                @if (Session["InventoryCartItemCount"] != null && (int)Session["InventoryCartItemCount"] > 0)
                                 {
-                                    <span class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger">@ViewBag.InventoryCartItemCount</span>
+                                    <span class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger">@Session["InventoryCartItemCount"]</span>
                                 }
                             </a>
                         </li>
@@ -58,9 +58,9 @@
                         <li>
                             <a href="@Url.Action("ShoppingCart", "CustomerShopping", new {area=""})" class="nav-link position-relative">
                                 <i class="fas fa-shopping-cart"></i>
-                                @if (ViewBag.CartItemCount != null && (int)ViewBag.CartItemCount > 0)
+                                @if (Session["CartItemCount"] != null && (int)Session["CartItemCount"] > 0)
                                 {
-                                    <span class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger">@ViewBag.CartItemCount</span>
+                                    <span class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger">@Session["CartItemCount"]</span>
                                 }
 
                             </a>

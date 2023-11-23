@@ -402,6 +402,7 @@
     <Content Include="Images\sort_desc.png" />
     <Content Include="Images\sort_desc_disabled.png" />
     <Content Include="Images\happyShopping.jpg" />
+    <Content Include="Images\stock.jpg" />
     <Content Include="Images\what.png" />
     <Content Include="Logs\log.txt" />
     <Content Include="Scripts\bootstrap.bundle.js" />

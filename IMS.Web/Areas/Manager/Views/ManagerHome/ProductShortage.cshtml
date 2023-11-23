@@ -39,11 +39,24 @@
                 <td>@j</td>
                 <td><img src="@Url.Content("~/Images/" + item.Image)" width="40" alt="img" /></td>
                 <td>@item.Name</td>
-                <td>@Model.ShortageCounts.ElementAt(i)</td>
-                @Model.ProductIds.ElementAt(i)
-                <td>
-                    <a href="@Url.Action("ProductDetails", "InventoryShopping", new {area="",ProductId = @Model.ProductIds.ElementAt(i), count=Model.ShortageCounts.ElementAt(i)})" class="btn btn-outline-danger"><i class="fa-solid fa-truck-ramp-box"></i>&nbsp; Buy Now </a>
-                </td>
+                @if (Model.ShortageCounts.Count() != 0)
+                {
+                    <td>@Model.ShortageCounts.ElementAt(i)</td>
+                    @Model.ProductIds.ElementAt(i)
+                    if (Model.IsInOrders[Model.ProductIds.ElementAt(i)])
+                    {
+                        <td>
+                            <a href="@Url.Action("ProductShortage", "ManagerHome", new {area="Manager"})" class="btn btn-outline-success" onclick="return validateCarrierNumber();"><i class="fa-solid fa-people-carry-box"></i>&nbsp; Already In Ordered Queue</a>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <a href="@Url.Action("ProductDetails", "InventoryShopping", new {area="",ProductId = @Model.ProductIds.ElementAt(i), count=Model.ShortageCounts.ElementAt(i)})" class="btn btn-outline-danger"><i class="fa-solid fa-truck-ramp-box"></i>&nbsp; Buy Now </a>
+                        </td>
+                    }
+
+                }
 
             </tr>
             i++;
@@ -62,5 +75,18 @@
                 ]
             });
         })
+
+        function validateCarrierNumber() {
+            Swal.fire({
+                title: "Oops!",
+                text: "The requested product has already been ordered. To proceed with a new order, please ensure that the previous order for this product is added to the inventory first.",
+                imageUrl: "/Images/stock.jpg",
+                imageWidth: 400,
+                imageHeight: 200,
+                imageAlt: "Custom image"
+            });
+            return false;
+        } 
     </script>
 }
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

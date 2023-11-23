@@ -11,5 +11,6 @@ namespace IMS.Models.ViewModel
         public IEnumerable<Product> products { get; set; }
         public List<int> ShortageCounts {  get; set; }
         public List<long> ProductIds {  get; set; }
+        public Dictionary<long,bool> IsInOrders { get; set; }
     }
 }

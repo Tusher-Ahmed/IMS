@@ -20,6 +20,7 @@ namespace IMS.Service
         void UpdateProduct(Product product);
         void DeleteProduct(Product product);
         Product GetProductByProductCode(int ProductCode);
+        List<Product> GetAllProductByProductCode(int ProductCode);
     }
 
     public class ProductService:IProductService
@@ -143,6 +144,11 @@ namespace IMS.Service
                     throw;
                 }
             }
+        }
+
+        public List<Product> GetAllProductByProductCode(int ProductCode)
+        {
+            return _session.Query<Product>().Where(u=>u.ProductCode== ProductCode).ToList();
         }
     }
 }
