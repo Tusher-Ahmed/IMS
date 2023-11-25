@@ -37,6 +37,7 @@ namespace IMS.Web.App_Start
         public ApplicationUserManager(IUserStore<ApplicationUser, long> store)
             : base(store)
         {
+ 
         }
 
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, 
@@ -52,7 +53,7 @@ namespace IMS.Web.App_Start
             // Configure validation logic for passwords
             manager.PasswordValidator = new PasswordValidator
             {
-                RequiredLength = 6,
+                RequiredLength = 8,
                 //RequireNonLetterOrDigit = true,
                 //RequireDigit = true,
                 //RequireLowercase = true,

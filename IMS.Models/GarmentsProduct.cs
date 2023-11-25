@@ -23,6 +23,7 @@ namespace IMS.Models
         [RegularExpression(@"^[a-zA-Z'""\(\)_\-, ]*$", ErrorMessage = "Invalid Product Name!!")]
         public virtual string Name { get; set; }
         public virtual string Image { get; set; }
+        [Display(Name="Image")]
         public virtual IFormFile ImageFile { get; set; }
 
         [Required(ErrorMessage = "Product Price is required.")]

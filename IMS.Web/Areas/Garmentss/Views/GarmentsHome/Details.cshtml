@@ -47,11 +47,20 @@
                     </tr>
                 }
             <tr class="bg-dark">
-                <td class="fw-bold  text-white">Total Price</td>
-                <td colspan="6"></td>
+                <td colspan="5"></td>
+                @{ int count = 0; }
+                @foreach (var item in Model)
+                {
+                    count += item.Quantity;
+                }
+                <td class="fw-bold text-white">
+                    Total:
+                    @count 
+                </td>
+                <td class="fw-bold  text-white">Total Price : </td>
                 @{ decimal TotalPrice = 0;}
                 @foreach (var item in Model)
-                {                   
+                {
                     TotalPrice += item.Price * item.Quantity;
 
                 }

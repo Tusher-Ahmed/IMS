@@ -53,10 +53,11 @@
     </div>
     <br />
     <div class="form-group">
-        @Html.LabelFor(model => model.ImageFile, htmlAttributes: new { @class = "control-label col-md-2" })
+        @Html.LabelFor(model => model.Image, htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-12">
             <input type="file" name="ImageFile" id="ImageFile" class="form-control" />
-            @Html.ValidationMessageFor(model => model.ImageFile, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Image)
+            @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
         </div>
     </div>
     <br />

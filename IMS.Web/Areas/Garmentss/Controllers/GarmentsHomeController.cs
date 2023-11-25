@@ -1,5 +1,6 @@
 ﻿using IMS.Models.ViewModel;
 using IMS.Service;
+using IMS.Web.Models;
 using Microsoft.AspNet.Identity;
 using NHibernate;
 using NHibernate.Util;
@@ -119,6 +120,30 @@ namespace IMS.Web.Areas.Garmentss.Controllers
                 price += item.Price * item.Quantity;
             }
             return price;
+        }
+        #endregion
+
+        #region Rejected Order
+        public ActionResult RejectedOrder()
+        {
+            var context = new ApplicationDbContext();            
+            long userId=Convert.ToInt64(User.Identity.GetUserId());
+            var products = _inventoryOrderHistoryService.GetAllRejectedOrder(userId);
+            Dictionary<long,string> orderBy= new Dictionary<long,string>();
+
+            foreach(var product in products)
+            {
+                string manager = context.Users.FirstOrDefault(u => u.Id == product.CreatedBy).Email;
+                orderBy.Add(product.OrderHistoryId, manager);
+            }
+
+            RejectedOrderViewModel rejectedOrderViewModel = new RejectedOrderViewModel
+            {
+                product = products,
+                OrderBy = orderBy,
+            };
+
+            return View(rejectedOrderViewModel);
         }
         #endregion
 

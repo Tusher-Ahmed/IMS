@@ -1,6 +1,7 @@
 ﻿using IMS.DAO;
 using IMS.DataAccess;
 using IMS.Models;
+using IMS.Models.ViewModel;
 using NHibernate;
 using System;
 using System.Collections.Generic;
@@ -16,12 +17,14 @@ namespace IMS.Service
         IEnumerable<OrderHistory> GetAll();
         IEnumerable<OrderHistory> GetByOrderId(long orderId);
         List<OrderHistory> GetHistories(List<long> ids, DateTime? startDate = null, DateTime? endDate = null, string searchText = "");
+        List<Product> GetAllRejectedOrder(long userId);
         OrderHistory GetById(long id);
     }
     public class InventoryOrderHistoryService : IInventoryOrderHistoryService
     {
         private readonly BaseDAO<OrderHistory> _repository;
         private readonly IOrderHistoryDao _orderHistoryDao;
+        private readonly IProductService _productService;
         private ISession _session;
 
         public ISession Session
@@ -34,6 +37,7 @@ namespace IMS.Service
         {
             _repository = new BaseDAO<OrderHistory>();
             _orderHistoryDao = new OrderHistoryDao();
+            _productService = new ProductService() { Session=_session};
         }
 
         public void Add(OrderHistory orderHistory)
@@ -72,5 +76,21 @@ namespace IMS.Service
             return _orderHistoryDao.GetOrderHistories(ids, startDate, endDate, searchText);
         }
 
+        public List<Product> GetAllRejectedOrder(long userId)
+        {
+            string product = $@"
+SELECT *
+FROM Product AS P
+WHERE P.GarmentsId = '{userId}' 
+AND P.Rejected = 'True'
+";
+            var iquery = Session.CreateSQLQuery(product);
+            iquery.AddEntity(typeof(Product));
+            var result = iquery.List<Product>().ToList();
+
+            return result;
+            
+
+        }
     }
 }

@@ -1,0 +1,56 @@
+﻿@model IMS.Models.ViewModel.RejectedOrderViewModel
+@{
+    ViewBag.Title = "RejectedOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row pt-2 pb-4 mb-4">
+    <div class="col-6">
+        <h4 class="text-uppercase">Rejected Orders</h4>
+    </div>
+    <div class="col-6 text-end">
+        <a href="@Url.Action("Index", "GarmentsHome", new {area="Garmentss"})" class="btn btn-outline-success"><i class="fa-solid fa-square-caret-left"></i> Back To Dashboard</a>
+    </div>
+</div>
+<table class="table table-striped table-hover pt-2 pb-4" id="historyOrder">
+    <thead>
+        <tr>
+            <th class="border-top-0">No.</th>
+            <th class="border-top-0">Image</th>
+            <th class="border-top-0">Name</th>
+            <th class="border-top-0">Price</th>
+            <th class="border-top-0">Quantity</th>
+            <th class="border-top-0">Order Date</th>
+            <th class="border-top-0">Amount</th>
+            <th class="border-top-0">Ordered By</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @{ int i = 1; }
+        @foreach (var item in Model.product.OrderByDescending(u=>u.OrderHistoryId))
+        {
+
+            <tr>
+                <td class="txt-oflo">@i</td>
+                <td class="txt-oflo"><img src="@Url.Content("~/Images/" + item.Image)" width="40" alt="img" /></td>
+                <td class="txt-oflo">@item.Name</td>
+                <td class="txt-oflo">@item.BuyingPrice.ToString("C")</td>
+                <td class="txt-oflo">@item.Quantity</td>
+                <td class="txt-oflo">@item.CreationDate.ToString().AsDateTime().ToShortDateString()</td>
+                <td class="txt-oflo">@((item.BuyingPrice * item.Quantity).ToString("C"))</td>
+                <td class="txt-oflo">@Model.OrderBy[item.OrderHistoryId]</td>
+            </tr>
+            i++;
+        }
+    </tbody>
+</table>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("#historyOrder").DataTable();
+        });
+    </script>
+}
+
+

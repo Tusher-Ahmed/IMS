@@ -4,16 +4,16 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<a href="@Url.Action("Index", "CustomerHome", new {area="Customer"})" class="dont-show mt-2 btn btn-outline-info">
+<a href="@Url.Action("Index", "CustomerHome", new {area="Customer"})" class="dont-show no-print mt-2 btn btn-outline-info">
     <i class="fa-solid fa-circle-left"></i>
 </a>
-<div class="row">
+<div class="row" id="CustomerInvoice">
     <div class="col-10 pb-4 mb-4 offset-1">
         <div class="card">
             <div class="card-body">
                 <div class="row">
                     <div class="col-12 text-center pb-3 pt-2">
-                        <h4 class="">Inventory Management System</h4>
+                        <h4 class="text-uppercase pb-4">Inventory Management System</h4>
                     </div>
                     <div class="col-6 pb-2">
                         <h5>Order By</h5>
@@ -100,19 +100,33 @@
                                     </tr>
                                     i++;
                                 }
+
+                                <tr style="border-bottom:1px solid #fcfafa00; border-top:2px solid #000 !important;">
+                                    <td class="fw-bold">
+                                        Payment:
+                                        Credit Card
+                                    </td>
+                                    <td colspan="2"></td>
+                                    <td class="fw-bold">
+                                        Total:
+                                        @{ int sum = 0; }
+
+                                        @foreach (var item in Model.OrderDetails)
+                                        {
+                                            sum += item.Count;
+                                        }
+                                        <small>@sum</small>
+                                    </td>
+                                    <td colspan="1"></td>
+                                    <td class="fw-bold">
+                                        Total:
+                                        @Model.OrderHeader.OrderTotal.ToString("C")
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="col-6 pt-2">
-                        <h5>Payment Method</h5>
-                        <p>Credit Card</p>
-                    </div>
-                    <div class="col-6 text-end pt-2">
-                        <h5>Total</h5>
-
-                        <p class="fw-bold">@Model.OrderHeader.OrderTotal.ToString("C")</p>
-
-                    </div>
+                    
                     <div class="col-12 text-end pt-3 pb-3 no-print">
                         <button class="btn btn-primary" onclick="window.print();">Print Invoice</button>
                     </div>
@@ -125,24 +139,16 @@
 @section Scripts{
     <script>
         window.onbeforeprint = function () {
-            var btn = document.querySelectorAll(".dont-show");
             var elementsToHide = document.querySelectorAll('.no-print');
             for (var i = 0; i < elementsToHide.length; i++) {
                 elementsToHide[i].style.display = 'none';
             }
-            for (var i = 0; i < btn.length; i++) {
-                btn[i].style.display = 'none';
-            }
         }
 
         window.onafterprint = function () {
-            var btn = document.querySelectorAll(".dont-show");
             var elementsToHide = document.querySelectorAll('.no-print');
             for (var i = 0; i < elementsToHide.length; i++) {
                 elementsToHide[i].style.display = '';
-            }
-            for (var i = 0; i < btn.length; i++) {
-                btn[i].style.display = 'none';
             }
         }
     </script>

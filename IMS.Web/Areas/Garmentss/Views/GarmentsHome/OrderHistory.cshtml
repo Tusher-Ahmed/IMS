@@ -29,7 +29,7 @@
             
             <tr>
                 <td class="txt-oflo">@item.OrderId</td>
-                <td class="txt-oflo">@item.CreationDate</td>
+                <td class="txt-oflo">@item.CreationDate.ToString().AsDateTime().ToShortDateString()</td>
                 <td class="txt-oflo">@Model.TotalPrice[item.OrderId].ToString("C")</td>
                 <td>
                     <a href="@Url.Action("Details", "GarmentsHome",new {area="Garmentss", orderId = item.OrderId })" class="btn btn-outline-dark">

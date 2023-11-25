@@ -118,6 +118,7 @@
     <Compile Include="ViewModel\OrderHistoryViewModel.cs" />
     <Compile Include="ViewModel\ProductShortageViewModel.cs" />
     <Compile Include="ViewModel\ProductViewModel.cs" />
+    <Compile Include="ViewModel\RejectedOrderViewModel.cs" />
     <Compile Include="ViewModel\RejectedProductListViewModel.cs" />
     <Compile Include="ViewModel\StaffDashboardViewModel.cs" />
     <Compile Include="ViewModel\UserDetailViewModel.cs" />

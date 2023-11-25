@@ -469,6 +469,7 @@
     <Content Include="Areas\Manager\Views\ManagerHome\Partial\_OrderHistory.cshtml" />
     <Content Include="Areas\Manager\Views\ManagerHome\Partial\_SellingReport.cshtml" />
     <Content Include="log4net.config" />
+    <Content Include="Areas\Garmentss\Views\GarmentsHome\RejectedOrder.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />

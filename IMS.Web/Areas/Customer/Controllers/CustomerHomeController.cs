@@ -54,7 +54,7 @@ namespace IMS.Web.Areas.Customer.Controllers
                     OrderHeaders = orderHeaders,
                     OrderDetails = orders,
                     TotalOrders = orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusDelivered).Count(),
-                    NewArrival = orderHeaders.Where(u => u.OrderStatus != ShoppingHelper.StatusShipped &&
+                    NewArrival = orderHeaders.Where(u => u.OrderStatus != ShoppingHelper.StatusDelivered &&
                           u.OrderStatus != ShoppingHelper.StatusCancelled && u.OrderStatus != ShoppingHelper.StatusRefunded).Count(),
                     TotalCanceledOrder = orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled).Count()
                 };

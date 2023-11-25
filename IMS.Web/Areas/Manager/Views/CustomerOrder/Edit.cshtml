@@ -164,11 +164,19 @@
 
                                     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                     {
-                                        @Html.TextBoxFor(model => model.OrderHeader.Carrier, new { @class = "form-control", id = "carrier" })
+                                        if (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusInProces )
+                                        {
+                                            @Html.TextBoxFor(model => model.OrderHeader.Carrier, new { @class = "form-control", id = "carrier", placeholder = "Order is not shipped yet!" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(model => model.OrderHeader.Carrier, new { @class = "form-control", id = "carrier", @disabled = "disabled", placeholder = "Order is not shipped yet!" })
+                                        }
+
                                     }
                                     else
                                     {
-                                        @Html.TextBoxFor(model => model.OrderHeader.Carrier, new { @class = "form-control", @disabled = "disabled" , placeholder = "Order is not shipped yet!" })
+                                        @Html.TextBoxFor(model => model.OrderHeader.Carrier, new { @class = "form-control", @disabled = "disabled", placeholder = "Order is not shipped yet!" })
                                     }
 
                                 </div>
@@ -195,7 +203,7 @@
                                 </div>
                             </div>
 
-                            @if (User.IsInRole("Customer") && (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped || Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled))
+                            @if (User.IsInRole("Customer") && (Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusDelivered || Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped || Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusCancelled))
                             {
                                 <div class="row my-1">
                                     <div class="col-3">Arrival Date</div>

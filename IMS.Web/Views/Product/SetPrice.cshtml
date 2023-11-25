@@ -6,7 +6,7 @@
 
 <h4 class="text-uppercase">Set Price For each Product</h4>
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("SetPrice", "Product", FormMethod.Post, new {area="", enctype = "multipart/form-data", @class = "pb-4 pt-2" }))
 {
     @Html.AntiForgeryToken()
 
@@ -55,7 +55,15 @@
                         @Html.EditorFor(model => model.ProductType.Name, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
                     </div>
                     <br />
-                    <div class="form-group mb-3">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Image, htmlAttributes: new { @class = "control-label col-md-2 mb-1" })
+                        <div class="col-md-12">
+                            <input type="file" name="ImageFile" id="ImageFile" class="form-control" />
+                            @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group mb-3 mt-2">
                         @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-12" })
                         @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
                         @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })

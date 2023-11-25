@@ -80,27 +80,33 @@ namespace IMS.Web.Controllers
         [ValidateInput(false)] // Allow HTML input
         public ActionResult Create([Bind(Exclude = "ImageFile")] GarmentsProduct model, HttpPostedFileBase ImageFile)
         {
+            if (ImageFile != null && ImageFile.ContentLength > 0)
+            {
+
+                var fileName = Path.GetFileName(ImageFile.FileName);
+                var path = Path.Combine(Server.MapPath("~/Images"), fileName);
+                ImageFile.SaveAs(path);
+
+
+                model.Image = fileName;
+            }
+            else
+            {
+                ModelState.AddModelError("Image", "Image is required");
+
+                var dept = _departmentService.GetAllDept();
+                var productT = _productTypeService.GetAllType();
+                ViewBag.Departments = new SelectList(dept, "Id", "Name");
+                ViewBag.ProductTypes = new SelectList(productT, "Id", "Name");
+
+                return View(model);
+            }
+
             try
             {
                 if (ModelState.IsValid)
                 {
-
-                    if (ImageFile != null && ImageFile.ContentLength > 0)
-                    {
-
-                        var fileName = Path.GetFileName(ImageFile.FileName);
-                        var path = Path.Combine(Server.MapPath("~/Images"), fileName);
-                        ImageFile.SaveAs(path);
-
-
-                        model.Image = fileName;
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("Image", "Image is required");
-                        return View(model);
-                    }
-
+                    
                     // Set other product-related properties
                     model.ProductType = _productTypeService.GetProductTypeById((long)model.ProductTypeId);
                     model.Department = _departmentService.GetDeptById((long)model.DepartmentId);
@@ -113,11 +119,10 @@ namespace IMS.Web.Controllers
                     return RedirectToAction("Index");
                 }
 
-                // If ModelState is not valid, re-populate the dropdowns
-                var departments = _departmentService.GetAllDept();
-                var productTypes = _productTypeService.GetAllType();
-                ViewBag.Departments = new SelectList(departments, "Id", "Name");
-                ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
+                var dept = _departmentService.GetAllDept();
+                var productT = _productTypeService.GetAllType();
+                ViewBag.Departments = new SelectList(dept, "Id", "Name");
+                ViewBag.ProductTypes = new SelectList(productT, "Id", "Name");
 
                 return View(model);
             }

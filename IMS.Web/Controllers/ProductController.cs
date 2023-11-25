@@ -380,7 +380,7 @@ namespace IMS.Web.Controllers
         }
         #endregion
 
-        #region Update Price and Status by Manager
+        #region Set Price and Status by Manager
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult ManagePrice()
         {
@@ -432,30 +432,40 @@ namespace IMS.Web.Controllers
         [HttpPost]
         [Authorize(Roles = "Manager,Admin")]
         [ValidateInput(false)]
-        public ActionResult SetPrice(long id, Product product)
+        public ActionResult SetPrice(long id, Product product, HttpPostedFileBase ImageFile)
         {
             try
             {
                 var prod = _product.GetProductById(id);
-                var (processedDescription, primaryImageUrl) = ProcessDescription(product.Description);
-                if (string.IsNullOrEmpty(processedDescription))
+                
+                if (string.IsNullOrEmpty(product.Description))
                 {
                     ModelState.AddModelError("Description", "Product Description Is Required.");
                     return View(prod);
                 }
                 if (prod != null)
                 {
+                    if (ImageFile != null && ImageFile.ContentLength > 0)
+                    {
+
+                        var fileName = Path.GetFileName(ImageFile.FileName);
+                        var path = Path.Combine(Server.MapPath("~/Images"), fileName);
+                        ImageFile.SaveAs(path);
+
+
+                        prod.Image = fileName;
+                    }
                     var existingProduct = _product.GetProductByProductCode(prod.ProductCode);
                     if (existingProduct != null)
                     {
                         existingProduct.Quantity = prod.Quantity + existingProduct.Quantity;
                         existingProduct.Price = product.Price;
                         existingProduct.Name = product.Name;
-                        existingProduct.Description = processedDescription;
+                        existingProduct.Description = product.Description;
 
-                        if (!string.IsNullOrEmpty(primaryImageUrl))
+                        if (!string.IsNullOrEmpty(prod.Image))
                         {
-                            existingProduct.Image = primaryImageUrl;
+                            existingProduct.Image = prod.Image;
                         }
                         else
                         {
@@ -472,17 +482,11 @@ namespace IMS.Web.Controllers
                     }
                     else
                     {
+
                         prod.Price = product.Price;
-                        prod.Name = product.Name;
-                        prod.Description = processedDescription;
-                        if (!string.IsNullOrEmpty(primaryImageUrl))
-                        {
-                            prod.Image = primaryImageUrl;
-                        }
-                        else
-                        {
-                            prod.Image = prod.Image;
-                        }
+                        prod.Name = product.Name;                                              
+                        prod.Image = prod.Image;
+                        prod.Description=product.Description;
                         prod.IsPriceAdded = true;
                         prod.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());//ManagerId
                         prod.Status = 1;
@@ -506,61 +510,7 @@ namespace IMS.Web.Controllers
 
         }
 
-        private (string, string) ProcessDescription(string description)
-        {
-            string pattern = "<img.*?src=[\"'](.*?)[\"'].*?>";
-            var match = Regex.Match(description, pattern);
-
-            if (match.Success)
-            {
-                string dataUri = match.Groups[1].Value;
-
-                if (dataUri.StartsWith("data:image/"))
-                {
-                    byte[] imageBytes = Convert.FromBase64String(dataUri.Split(',')[1]);
-
-                    // Check the image size here
-                    if (imageBytes.Length > 5 * 1024 * 1024)
-                    {
-                        ModelState.AddModelError("Image", "Image size cannot exceed 5 MB.");
-                        return (description, null);
-                    }
-                    string imageUrl = SaveDataUriAsImage(dataUri);
-
-                    // Remove the embedded image from the description
-                    string processedDescription = description.Replace(match.Value, string.Empty);
-
-                    // Remove extra line breaks and white spaces
-                    processedDescription = processedDescription.Trim();
-
-                    return (processedDescription, imageUrl);
-                }
-            }
-
-            // No embedded image found
-            return (description, null);
-        }
-
-        private string SaveDataUriAsImage(string dataUri)
-        {
-
-            // Extract the file extension from the data URI
-            string extension = dataUri.Split(';')[0].Split('/')[1];
-
-            // Create a unique file name
-            string fileName = Guid.NewGuid() + "." + extension;
-
-            // Get the base64-encoded image data
-            string base64Data = dataUri.Split(',')[1];
-
-            // Decode and save the image as a file
-            byte[] imageBytes = Convert.FromBase64String(base64Data);
-            string imagePath = Path.Combine(Server.MapPath("~/Images"), fileName); // Change this path to where you want to save the image
-            System.IO.File.WriteAllBytes(imagePath, imageBytes);
-
-            // Return the URL to the saved image
-            return fileName; // Adjust the path as needed
-        }
+       
         #endregion
     }
 }
