@@ -79,6 +79,8 @@ namespace IMS.Web.Controllers
             int productShortageCount = _productService.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded == true).Count();
             ViewBag.ProductShortageCount= productShortageCount;
 
+            int TotalInQueue = _productService.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).Count();
+            ViewBag.SetPriceCount = TotalInQueue;
         }
     }
 }

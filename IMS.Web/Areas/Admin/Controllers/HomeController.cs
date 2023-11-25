@@ -153,12 +153,12 @@ namespace IMS.Web.Areas.Admin.Controllers
                     if (ImageFile != null && ImageFile.ContentLength > 0)
                     {
 
-                        var fileName = Path.GetFileName(ImageFile.FileName);
-                        var path = Path.Combine(Server.MapPath("~/Images"), fileName);
+                        var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+
+                        var path = Path.Combine(Server.MapPath("~/Images"), uniqueFileName);
                         ImageFile.SaveAs(path);
 
-
-                        prod.Image = fileName;
+                        prod.Image = uniqueFileName;
                     }
 
                     prod.ModifyBy = userId;//ManagerId

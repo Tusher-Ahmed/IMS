@@ -132,12 +132,12 @@ namespace IMS.Web.Areas.Manager.Controllers
                     if (ImageFile != null && ImageFile.ContentLength > 0)
                     {
 
-                        var fileName = Path.GetFileName(ImageFile.FileName);
-                        var path = Path.Combine(Server.MapPath("~/Images"), fileName);
+                        var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+
+                        var path = Path.Combine(Server.MapPath("~/Images"), uniqueFileName);
                         ImageFile.SaveAs(path);
 
-
-                        prod.Image = fileName;
+                        prod.Image = uniqueFileName;
                     }
                     prod.Description = product.Description;
                     prod.ModifyBy = userId;//ManagerId

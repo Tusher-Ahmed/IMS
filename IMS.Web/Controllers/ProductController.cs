@@ -448,14 +448,16 @@ namespace IMS.Web.Controllers
                     if (ImageFile != null && ImageFile.ContentLength > 0)
                     {
 
-                        var fileName = Path.GetFileName(ImageFile.FileName);
-                        var path = Path.Combine(Server.MapPath("~/Images"), fileName);
+                        var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+
+                        var path = Path.Combine(Server.MapPath("~/Images"), uniqueFileName);
                         ImageFile.SaveAs(path);
 
-
-                        prod.Image = fileName;
+                        prod.Image = uniqueFileName;
                     }
+
                     var existingProduct = _product.GetProductByProductCode(prod.ProductCode);
+
                     if (existingProduct != null)
                     {
                         existingProduct.Quantity = prod.Quantity + existingProduct.Quantity;

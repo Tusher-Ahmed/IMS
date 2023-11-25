@@ -83,12 +83,12 @@ namespace IMS.Web.Controllers
             if (ImageFile != null && ImageFile.ContentLength > 0)
             {
 
-                var fileName = Path.GetFileName(ImageFile.FileName);
-                var path = Path.Combine(Server.MapPath("~/Images"), fileName);
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+
+                var path = Path.Combine(Server.MapPath("~/Images"), uniqueFileName);
                 ImageFile.SaveAs(path);
 
-
-                model.Image = fileName;
+                model.Image = uniqueFileName;
             }
             else
             {
@@ -237,18 +237,19 @@ namespace IMS.Web.Controllers
                 }
 
                 gv.GarmentsProduct.Image = product.Image;
+
                 if (ModelState.IsValid)
                 {
                     if (ImageFile != null && ImageFile.ContentLength > 0)
                     {
 
-                        var fileName = Path.GetFileName(ImageFile.FileName);
-                        var path = Path.Combine(Server.MapPath("~/Images"), fileName);
+                        var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+
+                        var path = Path.Combine(Server.MapPath("~/Images"), uniqueFileName);
                         ImageFile.SaveAs(path);
 
-
-                        gv.GarmentsProduct.Image = fileName;
-                    }
+                        gv.GarmentsProduct.Image = uniqueFileName;
+                    }                   
 
                     gv.GarmentsProduct.ProductType = _productTypeService.GetProductTypeById((long)gv.GarmentsProduct.ProductTypeId);
                     gv.GarmentsProduct.Department = _departmentService.GetDeptById((long)gv.GarmentsProduct.DepartmentId);

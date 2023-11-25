@@ -23,6 +23,16 @@
 
             </a>
 
+            <a href="@Url.Action("ManagePrice", "Product", new {area=""})" class="btn btn-dark mb-2 w-100 text-start position-relative">
+
+                <i class="fa-solid fa-tags"></i>&nbsp; Set Product Price
+                @if (ViewBag.NeedApproval != null && (int)ViewBag.NeedApproval > 0)
+                {
+                    <span class="position-absolute top-2 start-60 translate-middle badge rounded-pill bg-danger" style="margin-top:5px; margin-left:10px;">@ViewBag.SetPriceCount</span>
+                }
+
+            </a>
+
             <a href="@Url.Action("InventoryOrder", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-cart-flatbed-suitcase"></i>&nbsp; Inventory Order History</a>
             <a href="@Url.Action("ProductShortage", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start  position-relative">
 
