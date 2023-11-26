@@ -13,8 +13,16 @@
     <tbody>
         @foreach (var item in Model.History.GroupBy(u => u.OrderId).Select(t => t.First()))
         {
+            int depth = item.OrderId.ToString().Length;
+            int dif = 6 - depth;
+            string num = item.OrderId.ToString();
+            if (dif > 0)
+            {
+                string newId = new string('0', dif);
+                num = newId + num;
+            }
             <tr>
-                <td>@item.OrderId</td>
+                <td>@num</td>
                 <td>@Model.Name[item.OrderId]</td>
                 <td>@item.CreationDate.ToString().AsDateTime().ToShortDateString()</td>
                 <td>@item.TotalPrice.ToString("C")</td>

@@ -25,7 +25,7 @@
                             <img src="@Url.Content("~/Images/" + item.GarmentsProduct.Image)" width="70" class="rounded" alt="Product Image">
                         </div>
                         <div class="col-12 col-lg-6 pt-md-3">
-                            <h6 class="text-uppercase text-secondary"><strong>@item.GarmentsProduct.Name</strong></h6>
+                           <a href="@Url.Action("ProductDetails", "InventoryShopping", new {ProductId=item.GarmentsProduct.Id,count=1})"class="text-decoration-none"><h6 class="text-uppercase text-secondary"><strong>@item.GarmentsProduct.Name</strong></h6></a> 
                             <p><small>Sizes: @item.GarmentsProduct.SKU</small></p>
                         </div>
                         <div class="col-12  col-lg-5 text-center row">

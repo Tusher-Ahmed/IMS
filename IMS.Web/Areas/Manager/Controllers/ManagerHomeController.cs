@@ -439,9 +439,20 @@ namespace IMS.Web.Areas.Manager.Controllers
                     string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
                     var invoiceUrl = Url.Action("Invoice", "ManagerHome", new { area = "Manager", orderId = item.OrderId });
                     var productDetailsUrl = Url.Action("ProductDetails", "ManagerHome", new { area = "Manager", orderId = item.OrderId });
+
+                    int depth = item.OrderId.ToString().Length;
+                    int dif = 6 - depth;
+                    string num = item.OrderId.ToString();
+
+                    if (dif > 0)
+                    {
+                        string newId = new string('0', dif);
+                        num = newId + num;
+                    }
+
                     var str = new List<string>()
                 {
-                    $"{item.OrderId}",
+                    $"{num}",
                     $"{manager}",
                     $"{item.CreationDate.ToString().AsDateTime().ToShortDateString()}",
                     $"{item.TotalPrice.ToString("C")}",
@@ -691,10 +702,10 @@ namespace IMS.Web.Areas.Manager.Controllers
 
         public ActionResult LoadReports(DateTime? startDate, DateTime? endDate, string searchText)
         {
+            var context = new ApplicationDbContext();
+            var product = _product.GetAllProduct().Where(u => u.Rejected != true);
             try
             {
-                var context = new ApplicationDbContext();
-                var product = _product.GetAllProduct().Where(u => u.Rejected != true);
                 List<OrderHistory> history = new List<OrderHistory>();
                 history = _inventoryOrderHistoryService.GetHistories(product.Select(x => x.OrderHistoryId).ToList(), startDate, endDate, searchText);
                 Dictionary<long, string> managers = new Dictionary<long, string>();

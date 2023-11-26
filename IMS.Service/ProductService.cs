@@ -41,7 +41,7 @@ namespace IMS.Service
         public ProductViewModel GetProducts(ProductViewModel product)
         {
             int pageNumber = 1;
-            int pageSize =  10; 
+            int pageSize =  12; 
 
             var query = _repository.GetAll().Where(u=>u.IsPriceAdded==true && u.Status==1); 
 

@@ -69,7 +69,12 @@ namespace IMS.Web.Controllers
         [HttpPost]
         [AllowAnonymous]
         public ActionResult ProductDetails(ShoppingCart shoppingCart)
-        {
+         {
+            if (shoppingCart.Count <= 0)
+            {
+                ModelState.AddModelError("Count", "Add at least 1 product.");
+                return RedirectToAction("ProductDetails", new {ProductId=shoppingCart.ProductId});
+            }
             try
             {
                 if (!User.Identity.IsAuthenticated)

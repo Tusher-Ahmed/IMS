@@ -27,6 +27,7 @@
 <table class="table table-striped table-hover" id="managePriceTable">
     <thead>
         <tr>
+            <th>No.</th>
             <th>Image</th>
             <th>Name</th>
             <th>SKU</th>
@@ -37,9 +38,12 @@
         </tr>
     </thead>
     <tbody>
+        @{ int i = 1;}
+
         @foreach (var item in Model.Products)
         {
             <tr>
+                <td>@i</td>
                 <td>
                     <img src="@Url.Content("~/Images/" + item.Image)" width="30" class="rounded" alt="Product Image">
                 </td>
@@ -54,6 +58,7 @@
                     </a>
                 </td>
             </tr>
+            i++;
         }
     </tbody>
 </table>
@@ -62,8 +67,8 @@
         $(document).ready(function () {
             $("#managePriceTable").DataTable({
                 "columnDefs": [
-                    { "orderable": false, "targets": [0, 6] },
-                    { "orderable": true, "targets": [1, 2, 3, 4, 5] }
+                    { "orderable": false, "targets": [1, 7] },
+                    { "orderable": true, "targets": [0, 2, 3, 4, 5,6] }
                 ]
             });
         })

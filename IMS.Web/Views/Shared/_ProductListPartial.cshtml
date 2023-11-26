@@ -9,8 +9,8 @@
     <br />
     @foreach (var product in Model.Products)
     {
-        <div class="col-md-3 mt-2 mb-2">
-            <div class="card" style="width: 16rem;">
+        <div class="col-lg-3 col-md-6 mt-2 mb-2">
+            <div class="card" style="width:90%; margin-left:5%;">
                 <img src="@Url.Content("~/Images/" + product.Image)" height="250" class="card-img-top" alt="Product Image">
                 <div class="card-body">
                     <p class="card-title text-uppercase" style="font-weight:bold;font-size:15px;">@product.Name</p>
@@ -26,11 +26,11 @@
 @if (Model.Products.Count() > 0)
 {
     <div class=" row pt-5 mt-5 ">
-        <div class="col-md-6">
+        <div class="col-6">
             Page @Model.PageNumber of @Math.Ceiling((double)Model.TotalCount / Model.PageSize)
         </div>
 
-        <div class="text-end col-md-6">
+        <div class="text-end col-6">
             @if (Model.PageNumber > 1)
             {
                 <a href="@Url.Action("Index", new { pageNumber = Model.PageNumber - 1 })" class="btn btn-primary">Previous</a>

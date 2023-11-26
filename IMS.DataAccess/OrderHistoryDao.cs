@@ -21,6 +21,7 @@ namespace IMS.DataAccess
         public List<OrderHistory> GetOrderHistories(List<long> ids, DateTime? startDate = null, DateTime? endDate = null, string searchText = "")
         {
             string condition = string.Empty;
+            string res = RemoveLeadingZeros(searchText);
 
             if (startDate.HasValue)
             {
@@ -33,8 +34,8 @@ namespace IMS.DataAccess
             }
 
             if (!string.IsNullOrEmpty(searchText))
-            {
-                condition += $" AND (oh.OrderId LIKE :searchText OR u.UserName LIKE :searchText) ";
+            {                
+                condition += $" AND (oh.OrderId LIKE :searchRes OR u.UserName LIKE :searchRes) ";
             }
 
             string query = $@"
@@ -46,11 +47,15 @@ WHERE oh.Id IN({string.Join(",", ids)})
 ";
 
             var iquery = Session.CreateSQLQuery(query);
-            if(string.IsNullOrWhiteSpace(searchText) == false) { iquery.SetParameter("searchText", $"%{searchText}%"); }
+            if(string.IsNullOrWhiteSpace(searchText) == false) { iquery.SetParameter("searchRes", $"%{res}%"); }
             iquery.AddEntity(typeof(OrderHistory));
             var result = iquery.List<OrderHistory>().ToList();
 
             return result;
+        }
+        static string RemoveLeadingZeros(string input)
+        {
+            return input.TrimStart('0');
         }
     }
 }

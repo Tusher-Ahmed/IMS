@@ -8,19 +8,19 @@
 @using (Html.BeginForm("Index", "Product", FormMethod.Get, new { @class = "form-horizontal" }))
 {
     <div class="row pb-5 pt-2">
-        <div class="col-md-3">
+        <div class="col-md-3 pb-1">
             <div class="form-group">               
                 @Html.TextBoxFor(m => m.SearchProductName, new { placeholder = "Search by Product Name", @class = "form-control", id = "SearchProductName" })
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-3 pb-1">
             <div class="form-group">
                 @Html.DropDownList("SearchDepartmentId", new SelectList(Model.Departments, "Id", "Name"), "-- Select Department --", new { @class = "form-control" })
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-3 pb-1">
             <div class="form-group">
                 @Html.DropDownList("SearchProductTypeId", new SelectList(Model.ProductTypes, "Id", "Name"), "-- Select Product Type --", new { @class = "form-control" })
             </div>

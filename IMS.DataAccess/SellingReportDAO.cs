@@ -23,6 +23,7 @@ namespace IMS.DataAccess
         public List<OrderHeader> SellingRecords(DateTime? start = null, DateTime? end = null, string searchText = "")
         {
             string condition = string.Empty;
+            string res = RemoveLeadingZeros(searchText);
 
             if (start.HasValue)
             {
@@ -47,11 +48,15 @@ WHERE OH.OrderStatus <> 'Cancelled'
 ";
 
             var iquery = Session.CreateSQLQuery(query);
-            if (string.IsNullOrWhiteSpace(searchText) == false) { iquery.SetParameter("searchText", $"%{searchText}%"); }
+            if (string.IsNullOrWhiteSpace(searchText) == false) { iquery.SetParameter("searchText", $"%{res}%"); }
             iquery.AddEntity(typeof(OrderHeader));
             var result = iquery.List<OrderHeader>().ToList();
 
             return result;
+        }
+        static string RemoveLeadingZeros(string input)
+        {
+            return input.TrimStart('0');
         }
     }
 }

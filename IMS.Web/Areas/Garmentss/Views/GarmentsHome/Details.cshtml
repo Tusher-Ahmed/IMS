@@ -35,8 +35,16 @@
 
                 @foreach (var item in Model)
                 {
+                    int depth = item.OrderId.ToString().Length;
+                    int dif = 6 - depth;
+                    string num = item.OrderId.ToString();
+                    if (dif > 0)
+                    {
+                        string newId = new string('0', dif);
+                        num = newId + num;
+                    }
                     <tr>
-                        <td>@item.OrderId</td>
+                        <td>@num</td>
                         <td>@item.GarmentsProduct.Id</td>
                         <td>@item.GarmentsProduct.Name</td>
                         <td>@item.GarmentsProduct.Department.Name</td>

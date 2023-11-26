@@ -41,8 +41,16 @@
     <tbody>
         @foreach (var item in Model.Products)
         {
+            int depth = item.OrderHistoryId.ToString().Length;
+            int dif = 6 - depth;
+            string num = item.OrderHistoryId.ToString();
+            if (dif > 0)
+            {
+                string newId = new string('0', dif);
+                num = newId + num;
+            }
             <tr>
-                <td>@item.OrderHistoryId</td>
+                <td>@num</td>
                 <td>
                     <img src="@Url.Content("~/Images/" + item.Image)" width="30" class="rounded" alt="Product Image">
                 </td>

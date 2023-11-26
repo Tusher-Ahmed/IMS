@@ -57,6 +57,11 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult ProductDetails( InventoryOrderCart inventoryOrderCart)
         {
+            if (inventoryOrderCart.Count <= 0)
+            {
+                ModelState.AddModelError("Count", "Add at least 1 product.");
+                return RedirectToAction("ProductDetails", new { ProductId = inventoryOrderCart.ProductId });
+            }
             try
             {
                 if (ModelState.IsValid)

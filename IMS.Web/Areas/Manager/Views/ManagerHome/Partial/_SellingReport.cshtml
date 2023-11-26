@@ -13,8 +13,16 @@
     <tbody>
         @foreach (var item in Model)
         {
+            int depth = item.Id.ToString().Length;
+            int dif = 6 - depth;
+            string num = item.Id.ToString();
+            if (dif > 0)
+            {
+                string newId = new string('0', dif);
+                num = newId + num;
+            }
             <tr>
-                <td>@item.Id</td>
+                <td>@num</td>
                 <td>@item.Name</td>
                 <td>@item.PaymentStatus</td>
                 <td>@item.OrderDate.ToString().AsDateTime().ToShortDateString()</td>
