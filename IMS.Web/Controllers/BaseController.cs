@@ -67,20 +67,27 @@ namespace IMS.Web.Controllers
             }
             #endregion
 
-            int cartItemCount = _customerShopping.GetAllOrders().Where(u => u.CustomerId == Convert.ToInt64(User.Identity.GetUserId()) && u.Product.Status==1).Count(); 
-            HttpContext.Session["CartItemCount"] = cartItemCount;
+            if (User.IsInRole("Customer"))
+            {
+                int cartItemCount = _customerShopping.GetAllOrders().Where(u => u.CustomerId == Convert.ToInt64(User.Identity.GetUserId()) && u.Product.Status == 1).Count();
+                HttpContext.Session["CartItemCount"] = cartItemCount;
+            }
             
-            int InventoryCartCount = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == Convert.ToInt64(User.Identity.GetUserId())).Count();
-            HttpContext.Session["InventoryCartItemCount"] = InventoryCartCount;
+            if(User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                int InventoryCartCount = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == Convert.ToInt64(User.Identity.GetUserId())).Count();
+                HttpContext.Session["InventoryCartItemCount"] = InventoryCartCount;
 
-            int NeedApprovalCount= _productService.GetAllProduct().Where(u => u.Approved == null).Count();
-            ViewBag.NeedApproval = NeedApprovalCount;
+                int NeedApprovalCount = _productService.GetAllProduct().Where(u => u.Approved == null).Count();
+                ViewBag.NeedApproval = NeedApprovalCount;
 
-            int productShortageCount = _productService.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded == true).Count();
-            ViewBag.ProductShortageCount= productShortageCount;
+                int productShortageCount = _productService.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded == true).Count();
+                ViewBag.ProductShortageCount = productShortageCount;
 
-            int TotalInQueue = _productService.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).Count();
-            ViewBag.SetPriceCount = TotalInQueue;
+                int TotalInQueue = _productService.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).Count();
+                ViewBag.SetPriceCount = TotalInQueue;
+            }            
+           
         }
     }
 }

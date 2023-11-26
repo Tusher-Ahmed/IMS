@@ -24,7 +24,6 @@ namespace IMS.Service
     {
         private readonly BaseDAO<OrderHistory> _repository;
         private readonly IOrderHistoryDao _orderHistoryDao;
-        private readonly IProductService _productService;
         private ISession _session;
 
         public ISession Session
@@ -37,7 +36,6 @@ namespace IMS.Service
         {
             _repository = new BaseDAO<OrderHistory>();
             _orderHistoryDao = new OrderHistoryDao();
-            _productService = new ProductService() { Session=_session};
         }
 
         public void Add(OrderHistory orderHistory)

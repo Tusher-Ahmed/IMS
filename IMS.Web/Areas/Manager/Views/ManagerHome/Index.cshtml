@@ -10,8 +10,14 @@
         <div class="col-md-3 bg-dark text-dark pt-4 mb-4" style="height:750px">
             <h5 class="pb-2 p-2 mb-5 text-white"><i class="fa-solid fa-user-tie"></i>&nbsp; @User.Identity.Name</h5>
             <a href="@Url.Action("Index", "ManagerHome")" class="btn btn-dark mb-2  w-100 text-start"><img src="~/Images/dash.png" style="width:25px;padding:0px 6px 0px 0px;" />&nbsp; Dashboard</a>
-            <a href="@Url.Action("ProductList", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-store"></i>&nbsp; Product List</a>
-            <a href="@Url.Action("ManagePrice", "Product", new {area=""})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-tag"></i>&nbsp; Manage Product</a>
+            <a href="@Url.Action("ProductList", "ManagerHome", new {area="Manager"})" class="btn btn-dark mb-2 w-100 text-start"><i class="fa-solid fa-store"></i>&nbsp; Manage Product</a>
+            <a href="@Url.Action("ManagePrice", "Product", new {area=""})" class="btn btn-dark mb-2 w-100 text-start position-relative">
+                <i class="fa-solid fa-tags"></i>&nbsp; Set Product Price 
+                @if (ViewBag.SetPriceCount != null && (int)ViewBag.SetPriceCount > 0)
+                {
+                    <span class="position-absolute top-2 start-60 translate-middle badge rounded-pill bg-danger" style="margin-top:5px; margin-left:10px;">@ViewBag.SetPriceCount</span>
+                }
+            </a>
             <a href="@Url.Action("ApproveProduct", "Product", new {area=""})" class="btn btn-dark mb-2 w-100 text-start position-relative">
 
                 <i class="fa-solid fa-clipboard-check"></i>&nbsp; Product Approval

@@ -15,7 +15,7 @@
         <div class="card-body row container">
             <div class="container rounded p-2">
                 <div class="row">
-                    <div class="col-8 col-lg-8">
+                    <div class="col-md-6 col-lg-8">
                         <div class="row pl-2">
                             <h5 class=" pb-2">Product Price: @Model.Product.Price.ToString("c")</h5>
                         </div>
@@ -33,37 +33,37 @@
                         </div>
                         @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Staff") || User.IsInRole("Garments"))
                         {
-                            <div class="row">
-                                <div class="col-2">
+                            <div class="row pb-2">
+                                <div class="col-5 col-lg-2">
                                     <h4>Count</h4>
                                 </div>
-                                <div class="col-2">
+                                <div class="col-7 col-lg-2">
                                     <div class="form-group">
                                         @Html.TextBoxFor(model => model.Count, new { @class = "form-control", type = "number", disabled = "disabled" })
                                         @Html.ValidationMessageFor(model => model.Count, "", new { @class = "text-danger" })
                                     </div>
                                 </div>
-                                <div class="col-9"></div>
+                                <div class="col-12 col-lg-8"></div>
                             </div>
                         }
                         else
                         {
-                            <div class="row">
-                                <div class="col-2">
+                            <div class="row pb-2">
+                                <div class="col-5 col-lg-2">
                                     <h4>Count</h4>
                                 </div>
-                                <div class="col-2">
+                                <div class="col-7 col-lg-2">
                                     <div class="form-group">
                                         @Html.TextBoxFor(model => model.Count, new { @class = "form-control", type = "number", min = "1" })
                                         @Html.ValidationMessageFor(model => model.Count, "", new { @class = "text-danger" })
                                     </div>
                                 </div>
-                                <div class="col-9"></div>
+                                <div class="col-12 col-lg-8"></div>
                             </div>
                         }
 
                     </div>
-                    <div class="col-12 col-lg-3 offset-lg-1 text-center">
+                    <div class="col-md-6 col-lg-3 offset-lg-1 text-center">
                         <img src="@Url.Content("~/Images/" + Model.Product.Image)" height="200" class="rounded" style="box-shadow: 0 10px 5px -5px rgba(0, 0, 0, 0.2) " alt="Product Image">
                     </div>
                 </div>
@@ -74,13 +74,13 @@
             {
             
 
-                <button type="submit" class="btn btn-outline-primary" disabled>Add Product to Cart</button>
+                <button type="submit" class="btn btn-outline-primary mb-1" disabled>Add Product to Cart</button>
             }
             else
             {
-                <button type="submit" class="btn btn-outline-primary" >Add Product to Cart</button>
+                <button type="submit" class="btn btn-outline-primary mb-1" >Add Product to Cart</button>
             }
-            @Html.ActionLink("Back to Home", "Index", "Product", new { area = "" }, new { @class = "btn btn-outline-success" })
+            @Html.ActionLink("Back to Home", "Index", "Product", new { area = "" }, new { @class = "btn btn-outline-success mb-1" })
         </div>
     </div>
 }
