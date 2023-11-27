@@ -35,15 +35,16 @@
             <th>SKU</th>
             <th>Quantity</th>
             <th>Garments Name</th>
+            <th>Date</th>
             <th>Action</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.Products)
         {
-            int depth = item.OrderHistoryId.ToString().Length;
+            int depth = Model.OrderIds[item.OrderHistoryId].ToString().Length;
             int dif = 6 - depth;
-            string num = item.OrderHistoryId.ToString();
+            string num = Model.OrderIds[item.OrderHistoryId].ToString();
             if (dif > 0)
             {
                 string newId = new string('0', dif);
@@ -58,6 +59,7 @@
                 <td>@item.SKU</td>
                 <td>@item.Quantity</td>
                 <td>@Model.Gname[item.Id]</td>
+                <td>@item.ModificationDate.ToString().AsDateTime().ToShortTimeString()</td>
                 <td>
                     <a href="@Url.Action("EditByStaff", "Product", new { id = item.Id })" class="btn btn-outline-primary">
                         <i class="fas fa-edit"></i>

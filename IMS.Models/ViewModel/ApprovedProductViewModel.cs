@@ -10,5 +10,6 @@ namespace IMS.Models.ViewModel
     {
         public List<Product> Products { get; set; }
         public Dictionary<long,string> Gname { get; set; }
+        public Dictionary<long,long> OrderIds { get; set; }
     }
 }

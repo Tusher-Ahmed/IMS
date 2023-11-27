@@ -24,11 +24,11 @@ namespace IMS.Web.Controllers
         private readonly IEmployeeService _employeeService;
         private readonly ISupplierService _supplierService;
 
-        public AccountController(ISession session):base(session)
+        public AccountController(ISession session) : base(session)
         {
-            _customerService=new CustomerService { Session= session };
-            _employeeService=new EmployeeService { Session=session };
-            _supplierService=new SupplierService { Session=session };
+            _customerService = new CustomerService { Session = session };
+            _employeeService = new EmployeeService { Session = session };
+            _supplierService = new SupplierService { Session = session };
         }
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, ISession session) : this(session)
@@ -81,11 +81,11 @@ namespace IMS.Web.Controllers
         #region Login
         // POST: /Account/Login
         [HttpPost]
-        [AllowAnonymous]      
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -97,80 +97,38 @@ namespace IMS.Web.Controllers
             {
                 long userId = user.Id;
                 string userRole = "";
-                
+                int status = 0;
                 var roles = userManager.GetRoles(userId);
                 if (roles.Count > 0)
                 {
                     userRole = roles[0];
                 }
-                if(userRole=="Manager" || userRole == "Staff")
+
+                if (userRole == "Manager" || userRole == "Staff")
                 {
-                    int status=_employeeService.GetEmployeeByUserId(userId).Status;
-                    if(status != 0)
-                    {
-                        var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
-                        switch (result)
-                        {
-                            case SignInStatus.Success:
-                                return RedirectToLocal(returnUrl);
-                            case SignInStatus.LockedOut:
-                                return View("Lockout");
-                            case SignInStatus.RequiresVerification:
-                                return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                            case SignInStatus.Failure:
-                            default:
-                                ModelState.AddModelError("", "Invalid login attempt.");
-                                return View(model);
-                        }
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "Invalid login attempt.");
-                        return View(model);
-                    }
+                    status = _employeeService.GetEmployeeByUserId(userId).Status;
                 }
-                else if (userRole == "Customer")
+
+                if (userRole == "Customer")
                 {
-                    int status = _customerService.GetCustomerByUserId(userId).Status;
-                    if (status != 0)
-                    {
-                        var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
-                        switch (result)
-                        {
-                            case SignInStatus.Success:
-                                return RedirectToLocal(returnUrl);
-                            case SignInStatus.LockedOut:
-                                return View("Lockout");
-                            case SignInStatus.RequiresVerification:
-                                return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                            case SignInStatus.Failure:
-                            default:
-                                ModelState.AddModelError("", "Invalid login attempt.");
-                                return View(model);
-                        }
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "Invalid login attempt.");
-                        return View(model);
-                    }
+                    status = _customerService.GetCustomerByUserId(userId).Status;
                 }
-                else
+
+                if(userRole== "Admin" || userRole == "Supplier")
                 {
-                    var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+                    status = 1;
+                }
+
+                if (status != 0)
+                {
+                    var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: true);
                     switch (result)
                     {
                         case SignInStatus.Success:
-                            if(userRole == "Supplier") 
-                            {
-                                return SupplierRedirectToLocal(returnUrl);
-                            }
-                            else
-                            {
-                                return RedirectToLocal(returnUrl);
-                            }                            
+                            return RedirectToLocal(returnUrl);
                         case SignInStatus.LockedOut:
-                            return View("Lockout");
+                            ModelState.AddModelError("", "Your account has been blocked due to too many unsuccessful login attempts. Please try again after 15 minutes.");
+                            return View(model);
                         case SignInStatus.RequiresVerification:
                             return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
                         case SignInStatus.Failure:
@@ -179,18 +137,23 @@ namespace IMS.Web.Controllers
                             return View(model);
                     }
                 }
-
+                else
+                {
+                    ModelState.AddModelError("", "Invalid login attempt.");
+                    return View(model);
+                }
 
             }
             else
             {
-                var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+                var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: true);
                 switch (result)
                 {
                     case SignInStatus.Success:
                         return RedirectToLocal(returnUrl);
                     case SignInStatus.LockedOut:
-                        return View("Lockout");
+                        ModelState.AddModelError("", "Your account has been blocked due to too many unsuccessful login attempts. Please try again after 15 minutes.");
+                        return View(model);
                     case SignInStatus.RequiresVerification:
                         return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
                     case SignInStatus.Failure:
@@ -262,18 +225,18 @@ namespace IMS.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                
-                var user = new ApplicationUser 
+
+                var user = new ApplicationUser
                 {
                     UserName = model.Email,
                     Email = model.Email,
-                    PhoneNumber=model.PhoneNumber,
-                    
+                    PhoneNumber = model.PhoneNumber,
+
                 };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                   await UserManager.AddToRoleAsync(user.Id, "Customer");
+                    await UserManager.AddToRoleAsync(user.Id, "Customer");
                     Customer customer = new Customer
                     {
                         Name = model.ShopName,
@@ -281,10 +244,10 @@ namespace IMS.Web.Controllers
                         StreetAddress = model.StreetAddress,
                         Thana = model.Thana,
                         PostalCode = model.PostalCode,
-                        UserId= user.Id,
-                        Status=1
+                        UserId = user.Id,
+                        Status = 1
                     };
-                   _customerService.AddCustomer(customer);                  
+                    _customerService.AddCustomer(customer);
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                     return RedirectToAction("Index", "Product", new { area = "" });
@@ -348,7 +311,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Employee Registration by Admin
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult ERegister()
         {
             var roles = new List<SelectListItem>
@@ -371,7 +334,7 @@ namespace IMS.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var AdminId= Convert.ToInt64(User.Identity.GetUserId());
+                var AdminId = Convert.ToInt64(User.Identity.GetUserId());
                 var user = new ApplicationUser
                 {
                     UserName = model.Email,
@@ -391,7 +354,7 @@ namespace IMS.Web.Controllers
                         PostalCode = model.PostalCode,
                         UserId = user.Id,
                         CreatedBy = AdminId,
-                        Status=1
+                        Status = 1
                     };
                     _employeeService.AddEmployee(employee);
                     //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
@@ -456,7 +419,7 @@ namespace IMS.Web.Controllers
                 }
                 AddErrors(result);
             }
-           
+
 
             return View(model);
         }

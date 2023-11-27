@@ -33,16 +33,24 @@
         }
         @foreach (var item in Model.GarmentsProducts)
         {
+            int depth = Model.OrderIds[Model.Products.ElementAt(i).OrderHistoryId].ToString().Length;
+            int dif = 6 - depth;
+            string num = Model.OrderIds[Model.Products.ElementAt(i).OrderHistoryId].ToString();
+            if (dif > 0)
+            {
+                string newId = new string('0', dif);
+                num = newId + num;
+            }
             <tr> 
-                <td>@Model.OrderIds[Model.Products.ElementAt(i).OrderHistoryId]</td>
+                <td>@num</td>
                 <td>
                     <img src="@Url.Content("~/Images/" + item.Image)" width="30" class="rounded" alt="Product Image">
                 </td>
                 <td>@item.Name</td>
                 <td>@item.SKU</td>
                 <td>@Model.Quantity[Model.Products.ElementAt(i).OrderHistoryId]</td>
-                <td>@Model.SuppliersName.ElementAt(i)</td>
-                <td>@Model.Products.ElementAt(i).ApprovedBy</td>
+                <td>@Model.GName[Model.Products.ElementAt(i).OrderHistoryId]</td>
+                <td>@Model.StaffName[Model.Products.ElementAt(i).OrderHistoryId]</td>
             </tr>
             i++;
         }

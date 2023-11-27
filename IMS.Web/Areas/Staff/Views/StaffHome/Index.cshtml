@@ -63,19 +63,20 @@
                                         <th class="border-top-0">Image</th>
                                         <th class="border-top-0">Product Name</th>
                                         <th class="border-top-0">Quantity</th>
-                                        <th class="border-top-0">Garments Id</th>
+                                        <th class="border-top-0">Garments Name</th>
                                         <th class="border-top-0">Order Date</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
+
                                     @foreach (var item in Model.Products.OrderByDescending(i => i.CreationDate).Take(5))
                                     {
-                                        <tr>
+                                        <tr>                                            
                                             <td class="txt-oflo"><img src="@Url.Content("~/Images/" + item.Image)" width="40" alt="img" /></td>
                                             <td class="txt-oflo">@item.Name</td>
                                             <td class="txt-oflo">@item.Quantity</td>
-                                            <td class="txt-oflo">@item.GarmentsId</td>
+                                            <td class="txt-oflo">@Model.GName[item.Id]</td>
                                             <td class="txt-oflo">@item.CreationDate.ToString().AsDateTime().ToShortDateString()</td>
                                             <td>
                                                 <a href="@Url.Action("EditByStaff", "Product", new { id = item.Id,area="" })" class="btn btn-outline-primary">

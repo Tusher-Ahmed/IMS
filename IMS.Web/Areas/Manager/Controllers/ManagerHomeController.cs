@@ -308,40 +308,6 @@ namespace IMS.Web.Areas.Manager.Controllers
         }
         #endregion
 
-        #region get Total staff (number)
-        [Authorize(Roles = "Manager")]
-        public int GetAllStaff()
-        {
-            var context = new ApplicationDbContext();
-            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-            var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-            string roleNames = "Staff";
-
-            var roleIds = roleManager.Roles
-                .Where(r => roleNames.Contains(r.Name))
-                .Select(r => r.Id)
-                .ToList();
-
-            var usersWithDetails = context.Users
-                .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-                .ToList();
-
-            List<Employee> staffs = new List<Employee>();
-
-            foreach (var user in usersWithDetails)
-            {
-                var employee = _employeeService.GetEmployeeByUserId(user.Id);
-                if (employee != null)
-                {
-                    staffs.Add(employee);
-
-                }
-            }
-
-            return staffs.Count();
-        }
-        #endregion
-
         #region get staff details
         [Authorize(Roles = "Manager")]
         public ActionResult TotalStaff()
@@ -364,7 +330,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                 foreach (var user in usersWithDetails)
                 {
                     var employee = _employeeService.GetEmployeeByUserId(user.Id);
-                    if (employee != null)
+                    if (employee.Status != 0)
                     {
                         UserDetailViewModel users = new UserDetailViewModel
                         {
@@ -424,7 +390,8 @@ namespace IMS.Web.Areas.Manager.Controllers
                 }
                 if (!string.IsNullOrEmpty(search))
                 {
-                    history = history.Where(x => x.OrderId.ToString().Contains(search) || GetEmployeeNameByHistoryId(x.EmployeeId).Contains(search)).ToList();
+                    string res = RemoveLeadingZeros(search);
+                    history = history.Where(x => x.OrderId.ToString().Contains(res) || GetEmployeeNameByHistoryId(x.EmployeeId).Contains(res)).ToList();
                 }
                 recordsTotal = history.Count;
                 recordsFiltered = recordsTotal;
@@ -483,6 +450,11 @@ namespace IMS.Web.Areas.Manager.Controllers
             var context = new ApplicationDbContext();
             string manager = context.Users.FirstOrDefault(u => u.Id == createdBy).Email;
             return manager;
+        }
+
+        static string RemoveLeadingZeros(string input)
+        {
+            return input.TrimStart('0');
         }
         #endregion
 

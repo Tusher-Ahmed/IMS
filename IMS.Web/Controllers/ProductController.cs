@@ -261,10 +261,15 @@ namespace IMS.Web.Controllers
         {
             var product = _product.GetAllProduct().Where(u => u.Approved == null).ToList();
             Dictionary<long, string> garments= new Dictionary<long, string>();
-            foreach(var item in product)
+            Dictionary<long, long> orderId = new Dictionary<long, long>();
+
+            foreach (var item in product)
             {
                 string garment = _supplier.GetSupplierByUserId(item.GarmentsId).Name;
                 garments.Add(item.Id, garment);
+
+                long oId = _inventoryOrderHistoryService.GetById(item.OrderHistoryId).OrderId;
+                orderId.Add(item.OrderHistoryId, oId);
             }
 
             try
@@ -272,7 +277,8 @@ namespace IMS.Web.Controllers
                 ApprovedProductViewModel approvedProductViewModel = new ApprovedProductViewModel
                 {
                     Products = product,
-                    Gname = garments
+                    Gname = garments,
+                    OrderIds = orderId
                 };
                 return View(approvedProductViewModel);
             }
@@ -366,10 +372,31 @@ namespace IMS.Web.Controllers
         [Authorize(Roles = "Staff,Admin")]
         public ActionResult RejectedProductList()
         {
+            var prod = _product.GetAllProduct().Where(u => u.Approved == false && u.Rejected == true).ToList();
+            Dictionary<long, long> orderId = new Dictionary<long, long>();
+            Dictionary<long, string> staffs = new Dictionary<long, string>();
+            Dictionary<long, string> garments = new Dictionary<long, string>();
+
+            foreach (var item in prod)
+            {
+                long oId = _inventoryOrderHistoryService.GetById(item.OrderHistoryId).OrderId;
+                orderId.Add(item.OrderHistoryId, oId);
+
+                staffs.Add(item.OrderHistoryId, GetUserEmailById(item.ApprovedBy));
+
+                string sup = _supplier.GetSupplierByUserId(item.GarmentsId).Name;
+                garments.Add(item.OrderHistoryId, sup);
+            }
             try
             {
-                var prod = _product.GetAllProduct().Where(u => u.Approved == false && u.Rejected == true).ToList();
-                return View(prod);
+                StaffDashboardViewModel staffDashboardViewModel = new StaffDashboardViewModel
+                {
+                    Products = prod,
+                    OrderIds= orderId,
+                    GName=garments,
+                    StaffName=staffs
+                };
+                return View(staffDashboardViewModel);
             }
             catch (Exception ex)
             {
@@ -377,6 +404,13 @@ namespace IMS.Web.Controllers
                 return RedirectToAction("Index", "Error");
             }
 
+        }
+        public string GetUserEmailById(long? userId)
+        {
+            var context = new ApplicationDbContext();
+            string manager = context.Users.FirstOrDefault(u => u.Id == userId).Email;
+
+            return manager;
         }
         #endregion
 

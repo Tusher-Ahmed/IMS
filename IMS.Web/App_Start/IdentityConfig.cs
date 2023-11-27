@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.AspNetCore.Identity;
 
 namespace IMS.Web.App_Start
 {
@@ -32,16 +33,16 @@ namespace IMS.Web.App_Start
     }
 
     // Configure the application user manager used in this application. UserManager is defined in ASP.NET Identity and is used by the application.
-     public class ApplicationUserManager : UserManager<ApplicationUser, long>
+    public class ApplicationUserManager : UserManager<ApplicationUser, long>
     {
         public ApplicationUserManager(IUserStore<ApplicationUser, long> store)
             : base(store)
         {
- 
+
         }
 
-        public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, 
-            IOwinContext context) 
+        public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options,
+            IOwinContext context)
         {
             var manager = new ApplicationUserManager(new UserStoreIntPk(context.Get<ApplicationDbContext>()));
             // Configure validation logic for usernames
@@ -59,6 +60,11 @@ namespace IMS.Web.App_Start
                 //RequireLowercase = true,
                 //RequireUppercase = true,
             };
+            // Configure lockout settings
+            manager.UserLockoutEnabledByDefault = true;
+            manager.DefaultAccountLockoutTimeSpan = TimeSpan.FromMinutes(15);
+            manager.MaxFailedAccessAttemptsBeforeLockout = 5;
+
             manager.RegisterTwoFactorProvider("PhoneCode", new PhoneNumberTokenProvider<ApplicationUser, long>
             {
                 MessageFormat = "Your security code is: {0}"
@@ -78,7 +84,7 @@ namespace IMS.Web.App_Start
             }
             return manager;
         }
-    }  
+    }
 
     // Configure the application sign-in manager which is used in this application.
     public class ApplicationSignInManager : SignInManager<ApplicationUser, long>
@@ -98,4 +104,6 @@ namespace IMS.Web.App_Start
             return new ApplicationSignInManager(context.GetUserManager<ApplicationUserManager>(), context.Authentication);
         }
     }
+
+
 }

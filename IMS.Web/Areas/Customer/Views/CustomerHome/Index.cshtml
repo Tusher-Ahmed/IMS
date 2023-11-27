@@ -73,9 +73,19 @@
                                 <tbody>
                                     @foreach (var item in Model.OrderHeaders.OrderByDescending(u => u.Id).Take(5))
                                     {
+
+                                        int depth = item.Id.ToString().Length;
+                                        int dif = 6 - depth;
+                                        string num = item.Id.ToString();
+                                        if (dif > 0)
+                                        {
+                                            string newId = new string('0', dif);
+                                            num = newId + num;
+                                        }
+
                                         <tr>
                                             <td>
-                                                @item.Id
+                                                @num
                                             </td>
                                             <td>@item.OrderTotal.ToString("C")</td>
                                             <td>

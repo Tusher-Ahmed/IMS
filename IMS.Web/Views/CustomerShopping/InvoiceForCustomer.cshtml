@@ -21,7 +21,18 @@
                     </div>
                     <div class="col-6 pb-2">
                         <h5>Invoice No.</h5>
-                        <p>@Model.OrderHeader.Id</p>
+                        @{
+                            int depth = Model.OrderHeader.Id.ToString().Length;
+                            int dif = 6 - depth;
+                            string num = Model.OrderHeader.Id.ToString();
+                            if (dif > 0)
+                            {
+                                string newId = new string('0', dif);
+                                num = newId + num;
+                            }
+                        }
+
+                        <p>@num</p>
                     </div>
                     <div class="col-6 pb-2">
                         <h5>Order Date</h5>

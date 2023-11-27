@@ -11,6 +11,8 @@ namespace IMS.Models.ViewModel
         public IEnumerable<Product> Products { get; set; }
         public List<GarmentsProduct> GarmentsProducts { get; set; }
         public Dictionary<long,int> Quantity { get; set; }
+        public Dictionary<long,string> GName { get; set; }
+        public Dictionary<long,string> StaffName { get; set; }
         public Dictionary<long,long> OrderIds { get; set; }
         public List<string> SuppliersName { get; set; }
         public int TotalNewProduct {  get; set; }
