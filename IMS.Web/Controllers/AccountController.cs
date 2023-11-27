@@ -332,6 +332,18 @@ namespace IMS.Web.Controllers
 
         public async Task<ActionResult> ERegister(RegisterViewModel model)
         {
+            var roles = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Manager", Text = "Manager" },
+                new SelectListItem { Value = "Staff", Text = "Staff" }
+            };
+
+            if (model.ERoles == null)
+            {
+                ModelState.AddModelError("ERoles", "Roles is required.");
+                ViewBag.RolesList = new SelectList(roles, "Value", "Text");
+                return View(model);
+            }
             if (ModelState.IsValid)
             {
                 var AdminId = Convert.ToInt64(User.Identity.GetUserId());
@@ -363,11 +375,7 @@ namespace IMS.Web.Controllers
                 }
                 AddErrors(result);
             }
-            var roles = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "Manager", Text = "Manager" },
-                new SelectListItem { Value = "Staff", Text = "Staff" }
-            };
+            
 
             ViewBag.RolesList = new SelectList(roles, "Value", "Text");
 

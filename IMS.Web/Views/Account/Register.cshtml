@@ -21,35 +21,41 @@
 
         @Html.ValidationSummary("", new { @class = "text-danger" })
         <div class="row">
-            @*<div class="col-md-12 pb-2">
-                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Enter your username" })
-                </div>*@
             <div class="col-md-12 pb-2">
                 @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter your email" })
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
             </div>
             <div class="col-md-6 pb-2">
                 @Html.TextBoxFor(m => m.ShopName, new { @class = "form-control", placeholder = "Enter your shop name" })
+                @Html.ValidationMessageFor(m => m.ShopName, "", new { @class = "text-danger" })
             </div>
             <div class="col-md-6 pb-2">
                 @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "Enter your phone number" })
+                @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
             </div>
             <div class="col-md-6 pb-2">
                 @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
             </div>
             <div class="col-md-6 pb-2">
                 @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Confirm password" })
+                @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
             </div>
             <div class="col-md-6 pb-2">
                 @Html.TextBoxFor(m => m.City, new { @class = "form-control", placeholder = "City", required = "required" })
+                @Html.ValidationMessageFor(m => m.City, "", new { @class = "text-danger" })
             </div>
             <div class="col-md-6 pb-2">
                 @Html.TextBoxFor(m => m.StreetAddress, new { @class = "form-control", placeholder = "Street address", required = "required" })
+                @Html.ValidationMessageFor(m => m.StreetAddress, "", new { @class = "text-danger" })
             </div>
             <div class="col-md-6 pb-2">
                 @Html.TextBoxFor(m => m.Thana, new { @class = "form-control", placeholder = "Thana" })
+                @Html.ValidationMessageFor(m => m.Thana, "", new { @class = "text-danger" })
             </div>
             <div class="col-md-6 pb-2">
-                @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control", placeholder = "Postal code" })
+                @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control",type="number", placeholder = "Postal code" })
+                @Html.ValidationMessageFor(m => m.PostalCode, "", new { @class = "text-danger" })
             </div>
         </div>
         <div class="row">
