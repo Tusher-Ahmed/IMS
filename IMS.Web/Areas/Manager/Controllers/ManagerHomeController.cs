@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json.Linq;
 using NHibernate;
+using Stripe;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,7 +36,7 @@ namespace IMS.Web.Areas.Manager.Controllers
 
         public ManagerHomeController(ISession session) : base(session)
         {
-            _product = new ProductService { Session = session };
+            _product = new IMS.Service.ProductService { Session = session };
             _inventoryOrderHistoryService = new InventoryOrderHistoryService { Session = session };
             _employeeService = new EmployeeService { Session = session };
             _supplierService = new SupplierService { Session = session };
@@ -117,7 +118,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         }
         [HttpPost]
         [Authorize(Roles = "Manager")]
-        public ActionResult Edit(long id, Product product, HttpPostedFileBase ImageFile)
+        public ActionResult Edit(long id, IMS.Models.Product product, HttpPostedFileBase ImageFile)
         {
             try
             {
@@ -187,7 +188,7 @@ namespace IMS.Web.Areas.Manager.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Manager")]
-        public ActionResult Status(long id, Product product)
+        public ActionResult Status(long id, IMS.Models.Product product)
         {
             try
             {
@@ -283,7 +284,7 @@ namespace IMS.Web.Areas.Manager.Controllers
         }
         [Authorize(Roles = "Manager")]
         [HttpPost]
-        public ActionResult ChangeStatus(long id, Product product)
+        public ActionResult ChangeStatus(long id, IMS.Models.Product product)
         {
             try
             {
@@ -641,11 +642,14 @@ namespace IMS.Web.Areas.Manager.Controllers
                 var context = new ApplicationDbContext();
                 var product = _product.GetAllProduct();
                 List<OrderHistory> history = new List<OrderHistory>();
+                List<IMS.Models.Product> returnHistory = new List<IMS.Models.Product>();
+
                 Dictionary<long, string> managers = new Dictionary<long, string>();
                 var startDate = DateTime.Now.AddDays(-7);
                 var endDate = DateTime.Now;
 
                 history = _inventoryOrderHistoryService.GetHistories(product.Select(x => x.OrderHistoryId).ToList(), startDate, endDate);
+                returnHistory = _product.GetRejectHistory(startDate, endDate);
 
                 foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
                 {
@@ -656,7 +660,8 @@ namespace IMS.Web.Areas.Manager.Controllers
                 BuyingReportViewModel viewModel = new BuyingReportViewModel
                 {
                     History = history,
-                    Name = managers
+                    Name = managers,
+                    RejectProducts=returnHistory
                 };
 
                 ViewBag.StartDateValue = startDate.ToString("yyyy-MM-dd");
@@ -679,8 +684,11 @@ namespace IMS.Web.Areas.Manager.Controllers
             try
             {
                 List<OrderHistory> history = new List<OrderHistory>();
+                List<IMS.Models.Product> returnHistory = new List<IMS.Models.Product>();
                 history = _inventoryOrderHistoryService.GetHistories(product.Select(x => x.OrderHistoryId).ToList(), startDate, endDate, searchText);
+                returnHistory = _product.GetRejectHistory(startDate, endDate);
                 Dictionary<long, string> managers = new Dictionary<long, string>();
+
                 foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
                 {
                     string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
@@ -690,7 +698,8 @@ namespace IMS.Web.Areas.Manager.Controllers
                 BuyingReportViewModel viewModel = new BuyingReportViewModel
                 {
                     History = history,
-                    Name = managers
+                    Name = managers,
+                    RejectProducts=returnHistory
                 };
 
                 return PartialView("Partial/_OrderHistory", viewModel);

@@ -10,5 +10,6 @@ namespace IMS.Models.ViewModel
     {
         public List<OrderHistory> History { get; set; }
         public Dictionary<long,string> Name {  get; set; }
+        public List<Product> RejectProducts {  get; set; }
     }
 }

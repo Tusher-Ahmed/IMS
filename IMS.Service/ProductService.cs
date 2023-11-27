@@ -21,6 +21,7 @@ namespace IMS.Service
         void DeleteProduct(Product product);
         Product GetProductByProductCode(int ProductCode);
         List<Product> GetAllProductByProductCode(int ProductCode);
+        List<Product> GetRejectHistory(DateTime? startDate=null, DateTime? endDate = null);
     }
 
     public class ProductService:IProductService
@@ -149,6 +150,31 @@ namespace IMS.Service
         public List<Product> GetAllProductByProductCode(int ProductCode)
         {
             return _session.Query<Product>().Where(u=>u.ProductCode== ProductCode).ToList();
+        }
+
+        public List<Product> GetRejectHistory(DateTime? startDate = null, DateTime? endDate = null)
+        {
+            string condition = string.Empty;
+
+            if (startDate.HasValue)
+            {
+                condition += $" AND P.CreationDate >= '{startDate.Value.ToString("yyyy-MM-dd")}'";
+            }
+
+            if (endDate.HasValue)
+            {
+                condition += $" AND P.CreationDate <= '{endDate.Value.ToString("yyyy-MM-dd 23:59:59.999")}'";
+            }
+            string product = $@"
+SELECT *
+FROM Product AS P
+WHERE P.Approved = 'False' And P.Rejected = 'True' {condition}
+";
+            var iquery = Session.CreateSQLQuery(product);
+            iquery.AddEntity(typeof(Product));
+            var result = iquery.List<Product>().ToList();
+
+            return result;
         }
     }
 }

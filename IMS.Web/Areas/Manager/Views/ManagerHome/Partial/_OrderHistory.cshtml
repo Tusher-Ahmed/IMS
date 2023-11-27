@@ -28,17 +28,40 @@
                 <td>@item.TotalPrice.ToString("C")</td>
             </tr>
         }
-        <tr class="bg-dark text-white">
+        <tr class="bg-secondary text-white">
             <td class="fw-bold text-white">Total :</td>
             <td colspan="2"></td>
             @{
                 decimal totalAmount = 0;
+                decimal returnAmount = 0;
             }
             @foreach (var item in Model.History)
             {
                 totalAmount += @item.TotalPrice;
             }
             <td class="fw-bold text-white">@totalAmount.ToString("C")</td>
+        </tr>
+        @if (Model.RejectProducts.Count() > 0)
+        {
+
+            <tr class="bg-secondary text-white">
+                <td class="fw-bold text-white">Total Return Amount:</td>
+                <td colspan="2"></td>
+                @foreach (var item in Model.RejectProducts)
+                {
+                    decimal price = item.Quantity * item.BuyingPrice;
+                    returnAmount += price;
+                }
+                <td class="fw-bold text-white">@returnAmount.ToString("C")</td>
+            </tr>
+        }
+        <tr>
+            <td colspan="4"></td>
+        </tr>
+        <tr class="bg-dark text-white">
+            <td class="fw-bold text-white">Total Order Cost:</td>
+            <td colspan="2"></td>
+            <td class="fw-bold text-white">@((totalAmount-returnAmount).ToString("C"))</td>
         </tr>
     </tbody>
 </table>
