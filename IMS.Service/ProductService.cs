@@ -42,33 +42,40 @@ namespace IMS.Service
         public ProductViewModel GetProducts(ProductViewModel product)
         {
             int pageNumber = 1;
-            int pageSize =  12; 
+            int pageSize =  12;
 
-            var query = _repository.GetAll().Where(u=>u.IsPriceAdded==true && u.Status==1); 
+            //var query = _repository.GetAll().Where(u=>u.IsPriceAdded==true && u.Status==1);
 
-            
-            if (product.SearchProductTypeId.HasValue && product.SearchDepartmentId.HasValue)
-            {
-                query = query.Where(p => p.ProductType.Id == product.SearchProductTypeId.Value && p.Department.Id==product.SearchDepartmentId.Value);
-            }
+            string condition = string.Empty;
+
             if (product.SearchProductTypeId.HasValue)
             {
-                query = query.Where(p => p.ProductType.Id == product.SearchProductTypeId.Value);
+                condition += $" AND P.ProductTypeId = '{product.SearchProductTypeId.Value}'";
             }
 
             if (product.SearchDepartmentId.HasValue)
             {
-                query = query.Where(p => p.Department.Id == product.SearchDepartmentId.Value);
+                condition += $" AND P.DepartmentId = '{product.SearchDepartmentId.Value}'";
             }
+
             if (!string.IsNullOrWhiteSpace(product.SearchProductName))
             {
-                string searchKeyword = product.SearchProductName.ToLower();
-                query = query.Where(p => p.Name.ToLower().Contains(searchKeyword));
+                condition += $" AND P.Name LIKE '%{product.SearchProductName}%' ";
             }
+
+            var data = $@"
+SELECT * 
+FROM Product AS P
+WHERE P.IsPriceAdded = 'True' AND P.Status = '1'
+{condition}
+";
+            var iquery = Session.CreateSQLQuery(data);
+            iquery.AddEntity(typeof(Product));
+            var query = iquery.List<Product>().ToList();
 
             int totalCount = query.Count();
             
-            IEnumerable<Product> products = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            var products = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
 
          
             var resultModel = new ProductViewModel

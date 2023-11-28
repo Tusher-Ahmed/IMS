@@ -4,11 +4,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row pb-4 pt-2">
+<div class="row pb-3 mb-2 pt-2">
     <div class="col-md-6">
         <h4 class="text-uppercase">Selling Report</h4>
     </div>
-    <div class="col-6 text-end">
+    <div class="col-6 text-end no-print">
 
         @if (User.IsInRole("Admin"))
         {
@@ -23,24 +23,28 @@
 </div>
 @using (Html.BeginForm("", "", FormMethod.Post))
 {
-    <div class="row">
+    <div class="row pb-2 mb-3">
         <div class="col">
+            <label>From : </label>
             <input type="date" class="form-control" id="startDate" name="startDate" value="@ViewBag.StartDateValue" />
         </div>
         <div class="col">
+            <label>To : </label>
             <input type="date" class="form-control" id="finalDate" name="endDate" value="@ViewBag.EndDateValue" />
         </div>
         <div class="col">
+            <label></label>
             <input type="text" class="form-control" id="search" name="searchText" placeholder="Write order id or shop name..." value="@(Request.QueryString["searchText"] ?? "")" />
         </div>
         <div class="col">
+            <label></label>
             <input type="submit" id="btnView" class="btn btn-primary w-100" value="Search" />
         </div>
     </div>
 }
 
 <div id="tableContainer">
-    <table id="reportTable" class="table table-striped mt-4">
+    <table id="reportTable" class="table table-bordered table-hover mt-4">
         <thead>
             <tr>
                 <th>Order Id</th>
@@ -69,8 +73,11 @@
                     <td>@item.OrderTotal.ToString("C")</td>
                 </tr>
             }
-            <tr class="bg-dark text-white">
-                <td class="fw-bold text-white">Total :</td>
+            <tr>
+                <td colspan="5" style="border-right:none;border-left:none;"></td>
+            </tr>
+            <tr>
+                <td class="fw-bold text-dark">Total :</td>
                 <td colspan="3"></td>
                 @{
                     decimal totalAmount = 0;
@@ -79,10 +86,20 @@
                 {
                     totalAmount += @item.OrderTotal;
                 }
-                <td class="fw-bold text-white">@totalAmount.ToString("C")</td>
+                <td class="fw-bold text-dark">@totalAmount.ToString("C")</td>
             </tr>
         </tbody>
     </table>
+    @if (Model.Count() > 0)
+    {
+        <div class="row">
+            <div class="col-9"></div>
+            <div class="col-3">
+                <button id="btnPrint" class="btn btn-secondary w-100 no-print" onclick="window.print();">Print</button>
+            </div>
+        </div>
+    }
+
 </div>
 
 @section scripts{
@@ -105,6 +122,20 @@
                 });
 
             })
+
+            window.onbeforeprint = function () {
+                var elementsToHide = document.querySelectorAll('.no-print');
+                for (var i = 0; i < elementsToHide.length; i++) {
+                    elementsToHide[i].style.display = 'none';
+                }
+            }
+
+            window.onafterprint = function () {
+                var elementsToHide = document.querySelectorAll('.no-print');
+                for (var i = 0; i < elementsToHide.length; i++) {
+                    elementsToHide[i].style.display = '';
+                }
+            }
         })
     </script>
 }

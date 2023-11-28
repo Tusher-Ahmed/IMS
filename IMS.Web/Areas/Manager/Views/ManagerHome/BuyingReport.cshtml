@@ -4,11 +4,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row pt-2 pb-4 mb-4">
+<div class="row pt-2 pb-3 mb-2">
     <div class="col-6">
         <h4 class="text-uppercase">Buying Report</h4>
     </div>
-    <div class="col-6 text-end">
+    <div class="col-6 text-end no-print">
 
         @if (User.IsInRole("Admin"))
         {
@@ -23,26 +23,31 @@
 </div>
 @using (Html.BeginForm("", "", FormMethod.Post))
 {
-    <div class="row pb-2 mb-2">
+    <div class="row pb-2 mb-3">
         <div class="col">
+            <label>From : </label>
             <input type="date" class="form-control" id="startDate" name="startDate" value="@ViewBag.StartDateValue" />
         </div>
         <div class="col">
+            <label>To : </label>
             <input type="date" class="form-control" id="finalDate" name="endDate" value="@ViewBag.EndDateValue" />
         </div>
 
         <div class="col">
+            <label></label>
             <input type="text" class="form-control" id="search" name="searchText" placeholder="Write OrderId or employee email..." value="@(Request.QueryString["searchText"] ?? "")" />
         </div>
         <div class="col">
+            <label></label>
             <input type="submit" id="btnView" class="btn btn-primary w-100" value="Search" />
         </div>
+
     </div>
 }
 
 
 <div id="tableContainer">
-    <table class="table table-striped table-hover pt-2 pb-4" id="historyOrder">
+    <table class="table table-bordered table-hover pt-2 pb-4" id="historyOrder">
         <thead>
             <tr>
                 <th class="border-top-0">Order Id</th>
@@ -71,11 +76,11 @@
                 </tr>
             }
             <tr>
-                <td colspan="4"></td>
+                <td colspan="4" style="border-right:none;border-left:none;"></td>
             </tr>
 
-            <tr class="bg-secondary text-white">
-                <td class="fw-bold text-white">Total Order Amount:</td>
+            <tr>
+                <td class="fw-bold text-dark">Total :</td>
                 <td colspan="2"></td>
                 @{
                     decimal totalAmount = 0;
@@ -85,31 +90,42 @@
                 {
                     totalAmount += @item.TotalPrice;
                 }
-                <td class="fw-bold text-white">@totalAmount.ToString("C")</td>
+                <td class="fw-bold text-dark">@totalAmount.ToString("C")</td>
             </tr>
-            @if (Model.RejectProducts.Count() > 0)
+            @if (Model.RejectProducts.Count() > 0 && Model.History.Count() > 0)
             {
-                <tr class="bg-secondary text-white">
-                    <td class="fw-bold text-white">Total Return Amount:</td>
+
+                <tr >
+                    <td class="fw-bold text-dark">Total Return Amount:</td>
                     <td colspan="2"></td>
                     @foreach (var item in Model.RejectProducts)
                     {
                         decimal price = item.Quantity * item.BuyingPrice;
                         returnAmount += price;
                     }
-                    <td class="fw-bold text-white">@returnAmount.ToString("C")</td>
+                    <td class="fw-bold text-dark">@returnAmount.ToString("C")</td>
                 </tr>
             }
             <tr>
-                <td colspan="4"></td>
+                <td colspan="4" style="border-right:none;border-left:none;"></td>
             </tr>
-            <tr class="bg-dark text-white">
-                <td class="fw-bold text-white">Total Order Cost:</td>
+            <tr style="border-top:3px solid #000">
+                <td class="fw-bold text-dark">Total Order Cost:</td>
                 <td colspan="2"></td>
-                <td class="fw-bold text-white">@((totalAmount-returnAmount).ToString("C"))</td>
+                <td class="fw-bold text-dark">@((totalAmount-returnAmount).ToString("C"))</td>
             </tr>
         </tbody>
     </table>
+    @if (Model.History.Count() > 0)
+    {
+        <div class="row">
+            <div class="col-9"></div>
+            <div class="col-3">
+                <button id="btnPrint" class="btn btn-secondary w-100 no-print" onclick="window.print();">Print</button>
+            </div>
+        </div>
+    }
+
 </div>
 
 @section scripts{
@@ -132,6 +148,20 @@
                 });
 
             })
+
+            window.onbeforeprint = function () {
+                var elementsToHide = document.querySelectorAll('.no-print');
+                for (var i = 0; i < elementsToHide.length; i++) {
+                    elementsToHide[i].style.display = 'none';
+                }
+            }
+
+            window.onafterprint = function () {
+                var elementsToHide = document.querySelectorAll('.no-print');
+                for (var i = 0; i < elementsToHide.length; i++) {
+                    elementsToHide[i].style.display = '';
+                }
+            }
         })
     </script>
 }

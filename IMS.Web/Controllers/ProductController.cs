@@ -47,6 +47,11 @@ namespace IMS.Web.Controllers
         [AllowAnonymous]
         public ActionResult Index(ProductViewModel product)
         {
+            if (User.IsInRole("Supplier"))
+            {
+                return RedirectToAction("Index","Garments");
+            }
+
             try
             {
                 product = _product.GetProducts(product);

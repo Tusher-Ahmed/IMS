@@ -1,6 +1,6 @@
 ﻿@model IMS.Models.ViewModel.BuyingReportViewModel
 
-<table class="table table-striped table-hover pt-2 pb-4" id="historyOrder">
+<table class="table table-bordered table-hover pt-2 pb-4" id="historyOrder">
     <thead>
         <tr>
             <th class="border-top-0">Order Id</th>
@@ -28,8 +28,9 @@
                 <td>@item.TotalPrice.ToString("C")</td>
             </tr>
         }
-        <tr class="bg-secondary text-white">
-            <td class="fw-bold text-white">Total :</td>
+        <tr> <td colspan="4" style="border-right:none;border-left:none;"></td></tr>
+        <tr>
+            <td class="fw-bold text-dark">Total :</td>
             <td colspan="2"></td>
             @{
                 decimal totalAmount = 0;
@@ -39,29 +40,38 @@
             {
                 totalAmount += @item.TotalPrice;
             }
-            <td class="fw-bold text-white">@totalAmount.ToString("C")</td>
+            <td class="fw-bold text-dark">@totalAmount.ToString("C")</td>
         </tr>
-        @if (Model.RejectProducts.Count() > 0)
+        @if (Model.RejectProducts.Count() > 0 && Model.History.Count() > 0)
         {
 
-            <tr class="bg-secondary text-white">
-                <td class="fw-bold text-white">Total Return Amount:</td>
+            <tr>
+                <td class="fw-bold text-dark">Total Return Amount:</td>
                 <td colspan="2"></td>
                 @foreach (var item in Model.RejectProducts)
                 {
                     decimal price = item.Quantity * item.BuyingPrice;
                     returnAmount += price;
                 }
-                <td class="fw-bold text-white">@returnAmount.ToString("C")</td>
+                <td class="fw-bold text-dark">@returnAmount.ToString("C")</td>
             </tr>
         }
         <tr>
-            <td colspan="4"></td>
+            <td colspan="4" style="border-right:none;border-left:none;"></td>
         </tr>
-        <tr class="bg-dark text-white">
-            <td class="fw-bold text-white">Total Order Cost:</td>
+        <tr style="border-top:3px solid #000">
+            <td class="fw-bold text-dark">Total Order Cost:</td>
             <td colspan="2"></td>
-            <td class="fw-bold text-white">@((totalAmount-returnAmount).ToString("C"))</td>
+            <td class="fw-bold text-dark">@((totalAmount-returnAmount).ToString("C"))</td>
         </tr>
     </tbody>
 </table>
+@if (Model.History.Count() > 0)
+{
+    <div class="row">
+        <div class="col-9"></div>
+        <div class="col-3">
+            <button id="btnPrint" class="btn btn-secondary w-100 no-print" onclick="window.print();">Print</button>
+        </div>
+    </div>
+}

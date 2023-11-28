@@ -9,7 +9,7 @@ namespace IMS.Models.ViewModel
     public class ProductViewModel
     {
      
-        public IEnumerable<Product> Products { get; set; }
+        public List<Product> Products { get; set; }
         public IEnumerable<GarmentsProduct> GarmentsProducts { get; set; }
         public List<ProductType> ProductTypes { get; set; }
         public List<Department> Departments { get; set; }
