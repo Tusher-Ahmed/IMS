@@ -128,6 +128,11 @@
                 for (var i = 0; i < elementsToHide.length; i++) {
                     elementsToHide[i].style.display = 'none';
                 }
+
+                var watermarkImage = document.querySelector('#watermark img');
+                if (watermarkImage) {
+                    watermarkImage.style.display = 'block';
+                }
             }
 
             window.onafterprint = function () {
@@ -135,7 +140,50 @@
                 for (var i = 0; i < elementsToHide.length; i++) {
                     elementsToHide[i].style.display = '';
                 }
+
+                var watermarkImage = document.querySelector('#watermark img');
+                if (watermarkImage) {
+                    watermarkImage.style.display = 'none';
+                }
             }
+
+            window.onload = function () {
+                function addWatermark() {
+                    var watermarkDiv = document.createElement('div');
+                    watermarkDiv.id = 'watermark';
+
+                    var image = new Image();
+                    image.src = '/Images/logo.png';
+                    image.alt = 'IMS';
+                    image.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.1; pointer-events: none; display: none; width: 350px; height: 400px;';
+
+                    image.onload = function () {
+                        watermarkDiv.appendChild(image);
+                        document.body.appendChild(watermarkDiv);
+
+                        // Show the watermark only in print
+                        if (window.matchMedia) {
+                            var mediaQueryList = window.matchMedia('print');
+                            mediaQueryList.addListener(function (mql) {
+                                if (mql.matches) {
+                                    image.style.display = 'block';
+                                } else {
+                                    image.style.display = 'none';
+                                }
+                            });
+
+                            // Initial check for print media type
+                            if (mediaQueryList.matches) {
+                                image.style.display = 'block';
+                            }
+                        }
+                    };
+
+                    document.body.appendChild(watermarkDiv);
+                }
+
+                addWatermark();
+            };
         })
     </script>
 }

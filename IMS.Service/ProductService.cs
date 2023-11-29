@@ -21,6 +21,7 @@ namespace IMS.Service
         void DeleteProduct(Product product);
         Product GetProductByProductCode(int ProductCode);
         List<Product> GetAllProductByProductCode(int ProductCode);
+        List<Product> GetAllApprovedProduct();
         List<Product> GetRejectHistory(DateTime? startDate=null, DateTime? endDate = null);
     }
 
@@ -90,11 +91,14 @@ WHERE P.IsPriceAdded = 'True' AND P.Status = '1'
         }
         #endregion
 
+        #region Get All Product
         public IEnumerable<Product> GetAllProduct()
         {
             return _repository.GetAll();
         }
+        #endregion
 
+        #region Add Product
         public void Add(Product product)
         {
             using (var transaction = _session.BeginTransaction())
@@ -111,16 +115,23 @@ WHERE P.IsPriceAdded = 'True' AND P.Status = '1'
                 }
             }
         }
+        #endregion
+
+        #region Get Product By Id
         public Product GetProductById(long id)
         {
             return _repository.GetById(id);
         }
+        #endregion
+
+        #region GetProductByProductCode
         public Product GetProductByProductCode(int ProductCode)
         {
             return _session.Query<Product>().FirstOrDefault(u => u.ProductCode == ProductCode && u.Status==1 && u.IsPriceAdded==true && u.Approved==true);
         }
+        #endregion
 
-
+        #region UpdateProduct
         public void UpdateProduct(Product product)
         {            
             using (var transaction = _session.BeginTransaction())
@@ -137,6 +148,9 @@ WHERE P.IsPriceAdded = 'True' AND P.Status = '1'
                 }
             }
         }
+        #endregion
+
+        #region Delete Product
         public void DeleteProduct(Product product)
         {            
             using (var transaction = _session.BeginTransaction())
@@ -153,12 +167,16 @@ WHERE P.IsPriceAdded = 'True' AND P.Status = '1'
                 }
             }
         }
+        #endregion
 
+        #region GetAllProductByProductCode
         public List<Product> GetAllProductByProductCode(int ProductCode)
         {
             return _session.Query<Product>().Where(u=>u.ProductCode== ProductCode).ToList();
         }
+        #endregion
 
+        #region GetRejectHistory
         public List<Product> GetRejectHistory(DateTime? startDate = null, DateTime? endDate = null)
         {
             string condition = string.Empty;
@@ -183,5 +201,24 @@ WHERE P.Approved = 'False' And P.Rejected = 'True' {condition}
 
             return result;
         }
+        #endregion
+
+        #region GetAllApprovedProduct
+        public List<Product> GetAllApprovedProduct()
+        {
+            string res = $@"
+SELECT *
+FROM Product AS P
+WHERE (P.Status = '1' AND P.IsPriceAdded = 'True' AND P.Approved = 'True')
+";
+            var iquery = Session.CreateSQLQuery(res);
+            iquery.AddEntity(typeof(Product));
+            var result=iquery.List<Product>().ToList();
+
+            return result;
+        }
+
+        #endregion
+
     }
 }

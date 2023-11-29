@@ -396,6 +396,7 @@
     <Content Include="Images\404.jpg" />
     <Content Include="Images\dash.png" />
     <Content Include="Images\login.png" />
+    <Content Include="Images\logo.png" />
     <Content Include="Images\sort_asc.png" />
     <Content Include="Images\sort_asc_disabled.png" />
     <Content Include="Images\sort_both.png" />

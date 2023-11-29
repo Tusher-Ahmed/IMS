@@ -50,11 +50,24 @@ namespace IMS.Service
         #region Get All Product with Page number
         public GarmentsProductViewModel GetAllProduct(int pageNumber, long? supplierId)
         {
-            var query = _repository.GetAll().Where(u => u.Status == 1).ToList();
+            string condition = string.Empty;
             if (supplierId != 0)
             {
-                query = query.Where(u => u.GarmentsId==supplierId).ToList();
+               // query = query.Where(u => u.GarmentsId == supplierId).ToList();
+                condition = $" AND G.GarmentsId = '{supplierId}'";
             }
+
+            var re = $@"
+SELECT *
+FROM GarmentsProduct AS G
+WHERE G.Status = '1'
+{condition}
+";
+            var iquery = Session.CreateSQLQuery(re);
+            iquery.AddEntity(typeof(GarmentsProduct));
+            var query = iquery.List<GarmentsProduct>().ToList();
+
+            
            
 
             int pageSize = 12;

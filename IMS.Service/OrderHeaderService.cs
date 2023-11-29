@@ -19,6 +19,7 @@ namespace IMS.Service
         void UpdateStatus(long id, string orderStatus, string PaymentStatus=null);
         void UpdateStripeSessionAndIntent(long id, string sessionId,string paymentIntentId);
         List<OrderHeader> GetSellingReports(DateTime? start = null, DateTime? end = null, string searchText="");
+        List<OrderHeader> GetAllOrderHeadersWithCondition(string orderStatus = "", string paymentStatus = "");
     }
     public class OrderHeaderService:IOrderHeaderService
     {
@@ -137,6 +138,30 @@ namespace IMS.Service
         public List<OrderHeader> GetSellingReports(DateTime? start = null, DateTime? end = null, string searchText = "")
         {
             return _sellingReportDAO.SellingRecords(start, end, searchText);
+        }
+
+        public List<OrderHeader> GetAllOrderHeadersWithCondition(string orderStatus = "", string paymentStatus = "")
+        {
+            string condition = string.Empty;
+            if (!string.IsNullOrEmpty(orderStatus))
+            {
+                condition += $" OH.OrderStatus = '{orderStatus}'";
+            }
+
+            if (!string.IsNullOrEmpty(paymentStatus))
+            {
+                condition += $" AND OH.PaymentStatus = '{paymentStatus}'";
+            }
+            string res = $@"
+SELECT * 
+FROM OrderHeader AS OH 
+WHERE {condition}
+";
+            var iquery = Session.CreateSQLQuery(res);
+            iquery.AddEntity(typeof(OrderHeader));  
+            var result=iquery.List<OrderHeader>().ToList();
+
+            return result;
         }
     }
 }

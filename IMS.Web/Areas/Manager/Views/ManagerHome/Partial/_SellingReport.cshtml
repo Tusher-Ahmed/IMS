@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<IMS.Models.OrderHeader>
 
-<table id="reportTable" class="table table-striped mt-4">
+<table id="reportTable" class="table table-bordered mt-4">
     <thead>
         <tr>
             <th>Order Id</th>
@@ -29,8 +29,11 @@
                 <td>@item.OrderTotal.ToString("C")</td>
             </tr>
         }
-        <tr class="bg-dark text-white">
-            <td class="fw-bold text-white">Total :</td>
+        <tr>
+            <td colspan="5" style="border-right:none;border-left:none;"></td>
+        </tr>
+        <tr>
+            <td class="fw-bold text-dark">Total :</td>
             <td colspan="3"></td>
             @{
                 decimal totalAmount = 0;
@@ -39,7 +42,7 @@
             {
                 totalAmount += @item.OrderTotal;
             }
-            <td class="fw-bold text-white">@totalAmount.ToString("C")</td>
+            <td class="fw-bold text-dark">@totalAmount.ToString("C")</td>
         </tr>
     </tbody>
 </table>

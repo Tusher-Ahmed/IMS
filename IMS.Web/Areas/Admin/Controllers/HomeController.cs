@@ -71,8 +71,8 @@ namespace IMS.Web.Areas.Admin.Controllers
             {
                 AdminDashboardViewModel prod = new AdminDashboardViewModel
                 {
-                    Products = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true),
-                    TotalProduct = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true).Count(),
+                    Products = _product.GetAllApprovedProduct(),
+                    TotalProduct = _product.GetAllApprovedProduct().Count(),
                     TotalEmployee = GetEmployeeWithRoles(),
                     TotalShop = GetShopsWithRoles(),
                     orderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).ToList(),
@@ -105,7 +105,7 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                IEnumerable<Product> products = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true);
+                IEnumerable<Product> products = _product.GetAllApprovedProduct();
                 return View(products);
             }
             catch (Exception ex)

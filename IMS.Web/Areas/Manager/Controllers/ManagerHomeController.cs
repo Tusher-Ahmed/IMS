@@ -55,15 +55,15 @@ namespace IMS.Web.Areas.Manager.Controllers
             {
                 ManagerDashboardViewModel managerDashboardView = new ManagerDashboardViewModel
                 {
-                    TotalProducts = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true).Count(),
+                    TotalProducts = _product.GetAllApprovedProduct().Count(),
                     TotalShortage = _product.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded == true).Count(),
                     NewArrival = _product.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).Count(),
                     OrderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).ToList(),
-                    NewOrder = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Approved").Count(),
-                    Processing = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "InProcess").Count(),
+                    NewOrder = _orderHeaderService.GetAllOrderHeadersWithCondition("Approved").Count(),
+                    Processing = _orderHeaderService.GetAllOrderHeadersWithCondition("InProcess").Count(),
                     TotalCancel = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus != "Refunded").Count(),
-                    TotalShipped = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Shipped").Count(),
-                    TotalRefunded = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus == "Refunded").Count(),
+                    TotalShipped = _orderHeaderService.GetAllOrderHeadersWithCondition("Shipped").Count(),
+                    TotalRefunded = _orderHeaderService.GetAllOrderHeadersWithCondition("Cancelled", "Refunded").Count(),
 
                 };
 
@@ -84,7 +84,8 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var product = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true);
+               // var product = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true);
+                var product = _product.GetAllApprovedProduct();
                 return View(product);
             }
             catch (Exception ex)
