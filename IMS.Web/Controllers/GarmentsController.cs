@@ -143,7 +143,8 @@ namespace IMS.Web.Controllers
             try
             {
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var product = _garmentsService.GetAllP().Where(u => u.Status == 1 && u.GarmentsId == userId);
+                //var product = _garmentsService.GetAllP().Where(u => u.Status == 1 && u.GarmentsId == userId);
+                var product = _garmentsService.GetAllPro(1, userId);
                 return View(product);
             }
             catch (Exception ex)

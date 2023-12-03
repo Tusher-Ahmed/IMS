@@ -505,7 +505,7 @@ namespace IMS.Web.Controllers
                         existingProduct.Description = product.Description;
 
                         if (!string.IsNullOrEmpty(prod.Image))
-                        {
+                        {                          
                             existingProduct.Image = prod.Image;
                         }
                         else

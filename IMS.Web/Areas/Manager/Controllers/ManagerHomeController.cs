@@ -139,6 +139,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                         var path = Path.Combine(Server.MapPath("~/Images"), uniqueFileName);
                         ImageFile.SaveAs(path);
 
+
                         prod.Image = uniqueFileName;
                     }
                     prod.Description = product.Description;

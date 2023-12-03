@@ -2,6 +2,7 @@
 using IMS.DataAccess;
 using IMS.Models;
 using NHibernate;
+using NHibernate.Engine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace IMS.Service
         void UpdateStripeSessionAndIntent(long id, string sessionId,string paymentIntentId);
         List<OrderHeader> GetSellingReports(DateTime? start = null, DateTime? end = null, string searchText="");
         List<OrderHeader> GetAllOrderHeadersWithCondition(string orderStatus = "", string paymentStatus = "");
+        List<OrderHeader> GetOrderByStatus(string status = "All");
     }
     public class OrderHeaderService:IOrderHeaderService
     {
@@ -38,6 +40,7 @@ namespace IMS.Service
             _sellingReportDAO = new SellingReportDAO();
         }
 
+        #region Add Order Header
         public void AddOrderHeader(OrderHeader orderHeader)
         {
             
@@ -57,7 +60,9 @@ namespace IMS.Service
                 }
             }
         }
+        #endregion
 
+        #region Update OrderHeader
         public void Update(OrderHeader orderHeader)
         {
             using (var transaction = _session.BeginTransaction())
@@ -74,7 +79,9 @@ namespace IMS.Service
                 }
             }
         }
+        #endregion
 
+        #region Update Status
         public void UpdateStatus(long id, string orderStatus, string PaymentStatus = null)
         {
             var orderFromDb=_repository.GetById(id);
@@ -100,7 +107,9 @@ namespace IMS.Service
                 }
             }
         }
+        #endregion
 
+        #region Update Stripe Session And Intent
         public void UpdateStripeSessionAndIntent(long id, string sessionId, string paymentIntentId)
         {
             var orderFromDb = _repository.GetById(id);
@@ -124,22 +133,30 @@ namespace IMS.Service
             }
            
         }
+        #endregion
 
+        #region Get Order By Id
         public OrderHeader GetOrderHeaderById(long id)
         {
             return _repository.GetById(id);
         }
+        #endregion
 
+        #region Get All Order Headers
         public IEnumerable<OrderHeader> GetAllOrderHeaders()
         {
             return _repository.GetAll();
         }
+        #endregion
 
+        #region Get Selling Reports
         public List<OrderHeader> GetSellingReports(DateTime? start = null, DateTime? end = null, string searchText = "")
         {
             return _sellingReportDAO.SellingRecords(start, end, searchText);
         }
+        #endregion
 
+        #region GetAllOrderHeadersWithCondition
         public List<OrderHeader> GetAllOrderHeadersWithCondition(string orderStatus = "", string paymentStatus = "")
         {
             string condition = string.Empty;
@@ -163,5 +180,53 @@ WHERE {condition}
 
             return result;
         }
+        #endregion
+
+        #region GetOrderByStatus
+        public List<OrderHeader> GetOrderByStatus(string status = "All")
+        {
+            string condition=string.Empty;
+
+            if (status == "Approved")
+            {
+                condition += $" OH.OrderStatus = 'Approved'";
+            }
+            else if (status == "Shipped")
+            {
+                condition += $" OH.OrderStatus = 'Shipped'";
+            }
+            else if (status == "InProcess")
+            {
+                condition += $" OH.OrderStatus = 'InProcess'";
+            }
+            else if (status == "Delivered")
+            {
+                condition += $" OH.OrderStatus = 'Delivered'";
+            }
+            else if (status == "Cancelled")
+            {
+                condition += $" OH.OrderStatus = 'Cancelled' AND OH.PaymentStatus <> 'Refunded'";
+            }
+            else if (status == "Refunded")
+            {
+                condition += $" OH.OrderStatus = 'Cancelled' AND OH.PaymentStatus = 'Refunded'";
+            }
+            else if (status == "All")
+            {
+                condition += $" OH.OrderStatus IS NOT NULL ";
+            }
+
+            string res = $@"
+SELECT * 
+FROM OrderHeader AS OH 
+WHERE {condition}
+";
+            var iquery = Session.CreateSQLQuery(res);
+            iquery.AddEntity(typeof(OrderHeader));
+            var result = iquery.List<OrderHeader>().ToList();
+
+            return result;
+        }
+        #endregion
     }
 }

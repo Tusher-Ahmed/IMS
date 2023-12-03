@@ -28,7 +28,7 @@
                         <div class="row pl-2">
                             <p class="text-secondary"><span class="text-dark fw-bold">Product Sizes:</span> @Model.Product.SKU</p>
                         </div>
-                        <div class="row pl-2 pb-2">
+                        <div class="row pl-2 pb-2" id="ProductDescription">
                             <p class="text-secondary"><span class="text-dark fw-bold">Product Description:</span><br /> @Html.Raw(Model.Product.Description)</p>
                         </div>
                         @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Staff") || User.IsInRole("Garments"))

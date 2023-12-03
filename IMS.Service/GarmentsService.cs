@@ -16,6 +16,7 @@ namespace IMS.Service
     public interface IGarmentsService
     {
         IEnumerable<GarmentsProduct> GetAllP();
+        List<GarmentsProduct> GetAllPro(int status, long userId);
         GarmentsProductViewModel GetAllProduct(int pageNumber,long? supplierId);
         GarmentsProduct GetGarmentsProductById(long id);
         GarmentsProduct GetGarmentsProductByProductCode(int id);
@@ -66,8 +67,6 @@ WHERE G.Status = '1'
             var iquery = Session.CreateSQLQuery(re);
             iquery.AddEntity(typeof(GarmentsProduct));
             var query = iquery.List<GarmentsProduct>().ToList();
-
-            
            
 
             int pageSize = 12;
@@ -233,5 +232,20 @@ WHERE G.Status = '1'
         {
             return _session.Query<GarmentsProduct>().FirstOrDefault(x=>x.ProductCode == id);
         }
+
+        public List<GarmentsProduct> GetAllPro(int status, long userId)
+        {
+            string query = $@"
+SELECT *
+FROM GarmentsProduct AS GP
+WHERE GP.Status = '{status}' AND GP.GarmentsId = '{userId}'
+";
+            var iquery = Session.CreateSQLQuery(query);
+            iquery.AddEntity(typeof(GarmentsProduct));
+            var res = iquery.List<GarmentsProduct>().ToList();
+
+            return res;
+        }        
+
     }
 }
