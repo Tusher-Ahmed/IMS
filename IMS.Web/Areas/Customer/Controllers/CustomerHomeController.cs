@@ -76,36 +76,8 @@ namespace IMS.Web.Areas.Customer.Controllers
             try
             {
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var orderHeader = _orderHeaderService.GetAllOrderHeaders().Where(u => u.CustomerId == userId);
-                if (status == "Approved")
-                {
-                    return View(orderHeader.Where(u => u.OrderStatus == "Approved"));
-                }
-                else if (status == "Shipped")
-                {
-                    return View(orderHeader.Where(u => u.OrderStatus == "Shipped"));
-                }
-                else if (status == "InProcess")
-                {
-                    return View(orderHeader.Where(u => u.OrderStatus == "InProcess"));
-                }
-                else if (status == "Delivered")
-                {
-                    return View(orderHeader.Where(u => u.OrderStatus == "Delivered"));
-                }
-                else if (status == "Cancelled")
-                {
-                    return View(orderHeader.Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus != ShoppingHelper.StatusRefunded));
-                }
-                else if (status == "Refunded")
-                {
-                    return View(orderHeader.Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus == ShoppingHelper.StatusRefunded));
-                }
-                else if (status == "All")
-                {
-                    return View(orderHeader);
-                }
-
+                //var orderHeader = _orderHeaderService.GetAllOrderHeaders().Where(u => u.CustomerId == userId);
+                var orderHeader = _orderHeaderService.GetOrderByStatus(status , userId);              
                 return View(orderHeader);
             }
             catch (Exception ex)

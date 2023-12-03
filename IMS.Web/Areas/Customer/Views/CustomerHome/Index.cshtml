@@ -168,7 +168,7 @@
                             <div class="text-end p-1">
                                 @if (Model.OrderHeaders.Count() > 5)
                                 {
-                                    @Html.ActionLink("Show More", "OrderDetails", "CustomerHome", new { area = "Customer" }, new { @class = "btn btn-outline-success" })
+                                    @Html.ActionLink("Show More", "OrderDetails", "CustomerHome", new { area = "Customer" , status="All"}, new { @class = "btn btn-outline-success" })
                                 }
 
                             </div>

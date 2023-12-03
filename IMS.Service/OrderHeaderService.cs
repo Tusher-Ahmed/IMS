@@ -21,7 +21,7 @@ namespace IMS.Service
         void UpdateStripeSessionAndIntent(long id, string sessionId,string paymentIntentId);
         List<OrderHeader> GetSellingReports(DateTime? start = null, DateTime? end = null, string searchText="");
         List<OrderHeader> GetAllOrderHeadersWithCondition(string orderStatus = "", string paymentStatus = "");
-        List<OrderHeader> GetOrderByStatus(string status = "All");
+        List<OrderHeader> GetOrderByStatus(string status = "All", long? userId = 0);
     }
     public class OrderHeaderService:IOrderHeaderService
     {
@@ -183,9 +183,13 @@ WHERE {condition}
         #endregion
 
         #region GetOrderByStatus
-        public List<OrderHeader> GetOrderByStatus(string status = "All")
+        public List<OrderHeader> GetOrderByStatus(string status = "All", long? userId = 0)
         {
             string condition=string.Empty;
+            if(userId != 0)
+            {
+                condition += $" OH.CustomerId = '{userId}' AND";
+            }
 
             if (status == "Approved")
             {
@@ -217,8 +221,8 @@ WHERE {condition}
             }
 
             string res = $@"
-SELECT * 
-FROM OrderHeader AS OH 
+SELECT *  
+FROM OrderHeader AS OH  
 WHERE {condition}
 ";
             var iquery = Session.CreateSQLQuery(res);
