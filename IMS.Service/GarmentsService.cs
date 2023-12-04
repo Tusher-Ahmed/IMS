@@ -17,7 +17,7 @@ namespace IMS.Service
     {
         IEnumerable<GarmentsProduct> GetAllP();
         List<GarmentsProduct> GetAllPro(int status, long userId);
-        GarmentsProductViewModel GetAllProduct(int pageNumber,long? supplierId);
+        GarmentsProductViewModel GetAllProduct(GarmentsProductViewModel garmentsProduct,long? supplierId);
         GarmentsProduct GetGarmentsProductById(long id);
         GarmentsProduct GetGarmentsProductByProductCode(int id);
         void CreateGarmentsProduct(GarmentsProduct garmentsProduct);
@@ -49,13 +49,41 @@ namespace IMS.Service
         #endregion
 
         #region Get All Product with Page number
-        public GarmentsProductViewModel GetAllProduct(int pageNumber, long? supplierId)
+        public GarmentsProductViewModel GetAllProduct(GarmentsProductViewModel garmentsProduct, long? supplierId)
         {
             string condition = string.Empty;
             if (supplierId != 0)
             {
                // query = query.Where(u => u.GarmentsId == supplierId).ToList();
                 condition = $" AND G.GarmentsId = '{supplierId}'";
+            }
+            int pageNumber = 0;
+            if (garmentsProduct.PageNumber == 0)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                pageNumber = garmentsProduct.PageNumber;
+            }
+
+            int pageSize = 12;
+
+            //var query = _repository.GetAll().Where(u=>u.IsPriceAdded==true && u.Status==1);
+
+            if (garmentsProduct.SearchProductTypeId.HasValue)
+            {
+                condition += $" AND G.ProductTypeId = '{garmentsProduct.SearchProductTypeId.Value}'";
+            }
+
+            if (garmentsProduct.SearchDepartmentId.HasValue)
+            {
+                condition += $" AND G.DepartmentId = '{garmentsProduct.SearchDepartmentId.Value}'";
+            }
+
+            if (!string.IsNullOrWhiteSpace(garmentsProduct.SearchProductName))
+            {
+                condition += $" AND G.Name LIKE '%{garmentsProduct.SearchProductName}%' ";
             }
 
             var re = $@"
@@ -68,11 +96,9 @@ WHERE G.Status = '1'
             iquery.AddEntity(typeof(GarmentsProduct));
             var query = iquery.List<GarmentsProduct>().ToList();
            
-
-            int pageSize = 12;
             int totalCount = query.Count();
 
-            IEnumerable<GarmentsProduct> products = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            var products = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
             var resultModel = new GarmentsProductViewModel
             {
                 GarmentsProducts = products,

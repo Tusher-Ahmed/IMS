@@ -1,49 +1,78 @@
 ﻿@model IMS.Models.ViewModel.GarmentsProductViewModel
 
-<div class="row">
-    @foreach (var product in Model.GarmentsProducts)
-    {
-        <div class="col-md-6 col-lg-3 mt-2 mb-2">
-            <div class="card" style="width: 90%; margin-left:5%;">
-                <img src="@Url.Content("~/Images/" + product.Image)" class="card-img-top" alt="Product Image" style="height:280px;width:auto">
-                <div class="card-body">
-                    <p class="card-title text-uppercase" style="font-weight:bold;font-size:14px;">@product.Name</p>
-                    <p class="card-text" style="font-size:12px;">Sizes: @product.SKU</p>
-                    <p class="card-text" style="font-size:12px;">Price: @product.Price.ToString("C")</p>
-                    @* @Html.ActionLink("Product Details", "ProductDetails", "InventoryShopping", new { ProductId = product.Id, count = 1 }, new { @class = "btn btn-success" })*@
-                    <a href="@Url.Action("ProductDetails", "InventoryShopping",new {ProductId=product.Id ,count=1})" class="btn btn-success w-100">Product Details </a>
-                </div>
+@using (Html.BeginForm("Index", "Garments", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+    <div class="row pb-5 pt-2">
+        <div class="col-md-3 pb-1">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.SearchProductName, new { placeholder = "Search by Product Name", @class = "form-control", id = "SearchProductName" })
             </div>
         </div>
-    }
-</div>
-@if (Model.GarmentsProducts.Count() > 0)
-{
-    <div class=" row pt-5 mt-5 ">
-        <div class="col-md-6">
-            Page @Model.PageNumber of @Math.Ceiling((double)Model.TotalCount / Model.PageSize)
+
+        <div class="col-md-3 pb-1">
+            <div class="form-group">
+                @Html.DropDownList("SearchDepartmentId", new SelectList(Model.Departments, "Id", "Name"), "-- Select Department --", new { @class = "form-control" })
+            </div>
         </div>
 
-        <div class="text-end col-md-6">
-            @if (Model.PageNumber > 1)
-            {
-                <a href="@Url.Action("Index", new { pageNumber = Model.PageNumber - 1 })" class="btn btn-primary">Previous</a>
-            }
-            <span class="btn btn-light">@Model.PageNumber</span>
-            @if (Model.PageNumber < Math.Ceiling((double)Model.TotalCount / Model.PageSize))
-            {
-                <a href="@Url.Action("Index", new { pageNumber = Model.PageNumber + 1 })" class="btn btn-primary">Next</a>
-            }
-
-
+        <div class="col-md-3 pb-1">
+            <div class="form-group">
+                @Html.DropDownList("SearchProductTypeId", new SelectList(Model.ProductTypes, "Id", "Name"), "-- Select Product Type --", new { @class = "form-control" })
+            </div>
         </div>
 
+        <div class="col-md-3">
+            <div class="form-group">
+                <input type="submit" value="Search" class="btn btn-primary form-control" />
+            </div>
+        </div>
     </div>
 }
-else
-            {
-                <div>
-                    <h4>No data found in your product page...</h4>
-                </div>
-            }
+<div id="ProductList">
+    @Html.Partial("_GarmentsProductListPartial", Model)
+</div>
 
+@section Scripts{
+    <script>
+    $(document).ready(function () {
+        // Function to load products using AJAX
+        function loadProducts(pageNumber) {
+            // Gather search criteria
+            var searchProductName = $('#SearchProductName').val();
+            var searchProductTypeId = $('#SearchProductTypeId').val();
+            var searchDepartmentId = $('#SearchDepartmentId').val();
+
+            $.ajax({
+                url: '@Url.Action("Index", "Garments")',
+                type: 'GET',
+                data: {
+                    SearchProductName: searchProductName,
+                    SearchProductTypeId: searchProductTypeId,
+                    SearchDepartmentId: searchDepartmentId,
+                    PageNumber: pageNumber
+                },
+                success: function (result) {
+                    // Update the product list and pagination
+                    $('#ProductList').html(result);
+                },
+                error: function () {
+                    alert('Error loading products.');
+                }
+            });
+        }
+
+        // Handle form submission for searching
+        $('#searchForm').submit(function (e) {
+            e.preventDefault();
+            loadProducts(1); // Load the first page of results
+        });
+
+        // Handle pagination links
+        $(document).on('click', '.pagination a', function (e) {
+            e.preventDefault();
+            var pageNumber = $(this).data('page');
+            loadProducts(pageNumber);
+        });
+    });
+    </script>
+}
