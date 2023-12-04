@@ -44,7 +44,15 @@ namespace IMS.Service
         #region Customer Home page
         public ProductViewModel GetProducts(ProductViewModel product)
         {
-            int pageNumber = 1;
+            int pageNumber = 0;
+            if (product.PageNumber == 0)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                pageNumber = product.PageNumber;
+            }
             int pageSize =  12;
 
             //var query = _repository.GetAll().Where(u=>u.IsPriceAdded==true && u.Status==1);

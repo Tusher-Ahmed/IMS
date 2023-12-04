@@ -35,7 +35,7 @@ namespace IMS.Web.Controllers
 
         #region Garments Product Page
         [Authorize(Roles = "Admin,Manager,Supplier")]
-        public ActionResult Index(int pageNumber = 1)
+        public ActionResult Index(GarmentsProductViewModel GarmentsProduct)
         {
             try
             {
@@ -44,8 +44,15 @@ namespace IMS.Web.Controllers
                 {
                     supplierId = Convert.ToInt64(User.Identity.GetUserId());
                 }
-                var viewModel = _garmentsService.GetAllProduct(pageNumber, supplierId);
-                return View(viewModel);
+                GarmentsProduct = _garmentsService.GetAllProduct(GarmentsProduct, supplierId);
+                GarmentsProduct.ProductTypes = _productTypeService.GetAllType().ToList();
+                GarmentsProduct.Departments = _departmentService.GetAllDept().ToList();
+                if (Request.IsAjaxRequest())
+                {
+                    return PartialView("_GarmentsProductListPartial", GarmentsProduct);
+                }
+
+                return View(GarmentsProduct);
             }
             catch (Exception ex)
             {

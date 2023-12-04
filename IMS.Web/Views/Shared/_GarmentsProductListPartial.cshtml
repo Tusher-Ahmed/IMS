@@ -1,0 +1,49 @@
+﻿@model IMS.Models.ViewModel.GarmentsProductViewModel
+
+<div class="row">
+    @foreach (var product in Model.GarmentsProducts)
+    {
+        <div class="col-md-6 col-lg-3 mt-2 mb-2">
+            <div class="card" style="width: 90%; margin-left:5%;">
+                <img src="@Url.Content("~/Images/" + product.Image)" class="card-img-top" alt="Product Image" style="height:280px;width:auto">
+                <div class="card-body">
+                    <p class="card-title text-uppercase" style="font-weight:bold;font-size:14px;">@product.Name</p>
+                    <p class="card-text" style="font-size:12px;">Sizes: @product.SKU</p>
+                    <p class="card-text" style="font-size:12px;">Price: @product.Price.ToString("C")</p>
+                    @* @Html.ActionLink("Product Details", "ProductDetails", "InventoryShopping", new { ProductId = product.Id, count = 1 }, new { @class = "btn btn-success" })*@
+                    <a href="@Url.Action("ProductDetails", "InventoryShopping",new {ProductId=product.Id ,count=1})" class="btn btn-success w-100">Product Details </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@if (Model.GarmentsProducts.Count() > 0)
+{
+    <div class=" row pt-5 mt-5 ">
+        <div class="col-md-6">
+            Page @Model.PageNumber of @Math.Ceiling((double)Model.TotalCount / Model.PageSize)
+        </div>
+
+        <div class="text-end col-md-6">
+            @if (Model.PageNumber > 1)
+            {
+                <a href="@Url.Action("Index", new { pageNumber = Model.PageNumber - 1 })" class="btn btn-primary">Previous</a>
+            }
+            <span class="btn btn-light">@Model.PageNumber</span>
+            @if (Model.PageNumber < Math.Ceiling((double)Model.TotalCount / Model.PageSize))
+            {
+                <a href="@Url.Action("Index", new { pageNumber = Model.PageNumber + 1 })" class="btn btn-primary">Next</a>
+            }
+
+
+        </div>
+
+    </div>
+}
+else
+{
+    <div>
+        <h4>No relatable data found!</h4>
+    </div>
+}
+
