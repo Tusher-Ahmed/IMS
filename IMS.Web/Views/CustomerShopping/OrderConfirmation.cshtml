@@ -1,6 +1,6 @@
 ﻿@model IMS.Models.ViewModel.CustomerInvoiceViewModel
 
-<a href="@Url.Action("Index", "CustomerHome", new {area="Customer"})" class="dont-show mt-2 btn btn-outline-info">
+<a href="@Url.Action("Index", "CustomerHome", new {area="Customer"})" class="no-print mt-2 btn btn-outline-info">
     <i class="fa-solid fa-circle-left"></i>
 </a>
 <div class="row">
@@ -132,7 +132,9 @@
                             </tbody>
                         </table>
                     </div>
-                  
+                    <div class="col-12 text-end pt-3 pb-3 no-print">
+                        <button class="btn btn-primary" onclick="window.print();">Print Invoice</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,26 +144,66 @@
 @section Scripts{
     <script>
         window.onbeforeprint = function () {
-            var btn = document.querySelectorAll(".dont-show");
             var elementsToHide = document.querySelectorAll('.no-print');
             for (var i = 0; i < elementsToHide.length; i++) {
                 elementsToHide[i].style.display = 'none';
             }
-            for (var i = 0; i < btn.length; i++) {
-                btn[i].style.display = 'none';
+
+            var watermarkImage = document.querySelector('#watermark img');
+            if (watermarkImage) {
+                watermarkImage.style.display = 'block';
             }
         }
 
         window.onafterprint = function () {
-            var btn = document.querySelectorAll(".dont-show");
             var elementsToHide = document.querySelectorAll('.no-print');
             for (var i = 0; i < elementsToHide.length; i++) {
                 elementsToHide[i].style.display = '';
             }
-            for (var i = 0; i < btn.length; i++) {
-                btn[i].style.display = 'none';
+
+            var watermarkImage = document.querySelector('#watermark img');
+            if (watermarkImage) {
+                watermarkImage.style.display = 'none';
             }
         }
+
+        window.onload = function () {
+            function addWatermark() {
+                var watermarkDiv = document.createElement('div');
+                watermarkDiv.id = 'watermark';
+
+                var image = new Image();
+                image.src = '/Images/logo.png';
+                image.alt = 'IMS';
+                image.style = 'position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); opacity: 0.1; pointer-events: none; display: none; width: 350px; height: 400px;';
+
+                image.onload = function () {
+                    watermarkDiv.appendChild(image);
+                    document.body.appendChild(watermarkDiv);
+
+                    // Show the watermark only in print
+                    if (window.matchMedia) {
+                        var mediaQueryList = window.matchMedia('print');
+                        mediaQueryList.addListener(function (mql) {
+                            if (mql.matches) {
+                                image.style.display = 'block';
+                            } else {
+                                image.style.display = 'none';
+                            }
+                        });
+
+                        // Initial check for print media type
+                        if (mediaQueryList.matches) {
+                            image.style.display = 'block';
+                        }
+                    }
+                };
+
+                document.body.appendChild(watermarkDiv);
+            }
+
+            addWatermark();
+        };
     </script>
 
 }

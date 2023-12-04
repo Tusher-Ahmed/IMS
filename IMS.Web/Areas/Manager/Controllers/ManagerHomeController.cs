@@ -56,13 +56,13 @@ namespace IMS.Web.Areas.Manager.Controllers
                 ManagerDashboardViewModel managerDashboardView = new ManagerDashboardViewModel
                 {
                     TotalProducts = _product.GetAllApprovedProduct().Count(),
-                    TotalShortage = _product.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded == true).Count(),
-                    NewArrival = _product.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).Count(),
+                    TotalShortage = _product.GetAllShortageProduct().Count(),
+                    NewArrival = _product.GetAllNewProduct().Count(),
                     OrderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).ToList(),
-                    NewOrder = _orderHeaderService.GetAllOrderHeadersWithCondition("Approved").Count(),
-                    Processing = _orderHeaderService.GetAllOrderHeadersWithCondition("InProcess").Count(),
-                    TotalCancel = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == "Cancelled" && u.PaymentStatus != "Refunded").Count(),
-                    TotalShipped = _orderHeaderService.GetAllOrderHeadersWithCondition("Shipped").Count(),
+                    NewOrder = _orderHeaderService.GetOrderByStatus("Approved").Count(),
+                    Processing = _orderHeaderService.GetOrderByStatus("InProcess").Count(),
+                    TotalCancel = _orderHeaderService.GetOrderByStatus("Cancelled").Count(),
+                    TotalShipped = _orderHeaderService.GetOrderByStatus("Shipped").Count(),
                     TotalRefunded = _orderHeaderService.GetAllOrderHeadersWithCondition("Cancelled", "Refunded").Count(),
 
                 };

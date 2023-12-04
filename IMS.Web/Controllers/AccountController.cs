@@ -249,7 +249,7 @@ namespace IMS.Web.Controllers
                     };
                     _customerService.AddCustomer(customer);
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-
+                    TempData["success"] = "Shop Registered Successfully!";
                     return RedirectToAction("Index", "Product", new { area = "" });
                 }
                 AddErrors(result);
@@ -299,7 +299,7 @@ namespace IMS.Web.Controllers
                     };
                     _supplierService.AddSupplier(supplier);
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-
+                    TempData["success"] = "Garments Registered Successfully!";
                     return RedirectToAction("Index", "Garments", new { area = "" });
                 }
                 AddErrors(result);

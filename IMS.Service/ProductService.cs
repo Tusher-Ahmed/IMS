@@ -23,6 +23,8 @@ namespace IMS.Service
         List<Product> GetAllProductByProductCode(int ProductCode);
         List<Product> GetAllApprovedProduct();
         List<Product> GetRejectHistory(DateTime? startDate=null, DateTime? endDate = null);
+        List<Product> GetAllShortageProduct();
+        List<Product> GetAllNewProduct();
     }
 
     public class ProductService:IProductService
@@ -214,6 +216,35 @@ WHERE (P.Status = '1' AND P.IsPriceAdded = 'True' AND P.Approved = 'True')
             var iquery = Session.CreateSQLQuery(res);
             iquery.AddEntity(typeof(Product));
             var result=iquery.List<Product>().ToList();
+
+            return result;
+        }
+
+        public List<Product> GetAllShortageProduct()
+        {
+            string res = $@"
+SELECT *
+FROM Product AS P
+WHERE ( P.Quantity <= '0' AND P.IsPriceAdded = 'True')
+";
+            var iquery = Session.CreateSQLQuery(res);
+            iquery.AddEntity(typeof(Product));
+            var result = iquery.List<Product>().ToList();
+
+            return result;
+        }
+
+        public List<Product> GetAllNewProduct()
+        {
+            //GetAllNewProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0)
+            string res = $@"
+SELECT *
+FROM Product AS P
+WHERE ( P.Approved = 'True' AND P.IsPriceAdded = 'False' AND P.Status = '0')
+";
+            var iquery = Session.CreateSQLQuery(res);
+            iquery.AddEntity(typeof(Product));
+            var result = iquery.List<Product>().ToList();
 
             return result;
         }

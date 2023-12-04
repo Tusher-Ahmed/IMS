@@ -6,6 +6,7 @@ using IMS.Utility;
 using IMS.Web.Controllers;
 using Microsoft.AspNet.Identity;
 using NHibernate;
+using NHibernate.Engine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace IMS.Web.Areas.Customer.Controllers
             try
             {
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var orderHeaders = _orderHeaderService.GetAllOrderHeaders().Where(u => u.CustomerId == userId);
+                var orderHeaders = _orderHeaderService.GetOrderByStatus("All", userId);
                 List<OrderDetail> orders = new List<OrderDetail>();
                 foreach (var item in orderHeaders)
                 {
@@ -53,10 +54,10 @@ namespace IMS.Web.Areas.Customer.Controllers
                 {
                     OrderHeaders = orderHeaders,
                     OrderDetails = orders,
-                    TotalOrders = orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusDelivered).Count(),
+                    TotalOrders = _orderHeaderService.GetOrderByStatus("Delivered", userId).Count(),
                     NewArrival = orderHeaders.Where(u => u.OrderStatus != ShoppingHelper.StatusDelivered &&
                           u.OrderStatus != ShoppingHelper.StatusCancelled && u.OrderStatus != ShoppingHelper.StatusRefunded).Count(),
-                    TotalCanceledOrder = orderHeaders.Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled).Count()
+                    TotalCanceledOrder = _orderHeaderService.GetOrderByStatus("Cancelled", userId).Count()
                 };
 
                 return View(viewModel);
