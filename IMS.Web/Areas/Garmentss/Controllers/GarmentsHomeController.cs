@@ -3,6 +3,7 @@ using IMS.Service;
 using IMS.Web.Models;
 using Microsoft.AspNet.Identity;
 using NHibernate;
+using NHibernate.Criterion;
 using NHibernate.Util;
 using System;
 using System.Collections.Generic;
@@ -31,14 +32,19 @@ namespace IMS.Web.Areas.Garmentss.Controllers
         {
             try
             {
+                var context = new ApplicationDbContext();
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
                 var history = _inventoryOrderHistoryService.GetAll().Where(u => u.GarmentsId == userId);
 
                 Dictionary<long, decimal> TotalPrice = new Dictionary<long, decimal>();
+                Dictionary<long, string> orderBy = new Dictionary<long, string>();
 
+                string manager = string.Empty;
                 foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
                 {
                     TotalPrice.Add(item.OrderId, TotalAmount(item.OrderId));
+                    manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
+                    orderBy.Add(item.OrderId, manager);
                 }
 
                 GarmentsDashboardViewModel viewModel = new GarmentsDashboardViewModel
@@ -48,6 +54,7 @@ namespace IMS.Web.Areas.Garmentss.Controllers
                     TotalHistory = _inventoryOrderHistoryService.GetAll().Where(u => u.GarmentsId == userId).GroupBy(u => u.OrderId).Select(u => u.First()).Count(),
                     OrderHistory = history,
                     TotalPrice = TotalPrice,
+                    OrderBy = orderBy,
                 };
 
                 return View(viewModel);
@@ -66,20 +73,27 @@ namespace IMS.Web.Areas.Garmentss.Controllers
         {
             try
             {
+                var context = new ApplicationDbContext();
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
                 var history = _inventoryOrderHistoryService.GetAll().Where(u => u.GarmentsId == userId);
 
                 Dictionary<long, decimal> TotalPrice = new Dictionary<long, decimal>();
+                Dictionary<long, string> orderBy = new Dictionary<long, string>();
+
+                string manager = string.Empty;
 
                 foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
                 {
                     TotalPrice.Add(item.OrderId, TotalAmount(item.OrderId));
+                    manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
+                    orderBy.Add(item.OrderId, manager);
                 }
 
                 GarmentsOrderHistoryViewModel garmentsOrderHistoryViewModel = new GarmentsOrderHistoryViewModel
                 {
                     OrderHistory = history,
                     TotalPrice = TotalPrice,
+                    OrderBy = orderBy
                 };
 
                 return View(garmentsOrderHistoryViewModel);

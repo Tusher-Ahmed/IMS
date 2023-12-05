@@ -16,6 +16,7 @@
     <thead>
         <tr>
             <th class="border-top-0">Order Id</th>
+            <th class="border-top-0">ORDER By</th>
             <th class="border-top-0">ORDER DATE</th>
             <th class="border-top-0">TOTAL PRICE</th>
             <th class="border-top-0">Actions</th>
@@ -36,6 +37,7 @@
             }
             <tr>
                 <td class="txt-oflo">@num</td>
+                <td class="txt-oflo">@Model.OrderBy[item.OrderId]</td>
                 <td class="txt-oflo">@item.CreationDate.ToString().AsDateTime().ToShortDateString()</td>
                 <td class="txt-oflo">@Model.TotalPrice[item.OrderId].ToString("C")</td>
                 <td>

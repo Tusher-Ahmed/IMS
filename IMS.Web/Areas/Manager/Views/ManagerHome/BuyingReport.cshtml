@@ -96,7 +96,7 @@
             {
 
                 <tr>
-                    <td class="fw-bold text-dark">Total Return Amount:</td>
+                    <td class="fw-bold text-dark">Total Return Amount (-) :</td>
                     <td colspan="2"></td>
                     @foreach (var item in Model.RejectProducts)
                     {
@@ -110,7 +110,7 @@
                 <td colspan="4" style="border-right:none;border-left:none;"></td>
             </tr>
             <tr style="border-top:3px solid #000">
-                <td class="fw-bold text-dark">Total Order Cost:</td>
+                <td class="fw-bold text-dark">Total Order Cost :</td>
                 <td colspan="2"></td>
                 <td class="fw-bold text-dark">@((totalAmount-returnAmount).ToString("C"))</td>
             </tr>

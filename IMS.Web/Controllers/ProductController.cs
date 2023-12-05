@@ -419,7 +419,7 @@ namespace IMS.Web.Controllers
         }
         #endregion
 
-        #region Set Price and Status by Manager
+        #region Manage Price
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult ManagePrice()
         {
@@ -447,6 +447,9 @@ namespace IMS.Web.Controllers
             }
 
         }
+        #endregion
+
+        #region Set Price and Status by Manager
         [Authorize(Roles = "Manager,Admin")]
         public ActionResult SetPrice(long id)
         {

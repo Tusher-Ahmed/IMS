@@ -13,5 +13,6 @@ namespace IMS.Models.ViewModel
         public int TotalHistory {  get; set; }
         public IEnumerable<OrderHistory> OrderHistory { get; set; }
         public Dictionary<long, decimal> TotalPrice { get; set; }
+        public Dictionary<long, string> OrderBy { get; set; }
     }
 }
