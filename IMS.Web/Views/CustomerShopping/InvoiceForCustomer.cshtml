@@ -190,7 +190,7 @@
                     // Show the watermark only in print
                     if (window.matchMedia) {
                         var mediaQueryList = window.matchMedia('print');
-                        mediaQueryList.addListener(function (mql) {
+                        mediaQueryList.addEventListener('change', function (mql) {
                             if (mql.matches) {
                                 image.style.display = 'block';
                             } else {

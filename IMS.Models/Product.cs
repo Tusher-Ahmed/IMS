@@ -14,7 +14,7 @@ namespace IMS.Models
         public virtual long Id { get; set; }
         [Required(ErrorMessage = "Product Name is required.")]
         [Display(Name = "Product Name")]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Product Name must be between 3 and 50 characters.")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Product Name must be between 3 and 100 characters.")]
         // [RegularExpression(@"^[a-zA-Z]{3,}(?: [a-zA-Z]+)*$", ErrorMessage = "Invalid Keyword!!")]
         [RegularExpression(@"^[a-zA-Z'""\(\)_\-, ]*$", ErrorMessage = "Invalid Product Name!!")]
         public virtual string Name { get; set; }

@@ -10,7 +10,6 @@
 @using (Html.BeginForm("Create", "Garments", FormMethod.Post, new { enctype = "multipart/form-data", @class = "pb-4 pt-2" }))
 {
     @Html.AntiForgeryToken()
-    @Html.ValidationSummary("", new { @class = "text-danger" });
 
     <div class="form-group">
         @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-12" })
@@ -63,7 +62,7 @@
     <br />
     <div class="form-group">
         @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-12" })
-        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
+        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4" })
         @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
     </div>
     <br />
@@ -74,7 +73,7 @@
 @section Scripts{
     <script>
         tinymce.init({
-            selector: 'textarea#tiny',
+            selector: 'textarea#Description',
             plugins: 'anchor autolink charmap codesample emoticons image link lists searchreplace table visualblocks wordcount mediaembed editimage mergetags tinymcespellchecker autocorrect a11ychecker typography inlinecss',
             toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image table mergetags | align lineheight | tinycomments | numlist bullist indent outdent | emoticons charmap | removeformat',
             menubar: false,
@@ -118,11 +117,6 @@
             $('#SKU').val(selectedSKUs);
         });
 
-                    //$(document).on("click", "#btnAdd", function (e) {
-                    //    e.preventDefault();
-                    //    let a = $("#Description").val();
-                    //    console.log(a);
-                    //})
     </script>
 }
 <script src="~/Scripts/jquery-3.4.1.min.js"></script>
