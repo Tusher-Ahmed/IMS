@@ -87,20 +87,20 @@ namespace IMS.Web.Controllers
         [ValidateInput(false)] // Allow HTML input
         public ActionResult Create([Bind(Exclude = "ImageFile")] GarmentsProduct model, HttpPostedFileBase ImageFile)
         {
-            if (ImageFile != null && ImageFile.ContentLength > 0)
-            {
-
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
-
-                var path = Path.Combine(Server.MapPath("~/Images"), uniqueFileName);
-                ImageFile.SaveAs(path);
-
-                model.Image = uniqueFileName;
-            }
-            else
+            if (ImageFile == null || ImageFile.ContentLength <= 0)
             {
                 ModelState.AddModelError("Image", "Image is required");
 
+                var dept = _departmentService.GetAllDept();
+                var productT = _productTypeService.GetAllType();
+                ViewBag.Departments = new SelectList(dept, "Id", "Name");
+                ViewBag.ProductTypes = new SelectList(productT, "Id", "Name");
+
+                return View(model);
+            }
+            if (model.Description == null)
+            {
+                ModelState.AddModelError("Description", "Please enter the description");
                 var dept = _departmentService.GetAllDept();
                 var productT = _productTypeService.GetAllType();
                 ViewBag.Departments = new SelectList(dept, "Id", "Name");
@@ -113,7 +113,13 @@ namespace IMS.Web.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    
+                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+
+                    var path = Path.Combine(Server.MapPath("~/Images"), uniqueFileName);
+                    ImageFile.SaveAs(path);
+
+                    model.Image = uniqueFileName;
+
                     // Set other product-related properties
                     model.ProductType = _productTypeService.GetProductTypeById((long)model.ProductTypeId);
                     model.Department = _departmentService.GetDeptById((long)model.DepartmentId);
@@ -138,9 +144,8 @@ namespace IMS.Web.Controllers
                 log.Error("An error occurred in YourAction.", ex);
                 return RedirectToAction("Index", "Error");
             }
-            
         }
-       
+
         #endregion
 
         #region Product List
