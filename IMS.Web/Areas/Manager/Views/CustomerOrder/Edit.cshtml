@@ -18,15 +18,15 @@
 
                         @if (User.IsInRole("Manager"))
                         {
-                            <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
+                            <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="All"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
                         }
                         else if (User.IsInRole("Customer"))
                         {
-                            <a href="@Url.Action("Index", "CustomerHome", new {area="Customer"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
+                            <a href="@Url.Action("Index", "CustomerHome", new {area="Customer",status="All"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
                         }
                         else if (User.IsInRole("Admin"))
                         {
-                            <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
+                            <a href="@Url.Action("Index", "CustomerOrder", new {area="Manager",status="All"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
                         }
 
                     </div>

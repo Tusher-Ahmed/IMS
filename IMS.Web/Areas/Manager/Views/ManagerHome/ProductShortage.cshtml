@@ -6,7 +6,7 @@
 
 <div class="row pt-2 pb-4 mb-4">
     <div class="col-md-6">
-        <h4 class="text-uppercase">Product Shortage List</h4>
+        <h4 class="text-uppercase">Product Shortage list</h4>
     </div>
     <div class="col-md-6 text-end">
         @if (User.IsInRole("Manager"))
@@ -19,7 +19,7 @@
         }
     </div>
 </div>
-<table class="table table-striped table-hover" id="shortageProduct">
+<table class=" table table-striped table-hover" id="shortageProduct">
     <thead>
         <tr>
             <th>No.</th>
@@ -32,7 +32,7 @@
     <tbody>
         @{ int i = 0;
             int j = 1;
-            }
+        }
         @foreach (var item in Model.products)
         {
             <tr>
@@ -42,7 +42,7 @@
                 @if (Model.ShortageCounts.Count() != 0)
                 {
                     <td>@Model.ShortageCounts.ElementAt(i)</td>
-                    @Model.ProductIds.ElementAt(i)
+                    
                     if (Model.IsInOrders[Model.ProductIds.ElementAt(i)])
                     {
                         <td>
@@ -83,10 +83,10 @@
                 imageUrl: "/Images/stock.jpg",
                 imageWidth: 400,
                 imageHeight: 200,
-                imageAlt: "Custom image"
+                imageAlt: "Already in ordered queue!"
             });
             return false;
-        } 
+        }
     </script>
 }
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

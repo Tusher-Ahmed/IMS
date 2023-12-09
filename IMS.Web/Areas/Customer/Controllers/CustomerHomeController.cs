@@ -57,7 +57,7 @@ namespace IMS.Web.Areas.Customer.Controllers
                     TotalOrders = _orderHeaderService.GetOrderByStatus("Delivered", userId).Count(),
                     NewArrival = orderHeaders.Where(u => u.OrderStatus != ShoppingHelper.StatusDelivered &&
                           u.OrderStatus != ShoppingHelper.StatusCancelled && u.OrderStatus != ShoppingHelper.StatusRefunded).Count(),
-                    TotalCanceledOrder = _orderHeaderService.GetOrderByStatus("Cancelled", userId).Count()
+                    TotalCanceledOrder = _orderHeaderService.GetOrderByStatus("Refunded", userId).Count()
                 };
 
                 return View(viewModel);
