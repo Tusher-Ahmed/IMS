@@ -295,7 +295,7 @@ namespace IMS.Web.Controllers
                         StreetAddress = model.StreetAddress,
                         Thana = model.Thana,
                         PostalCode = model.PostalCode,
-                        UserId = user.Id,
+                        UserId = user.Id,                        
                     };
                     _supplierService.AddSupplier(supplier);
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
@@ -383,7 +383,7 @@ namespace IMS.Web.Controllers
         }
         #endregion
 
-        #region Staff Registration by Admin
+        #region Staff Registration by Manager
         [Authorize(Roles = "Manager")]
         public ActionResult StaffRegister()
         {
@@ -419,6 +419,7 @@ namespace IMS.Web.Controllers
                         PostalCode = model.PostalCode,
                         UserId = user.Id,
                         CreatedBy = ManagerId,
+                        Status=1
                     };
                     _employeeService.AddEmployee(employee);
                     //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
