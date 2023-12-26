@@ -1,4 +1,4 @@
-#Project: Inventory Management System (IMS) with ASP.NET MVC 5, NHibernate, Entity Framework, and MSSQL 2019
+##Project: Inventory Management System (IMS) with ASP.NET MVC 5, NHibernate, Entity Framework, and MSSQL 2019
 
 #Roles:
 
