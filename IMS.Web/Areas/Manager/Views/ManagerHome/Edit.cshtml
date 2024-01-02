@@ -21,8 +21,8 @@
                 <div class="row">
                     <div class="form-group mb-3">
                         @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-12 mb-1" })
-                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", @placeholder = "Product Name..." } })
-                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control",id="Name", @placeholder = "Product Name..." } })
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger", id="nameValidation" })
                     </div>
                     <br />
                     <div class="form-group col-6 mb-3">
@@ -74,7 +74,7 @@
 
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Save Changes" class="btn btn-outline-success" />
+                        <input type="submit" value="Save Changes" id="btnSubmit" class="btn btn-outline-success" />
                         @Html.ActionLink("Back to List", "ProductList", "ManagerHome", null, new { @class = "btn btn-outline-info" })
                     </div>
                 </div>
@@ -125,7 +125,16 @@
             },
 
             ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
-        });</script>
+        });
+
+        $('#btnSubmit').on('click', function (e) {
+            var name = $('#Name').val();
+            if ((name.match(/[a-zA-Z]/g) || []).length < 3) {
+                $('#nameValidation').text('Product name must contain at least three letters.');
+                e.preventDefault();
+            }
+        });
+    </script>
 }
 <script src="~/Scripts/jquery-3.4.1.min.js"></script>
 <script src="~/Scripts/jquery.validate.min.js"></script>

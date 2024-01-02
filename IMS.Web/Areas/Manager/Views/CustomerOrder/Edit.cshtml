@@ -301,7 +301,7 @@
                                 }
                             }
 
-                            @if (@Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(3) <= DateTime.Now && (User.IsInRole("Admin") || User.IsInRole("Manager")) && Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
+                            @if (true ||@Model.OrderHeader.ShippingDate.ToString().AsDateTime().AddDays(3) <= DateTime.Now && (User.IsInRole("Admin") || User.IsInRole("Manager")) && Model.OrderHeader.OrderStatus == IMS.Utility.ShoppingHelper.StatusShipped)
                             {
                                 <input type="submit" class="btn btn-dark form-control my-1 text-uppercase" value="Delivered Order" formaction="@Url.Action("DeliveredOrder", "CustomerOrder", new { area = "Manager" })" />
                             }

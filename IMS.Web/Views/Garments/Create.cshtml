@@ -36,7 +36,7 @@
         </div>
 
         @Html.HiddenFor(model => model.SKU)
-        @Html.ValidationMessageFor(model => model.SKU, "", new { @class = "text-danger" })
+        @Html.ValidationMessageFor(model => model.SKU, "", new { @class = "text-danger" ,id= "skuValidationMessage" })
     </div>
     <br />
     <div class="form-group">
@@ -109,13 +109,29 @@
 
             ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
         });
+
         $('input[name="SelectedSKUs"]').on('change', function () {
             var selectedSKUs = $('input[name="SelectedSKUs"]:checked').map(function () {
                 return this.value;
             }).get().join(',');
 
             $('#SKU').val(selectedSKUs);
+            validateSKU(selectedSKUs);
         });
+
+        function validateSKU(selectedSKUs) {
+            var errorMessage = "Product Sizes are required";
+
+            if (!selectedSKUs || selectedSKUs.split(',').length ==0) {
+                $('#skuValidationMessage').text(errorMessage);
+            } else {
+
+                $('#skuValidationMessage').text("");
+            }
+
+        }
+
+
 
     </script>
 }

@@ -147,6 +147,7 @@ namespace IMS.Web.Controllers
         #endregion
 
         #region Order Summary with stripe
+        [HttpGet]
         public ActionResult Summary()
         {
             try

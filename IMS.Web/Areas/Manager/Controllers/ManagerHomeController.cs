@@ -121,10 +121,11 @@ namespace IMS.Web.Areas.Manager.Controllers
         [Authorize(Roles = "Manager")]
         public ActionResult Edit(long id, IMS.Models.Product product, HttpPostedFileBase ImageFile)
         {
+            
             try
             {
                 var prod = _product.GetProductById(id);
-                
+
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
                 if (prod != null)
                 {

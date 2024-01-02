@@ -480,11 +480,6 @@ namespace IMS.Web.Controllers
             {
                 var prod = _product.GetProductById(id);
                 
-                if (string.IsNullOrEmpty(product.Description))
-                {
-                    ModelState.AddModelError("Description", "Product Description Is Required.");
-                    return View(prod);
-                }
                 if (prod != null)
                 {
                     if (ImageFile != null && ImageFile.ContentLength > 0)

@@ -90,23 +90,21 @@ namespace IMS.Web.Controllers
             if (ImageFile == null || ImageFile.ContentLength <= 0)
             {
                 ModelState.AddModelError("Image", "Image is required");
-
-                var dept = _departmentService.GetAllDept();
-                var productT = _productTypeService.GetAllType();
-                ViewBag.Departments = new SelectList(dept, "Id", "Name");
-                ViewBag.ProductTypes = new SelectList(productT, "Id", "Name");
-
-                return View(model);
             }
-            if (model.Description == null)
+
+            if(model.SKU == null)
             {
                 ModelState.AddModelError("Description", "Please enter the description");
-                var dept = _departmentService.GetAllDept();
-                var productT = _productTypeService.GetAllType();
-                ViewBag.Departments = new SelectList(dept, "Id", "Name");
-                ViewBag.ProductTypes = new SelectList(productT, "Id", "Name");
+            }
 
-                return View(model);
+            if (model.Description == null)
+            {
+                ModelState.AddModelError("SKU", "Please enter the description");
+            }
+
+            if (model.Name.Count(char.IsLetter) < 3)
+            {
+                ModelState.AddModelError("Name", "Product name must contain at least three letters.");
             }
 
             try
@@ -224,6 +222,18 @@ namespace IMS.Web.Controllers
             try
             {
                 var product = _garmentsService.GetGarmentsProductById(id);
+                gv.GarmentsProduct.Image = product.Image;
+
+                if (gv.GarmentsProduct.Name.Count(char.IsLetter) < 3)
+                {
+                    ModelState.AddModelError("GarmentsProduct.Name", "Product name must contain at least three letters.");
+                    var dept = _departmentService.GetAllDept();
+                    var productT = _productTypeService.GetAllType();
+                    ViewBag.Departments = new SelectList(dept, "Id", "Name", product.Department.Id);
+                    ViewBag.ProductTypes = new SelectList(productT, "Id", "Name", product.ProductType.Id);
+
+                    return View(gv);
+                }
 
                 if (gv.SelectedSKUs != null)
                 {
@@ -231,7 +241,7 @@ namespace IMS.Web.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("SKU", "SKU is required!!");
+                    ModelState.AddModelError("SelectedSKUs", "Product Sizes are required!!");
 
                     var dept = _departmentService.GetAllDept();
                     var productT = _productTypeService.GetAllType();
@@ -249,7 +259,7 @@ namespace IMS.Web.Controllers
                     return View(garmentsEditView);
                 }
 
-                gv.GarmentsProduct.Image = product.Image;
+                
 
                 if (ModelState.IsValid)
                 {

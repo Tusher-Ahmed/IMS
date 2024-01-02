@@ -33,6 +33,7 @@
 </div>
 
 @section Scripts{
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
     <script>
     $(document).ready(function () {
         // Function to load products using AJAX
@@ -63,12 +64,14 @@
 
         // Handle form submission for searching
         $('#searchForm').submit(function (e) {
+            console.log("hello there");
             e.preventDefault();
             loadProducts(1); // Load the first page of results
         });
 
         // Handle pagination links
         $(document).on('click', '.pagination a', function (e) {
+            console.log("hi there");
             e.preventDefault();
             var pageNumber = $(this).data('page');
             loadProducts(pageNumber);
