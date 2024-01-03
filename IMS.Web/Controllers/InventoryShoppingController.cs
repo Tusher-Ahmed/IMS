@@ -6,6 +6,7 @@ using NHibernate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 
@@ -130,25 +131,41 @@ namespace IMS.Web.Controllers
         
         public JsonResult IncrementCount(long id)
         {
-            var cart = _inventoryShoppingService.GetproductById(id);
-            _inventoryShoppingService.IncrementCount(cart, 1);
-            var newTotalPrice = CalculateTotalPrice();
-            return Json(new { newCount = cart.Count, newTotalPrice }); ;
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
+
+            var cart = _inventoryShoppingService.GetproductById(id,userId);
+            if (cart != null)
+            {
+                _inventoryShoppingService.IncrementCount(cart, 1);
+                var newTotalPrice = CalculateTotalPrice();
+                return Json(new { newCount = cart.Count, newTotalPrice });
+            }
+            Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            log.Error("User ID mismatch");
+            return Json(new { message = "User ID mismatch" });
         }
         [HttpPost]
         public JsonResult DecrementCount(long id)
         {
-            var cart = _inventoryShoppingService.GetproductById(id);
-            _inventoryShoppingService.DecrementCount(cart, 1);
-            var newTotalPrice = CalculateTotalPrice();
-            return Json(new { newCount = cart.Count, newTotalPrice }); ;
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
+            var cart = _inventoryShoppingService.GetproductById(id, userId);
+            if(cart != null)
+            {
+                _inventoryShoppingService.DecrementCount(cart, 1);
+                var newTotalPrice = CalculateTotalPrice();
+                return Json(new { newCount = cart.Count, newTotalPrice });
+            }
+            Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            log.Error("User ID mismatch");
+            return Json(new { message = "User ID mismatch" });
         }
 
         public ActionResult RemoveFromCart(long id)
         {
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
             try
             {
-                var cart = _inventoryShoppingService.GetproductById(id);
+                var cart = _inventoryShoppingService.GetproductById(id, userId);
                 if (cart != null)
                 {
                     _inventoryShoppingService.RemoveProduct(cart);

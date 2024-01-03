@@ -174,6 +174,7 @@ WHERE G.Status = '1'
                     prod.Price = garmentsProduct.Price;
                     prod.Image = garmentsProduct.Image;
                     prod.Department = garmentsProduct.Department;
+                    prod.ProductType = garmentsProduct.ProductType;
                     prod.ProductCode = prod.ProductCode;
                     prod.Description = garmentsProduct.Description;
                     prod.VersionNumber = prod.VersionNumber + 1;

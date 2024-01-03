@@ -127,7 +127,7 @@ namespace IMS.Web.Controllers
                     _garmentsService.CreateGarmentsProduct(model);
                     TempData["success"] = "Product Added Successfully";
 
-                    return RedirectToAction("Index");
+                    return RedirectToAction("ProductList");
                 }
 
                 var dept = _departmentService.GetAllDept();
@@ -227,12 +227,10 @@ namespace IMS.Web.Controllers
                 if (gv.GarmentsProduct.Name.Count(char.IsLetter) < 3)
                 {
                     ModelState.AddModelError("GarmentsProduct.Name", "Product name must contain at least three letters.");
-                    var dept = _departmentService.GetAllDept();
-                    var productT = _productTypeService.GetAllType();
-                    ViewBag.Departments = new SelectList(dept, "Id", "Name", product.Department.Id);
-                    ViewBag.ProductTypes = new SelectList(productT, "Id", "Name", product.ProductType.Id);
-
-                    return View(gv);
+                }
+                if (gv.GarmentsProduct.Description == null)
+                {
+                    ModelState.AddModelError("Description", "Description is required");                   
                 }
 
                 if (gv.SelectedSKUs != null)
@@ -242,23 +240,7 @@ namespace IMS.Web.Controllers
                 else
                 {
                     ModelState.AddModelError("SelectedSKUs", "Product Sizes are required!!");
-
-                    var dept = _departmentService.GetAllDept();
-                    var productT = _productTypeService.GetAllType();
-                    ViewBag.Departments = new SelectList(dept, "Id", "Name", product.Department.Id);
-                    ViewBag.ProductTypes = new SelectList(productT, "Id", "Name", product.ProductType.Id);
-
-                    var skus = new List<string>();
-
-                    GarmentsEditViewModel garmentsEditView = new GarmentsEditViewModel
-                    {
-                        GarmentsProduct = product,
-                        SelectedSKUs = skus
-                    };
-
-                    return View(garmentsEditView);
                 }
-
                 
 
                 if (ModelState.IsValid)
@@ -289,7 +271,7 @@ namespace IMS.Web.Controllers
                 ViewBag.ProductTypes = new SelectList(productTypes, "Id", "Name");
                 
 
-                return View(gv.GarmentsProduct);
+                return View(gv);
             }
             catch (Exception ex)
             {

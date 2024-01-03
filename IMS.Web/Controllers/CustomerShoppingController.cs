@@ -12,6 +12,7 @@ using Stripe.Checkout;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 
@@ -347,11 +348,17 @@ namespace IMS.Web.Controllers
         #region Invoice for customer
         public ActionResult InvoiceForCustomer(long id)
         {
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
             try
             {
                 OrderHeader orderheader = _orderHeaderService.GetOrderHeaderById(id);
-                var OrderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == id);
+                var OrderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == id && u.OrderHeader.CustomerId==userId );
                 List<IMS.Models.Product> products = new List<IMS.Models.Product>();
+
+                if(OrderDetails == null)
+                {
+                    return RedirectToAction("Index", "Error");
+                }
 
                 foreach (var orderDetail in OrderDetails)
                 {
@@ -382,27 +389,48 @@ namespace IMS.Web.Controllers
         [HttpPost]
         public JsonResult IncrementCount(long id)
         {
-            var cart = _customerShopping.GetById(id);
-            _customerShopping.IncrementCount(cart, 1);
-            var newTotalPrice = CalculateTotalPrice();
-            return Json(new { newCount = cart.Count, newTotalPrice }); ;
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
+            var cart = _customerShopping.GetById(id, userId);
+
+            if (cart != null)
+            {
+                _customerShopping.IncrementCount(cart, 1);
+                var newTotalPrice = CalculateTotalPrice();
+                return Json(new { newCount = cart.Count, newTotalPrice });
+            }
+
+            Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            log.Error("User ID mismatch");
+            return Json(new { message = "User ID mismatch" });
         }
         [HttpPost]
         public JsonResult DecrementCount(long id)
         {
-            var cart = _customerShopping.GetById(id);
-            _customerShopping.DecrementCount(cart, 1);
-            var newTotalPrice = CalculateTotalPrice();
-            return Json(new { newCount = cart.Count, newTotalPrice }); ;
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
+            var cart = _customerShopping.GetById(id, userId);
+
+            if(cart != null)
+            {
+                _customerShopping.DecrementCount(cart, 1);
+                var newTotalPrice = CalculateTotalPrice();
+                return Json(new { newCount = cart.Count, newTotalPrice });
+            }
+
+            Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            log.Error("User ID mismatch");
+            return Json(new { message = "User ID mismatch" });
         }
 
         public ActionResult RemoveFromCart(long id)
         {
-            var cart = _customerShopping.GetById(id);
+            long userId = Convert.ToInt64(User.Identity.GetUserId());
+            var cart = _customerShopping.GetById(id, userId);
+
             if (cart != null)
             {
                 _customerShopping.RemoveProduct(cart);
             }
+
             return RedirectToAction("ShoppingCart");
         }
         private decimal CalculateTotalPrice()

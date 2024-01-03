@@ -13,8 +13,8 @@
 
     <div class="form-group">
         @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-12" })
-        @Html.TextBoxFor(model => model.Name, new { placeholder = "Product Name", @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+        @Html.TextBoxFor(model => model.Name, new { placeholder = "Product Name", @class = "form-control",id="Name" })
+        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger",id="nameValidation" })
     </div>
     <br />
     <div class="form-group">
@@ -56,14 +56,14 @@
         <div class="col-md-12">
             <input type="file" name="ImageFile" id="ImageFile" class="form-control" />
             @Html.HiddenFor(model => model.Image)
-            @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
+            @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger",id="imageValidation" })
         </div>
     </div>
     <br />
     <div class="form-group">
         @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-12" })
-        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4" })
-        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+        @Html.TextAreaFor(model => model.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4",id="tiny" })
+        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" ,id="desValidation"})
     </div>
     <br />
     <button type="submit" id="btnAdd" class="btn btn-outline-primary">Add Product</button>
@@ -73,7 +73,7 @@
 @section Scripts{
     <script>
         tinymce.init({
-            selector: 'textarea#Description',
+            selector: 'textarea#tiny',
             plugins: 'anchor autolink charmap codesample emoticons image link lists searchreplace table visualblocks wordcount mediaembed editimage mergetags tinymcespellchecker autocorrect a11ychecker typography inlinecss',
             toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image table mergetags | align lineheight | tinycomments | numlist bullist indent outdent | emoticons charmap | removeformat',
             menubar: false,
@@ -120,7 +120,7 @@
         });
 
         function validateSKU(selectedSKUs) {
-            var errorMessage = "Product Sizes are required";
+            var errorMessage = 'Product Sizes are required';
 
             if (!selectedSKUs || selectedSKUs.split(',').length ==0) {
                 $('#skuValidationMessage').text(errorMessage);
@@ -130,7 +130,56 @@
             }
 
         }
+        $('#ImageFile').on('change', function () {
+            $('#imageValidation').text('');
+        })
 
+
+        $("#btnAdd").on('click', function (e) {
+            var name = $('#Name').val();
+            var selectedSKUs = $('input[name="SelectedSKUs"]:checked').map(function () {
+                return this.value;
+            }).get().join(',');
+            var image = $('#ImageFile').val();
+            var description = tinymce.activeEditor.getContent();
+            console.log(description);
+
+            if (name === '') {
+                $('#nameValidation').text('Product name is required.');
+
+            } else {
+                $('#nameValidation').text("");
+            }
+
+            if (name !== '' && (name.match(/[a-zA-Z]/g) || []).length < 3) {
+                $('#nameValidation').text('Product name must contain at least three letters.');
+                e.preventDefault();
+            } else {
+                $('#nameValidation').text('');
+            }
+            
+
+            if (!selectedSKUs || selectedSKUs.split(',').length == 0) {
+                $('#skuValidationMessage').text('Product Sizes are required.');
+            } else {
+
+                $('#skuValidationMessage').text("");
+            }
+
+            if (image == '') {
+                $('#imageValidation').text('Image is required.');
+            } else {
+                $('#imageValidation').text('');
+            }
+
+            if (description === '') {
+                $('#desValidation').text('Description is required.');
+                
+            } else {
+                $('#desValidation').text('');
+                
+            }
+        })
 
 
     </script>

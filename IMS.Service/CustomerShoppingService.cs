@@ -15,7 +15,7 @@ namespace IMS.Service
     {
         void AddCutomerShoppingCart(ShoppingCart shoppingCart);
         IEnumerable<ShoppingCart> GetAllOrders();
-        ShoppingCart GetById(long id);
+        ShoppingCart GetById(long id,long userId);
         int IncrementCount(ShoppingCart shoppingCart, int count);
         int DecrementCount(ShoppingCart shoppingCart, int count);
         void RemoveProduct(ShoppingCart shoppingCart);
@@ -78,9 +78,9 @@ namespace IMS.Service
         {
             return _repository.GetAll();
         }
-        public ShoppingCart GetById(long id)
+        public ShoppingCart GetById(long id, long userId)
         {
-            return _repository.GetById(id);
+            return Session.Query<ShoppingCart>().Where(u => u.Id == id && u.CustomerId == userId).FirstOrDefault();
         }
 
         public int IncrementCount(ShoppingCart shoppingCart, int count)

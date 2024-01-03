@@ -85,12 +85,12 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.GarmentsProduct.Description, htmlAttributes: new { @class = "control-label col-md-12" })
                     @Html.TextAreaFor(model => model.GarmentsProduct.Description, new { placeholder = "Write Product Description...", @class = "form-control", rows = "4", id = "tiny" })
-                    @Html.ValidationMessageFor(model => model.GarmentsProduct.Description, "", new { @class = "text-danger" })
+                    @Html.ValidationMessageFor(model => model.GarmentsProduct.Description, "", new { @class = "text-danger",id="desValidation" })
                 </div>
                 <br />
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Save Changes" class="btn btn-outline-success" />
+                        <input type="submit" value="Save Changes" id="btnAdd" class="btn btn-outline-success" />
                         @Html.ActionLink("Back to List", "ProductList", null, new { @class = "btn btn-outline-info" })
                     </div>
                 </div>
@@ -140,6 +140,33 @@
 
             ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
         });
+
+
+        $("#btnAdd").on('click', function (e) {
+            var name = $('#Name').val();
+            var description = tinymce.activeEditor.getContent();
+            console.log(description);
+
+            if (name === '') {
+                $('#nameValidation').text('Product name is required.');
+
+            } else {
+                $('#nameValidation').text("");
+            }
+            if (name !== '' && (name.match(/[a-zA-Z]/g) || []).length < 3) {
+                $('#nameValidation').text('Product name must contain at least three letters.');
+                e.preventDefault();
+            }          
+
+            if (description === '') {
+                $('#desValidation').text('Description is required.');
+                e.preventDefault();
+
+            } else {
+                $('#desValidation').text('');
+
+            }
+        })
 
     </script>
 }

@@ -15,7 +15,7 @@ namespace IMS.Service
     {
         void AddInventoryShoppingCart(InventoryOrderCart inventoryOrderCart);
         IEnumerable<InventoryOrderCart> GetAllInventoryOrders();
-        InventoryOrderCart GetproductById(long id);
+        InventoryOrderCart GetproductById(long id, long userId);
         int IncrementCount(InventoryOrderCart inventoryOrderCart, int count);
         int DecrementCount(InventoryOrderCart inventoryOrderCart, int count);
         void RemoveProduct(InventoryOrderCart Cart);
@@ -72,9 +72,9 @@ namespace IMS.Service
         }
         #endregion
 
-        public InventoryOrderCart GetproductById(long id)
+        public InventoryOrderCart GetproductById(long id, long userId)
         {
-            return _repository.GetById(id);
+            return Session.Query<InventoryOrderCart>().Where(u=>u.Id==id && u.EmployeeId==userId).FirstOrDefault();
         }
 
         public IEnumerable<InventoryOrderCart> GetAllInventoryOrders()

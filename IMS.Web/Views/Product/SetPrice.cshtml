@@ -133,15 +133,21 @@
 
         $('#btnSubmit').on('click', function (e) {
             var name = $('#Name').val();
-            if ((name.match(/[a-zA-Z]/g) || []).length < 3) {
+            if (name == "") {
+                $('#nameValidation').text('Product name is required.');
+              
+            }
+            if (name != "" && (name.match(/[a-zA-Z]/g) || []).length < 3) {
                 $('#nameValidation').text('Product name must contain at least three letters.');
                 e.preventDefault();
             }
 
-            var des = $('#tiny').val();
+            var des = tinymce.activeEditor.getContent();
             if (des == "") {
                 $('#desValidation').text('Description is required.');
                 e.preventDefault();
+            } else {
+                $('#desValidation').text('');
             }
         });
     </script>
