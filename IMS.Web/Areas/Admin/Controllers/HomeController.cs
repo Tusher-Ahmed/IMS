@@ -105,8 +105,16 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                IEnumerable<Product> products = _product.GetAllApprovedProduct();
-                return View(products);
+                if (User.IsInRole("Admin"))
+                {
+                    IEnumerable<Product> products = _product.GetAllApprovedProduct();
+                    return View(products);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -122,12 +130,20 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                var prod = _product.GetProductById(id);
-                if (prod != null)
+                if (User.IsInRole("Admin"))
                 {
-                    return View(prod);
+                    var prod = _product.GetProductById(id);
+                    if (prod != null)
+                    {
+                        return View(prod);
+                    }
+                    return RedirectToAction("ProductList");
                 }
-                return RedirectToAction("ProductList");
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -141,35 +157,43 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                var prod = _product.GetProductById(id);
-                long userId = Convert.ToInt64(User.Identity.GetUserId());
-
-                if (prod != null)
+                if (User.IsInRole("Admin"))
                 {
-                    prod.Price = product.Price;
-                    prod.Name = product.Name;
-                    prod.Description = product.Description;
+                    var prod = _product.GetProductById(id);
+                    long userId = Convert.ToInt64(User.Identity.GetUserId());
 
-                    if (ImageFile != null && ImageFile.ContentLength > 0)
+                    if (prod != null)
                     {
+                        prod.Price = product.Price;
+                        prod.Name = product.Name;
+                        prod.Description = product.Description;
 
-                        var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                        if (ImageFile != null && ImageFile.ContentLength > 0)
+                        {
 
-                        var path = Path.Combine(Server.MapPath("~/Images"), uniqueFileName);
-                        ImageFile.SaveAs(path);
+                            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
 
-                        prod.Image = uniqueFileName;
+                            var path = Path.Combine(Server.MapPath("~/Images"), uniqueFileName);
+                            ImageFile.SaveAs(path);
+
+                            prod.Image = uniqueFileName;
+                        }
+
+                        prod.ModifyBy = userId;//ManagerId
+                        prod.Status = 1;
+                        prod.VersionNumber = prod.VersionNumber + 1;
+
+                        _product.UpdateProduct(prod);
+                        TempData["success"] = "Product Updated Successfully!";
+                        return RedirectToAction("ProductList");
                     }
-
-                    prod.ModifyBy = userId;//ManagerId
-                    prod.Status = 1;
-                    prod.VersionNumber = prod.VersionNumber + 1;
-
-                    _product.UpdateProduct(prod);
-                    TempData["success"] = "Product Updated Successfully!";
-                    return RedirectToAction("ProductList");
+                    return View(product);
                 }
-                return View(product);
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -186,16 +210,24 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                if (id == 0)
+                if (User.IsInRole("Admin"))
                 {
-                    return HttpNotFound();
+                    if (id == 0)
+                    {
+                        return HttpNotFound();
+                    }
+                    var prod = _product.GetProductById(id);
+                    if (prod != null)
+                    {
+                        return View(prod);
+                    }
+                    return RedirectToAction("ProductList");
                 }
-                var prod = _product.GetProductById(id);
-                if (prod != null)
+                else
                 {
-                    return View(prod);
+                    return RedirectToAction("Index", "Error");
                 }
-                return RedirectToAction("ProductList");
+                
             }
             catch (Exception ex)
             {
@@ -236,12 +268,20 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                if (id != 0)
+                if (User.IsInRole("Admin"))
                 {
-                    var prod = _product.GetProductById(id);
-                    return View(prod);
+                    if (id != 0)
+                    {
+                        var prod = _product.GetProductById(id);
+                        return View(prod);
+                    }
+                    return RedirectToAction("ProductList");
                 }
-                return RedirectToAction("ProductList");
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -257,13 +297,21 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                var prod = _product.GetAllProduct().Where(u => u.Status == 0 && u.Approved == true && u.IsPriceAdded == true);
-                if (prod != null)
+                if (User.IsInRole("Admin"))
                 {
-                    return View(prod);
+                    var prod = _product.GetAllProduct().Where(u => u.Status == 0 && u.Approved == true && u.IsPriceAdded == true);
+                    if (prod != null)
+                    {
+                        return View(prod);
 
+                    }
+                    return RedirectToAction("ProductList");
                 }
-                return RedirectToAction("ProductList");
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -279,16 +327,24 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                if (id == 0)
+                if (User.IsInRole("Admin"))
                 {
-                    return HttpNotFound();
+                    if (id == 0)
+                    {
+                        return HttpNotFound();
+                    }
+                    var prod = _product.GetProductById(id);
+                    if (prod != null)
+                    {
+                        return View(prod);
+                    }
+                    return RedirectToAction("ProductList");
                 }
-                var prod = _product.GetProductById(id);
-                if (prod != null)
+                else
                 {
-                    return View(prod);
+                    return RedirectToAction("Index", "Error");
                 }
-                return RedirectToAction("ProductList");
+                
             }
             catch (Exception ex)
             {
@@ -302,17 +358,25 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                var prod = _product.GetProductById(id);
-                long userId = Convert.ToInt64(User.Identity.GetUserId());
-                if (prod != null)
+                if (User.IsInRole("Admin"))
                 {
-                    prod.Status = 1;
-                    prod.ModifyBy = userId;
-                    _product.UpdateProduct(prod);
-                    TempData["success"] = "Status Updated Successfully!";
-                    return RedirectToAction("ProductList");
+                    var prod = _product.GetProductById(id);
+                    long userId = Convert.ToInt64(User.Identity.GetUserId());
+                    if (prod != null)
+                    {
+                        prod.Status = 1;
+                        prod.ModifyBy = userId;
+                        _product.UpdateProduct(prod);
+                        TempData["success"] = "Status Updated Successfully!";
+                        return RedirectToAction("ProductList");
+                    }
+                    return View();
                 }
-                return View();
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+               
             }
             catch (Exception ex)
             {
@@ -349,44 +413,52 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-                var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-                string[] roleNames = { "Manager", "Staff" };
-
-                var roleIds = roleManager.Roles
-                    .Where(r => roleNames.Contains(r.Name))
-                    .Select(r => r.Id)
-                    .ToList();
-
-                var usersWithDetails = context.Users
-                    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-                    .ToList();
-
-                List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
-
-                foreach (var user in usersWithDetails)
+                if (User.IsInRole("Admin"))
                 {
-                    var employee = _employeeService.GetEmployeeByUserId(user.Id);
+                    var context = new ApplicationDbContext();
+                    var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                    var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
+                    string[] roleNames = { "Manager", "Staff" };
 
-                    if (employee.Status != 0)
+                    var roleIds = roleManager.Roles
+                        .Where(r => roleNames.Contains(r.Name))
+                        .Select(r => r.Id)
+                        .ToList();
+
+                    var usersWithDetails = context.Users
+                        .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
+                        .ToList();
+
+                    List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
+
+                    foreach (var user in usersWithDetails)
                     {
-                        UserDetailViewModel userDetails = new UserDetailViewModel
-                        {
-                            Id = user.Id,
-                            Email = user.Email,
-                            Phone = user.PhoneNumber,
-                            City = employee.City,
-                            StreetAddress = employee.StreetAddress,
-                            Thana = employee.Thana,
-                            PostalCode = employee.PostalCode,
-                            ERole = userManager.GetRoles(user.Id).FirstOrDefault()
-                        };
+                        var employee = _employeeService.GetEmployeeByUserId(user.Id);
 
-                        usersDetails.Add(userDetails);
+                        if (employee.Status != 0)
+                        {
+                            UserDetailViewModel userDetails = new UserDetailViewModel
+                            {
+                                Id = user.Id,
+                                Email = user.Email,
+                                Phone = user.PhoneNumber,
+                                City = employee.City,
+                                StreetAddress = employee.StreetAddress,
+                                Thana = employee.Thana,
+                                PostalCode = employee.PostalCode,
+                                ERole = userManager.GetRoles(user.Id).FirstOrDefault()
+                            };
+
+                            usersDetails.Add(userDetails);
+                        }
                     }
+                    return View(usersDetails);
                 }
-                return View(usersDetails);
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+               
             }
             catch (Exception ex)
             {
@@ -402,22 +474,30 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-                var user = userManager.FindById(id);
-                var employee = _employeeService.GetEmployeeByUserId(user.Id);
-
-                if (user != null && employee != null)
+                if (User.IsInRole("Admin"))
                 {
-                    employee.Status = 0;
-                    _employeeService.UpdateEmployee(employee);
-                    TempData["success"] = "Employee Deactivation Completed Successfully!";
-                    return RedirectToAction("Employees");
+                    var context = new ApplicationDbContext();
+                    var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                    var user = userManager.FindById(id);
+                    var employee = _employeeService.GetEmployeeByUserId(user.Id);
+
+                    if (user != null && employee != null)
+                    {
+                        employee.Status = 0;
+                        _employeeService.UpdateEmployee(employee);
+                        TempData["success"] = "Employee Deactivation Completed Successfully!";
+                        return RedirectToAction("Employees");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Employees");
+                    }
                 }
                 else
                 {
-                    return RedirectToAction("Employees");
+                    return RedirectToAction("Index", "Error");
                 }
+                
             }
             catch (Exception ex)
             {
@@ -434,42 +514,50 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-                var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-                string[] roleNames = { "Manager", "Staff" };
-
-                var roleIds = roleManager.Roles
-                    .Where(r => roleNames.Contains(r.Name))
-                    .Select(r => r.Id)
-                    .ToList();
-
-                var usersWithDetails = context.Users
-                    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-                    .ToList();
-
-                List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
-
-                foreach (var user in usersWithDetails)
+                if (User.IsInRole("Admin"))
                 {
-                    var employee = _employeeService.GetEmployeeByUserId(user.Id);
-                    if (employee.Status == 0)
+                    var context = new ApplicationDbContext();
+                    var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                    var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
+                    string[] roleNames = { "Manager", "Staff" };
+
+                    var roleIds = roleManager.Roles
+                        .Where(r => roleNames.Contains(r.Name))
+                        .Select(r => r.Id)
+                        .ToList();
+
+                    var usersWithDetails = context.Users
+                        .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
+                        .ToList();
+
+                    List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
+
+                    foreach (var user in usersWithDetails)
                     {
-                        UserDetailViewModel userDetails = new UserDetailViewModel
+                        var employee = _employeeService.GetEmployeeByUserId(user.Id);
+                        if (employee.Status == 0)
                         {
-                            Id = user.Id,
-                            Email = user.Email,
-                            Phone = user.PhoneNumber,
-                            City = employee.City,
-                            StreetAddress = employee.StreetAddress,
-                            Thana = employee.Thana,
-                            PostalCode = employee.PostalCode,
-                            ERole = userManager.GetRoles(user.Id).FirstOrDefault()
-                        };
-                        usersDetails.Add(userDetails);
+                            UserDetailViewModel userDetails = new UserDetailViewModel
+                            {
+                                Id = user.Id,
+                                Email = user.Email,
+                                Phone = user.PhoneNumber,
+                                City = employee.City,
+                                StreetAddress = employee.StreetAddress,
+                                Thana = employee.Thana,
+                                PostalCode = employee.PostalCode,
+                                ERole = userManager.GetRoles(user.Id).FirstOrDefault()
+                            };
+                            usersDetails.Add(userDetails);
+                        }
                     }
+                    return View(usersDetails);
                 }
-                return View(usersDetails);
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -485,43 +573,50 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-                var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-                string roleNames = "Customer";
-
-                var roleIds = roleManager.Roles
-                    .Where(r => roleNames.Contains(r.Name))
-                    .Select(r => r.Id)
-                    .ToList();
-
-                var usersWithDetails = context.Users
-                    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-                    .ToList();
-
-                List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
-
-                foreach (var user in usersWithDetails)
+                if (User.IsInRole("Admin"))
                 {
-                    var customer = _customerService.GetCustomerByUserId(user.Id);
-                    if (customer.Status != 0)
-                    {
-                        var userDetails = new UserDetailViewModel
-                        {
-                            Id = user.Id,
-                            Email = user.Email,
-                            Phone = user.PhoneNumber,
-                            ShopName = customer.Name,
-                            City = customer.City,
-                            StreetAddress = customer.StreetAddress,
-                            Thana = customer.Thana,
-                            PostalCode = customer.PostalCode,
-                        };
-                        usersDetails.Add(userDetails);
-                    }
-                }
+                    var context = new ApplicationDbContext();
+                    var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                    var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
+                    string roleNames = "Customer";
 
-                return View(usersDetails);
+                    var roleIds = roleManager.Roles
+                        .Where(r => roleNames.Contains(r.Name))
+                        .Select(r => r.Id)
+                        .ToList();
+
+                    var usersWithDetails = context.Users
+                        .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
+                        .ToList();
+
+                    List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
+
+                    foreach (var user in usersWithDetails)
+                    {
+                        var customer = _customerService.GetCustomerByUserId(user.Id);
+                        if (customer.Status != 0)
+                        {
+                            var userDetails = new UserDetailViewModel
+                            {
+                                Id = user.Id,
+                                Email = user.Email,
+                                Phone = user.PhoneNumber,
+                                ShopName = customer.Name,
+                                City = customer.City,
+                                StreetAddress = customer.StreetAddress,
+                                Thana = customer.Thana,
+                                PostalCode = customer.PostalCode,
+                            };
+                            usersDetails.Add(userDetails);
+                        }
+                    }
+
+                    return View(usersDetails);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
             }
             catch (Exception ex)
             {
@@ -537,22 +632,30 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-                var user = userManager.FindById(id);
-                var customer = _customerService.GetCustomerByUserId(user.Id);
-
-                if (user != null && customer != null)
+                if (User.IsInRole("Admin"))
                 {
-                    customer.Status = 0;
-                    _customerService.UpdateCustomer(customer);
-                    TempData["success"] = "Customer Deactivated Successfully!";
-                    return RedirectToAction("Shop");
+                    var context = new ApplicationDbContext();
+                    var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                    var user = userManager.FindById(id);
+                    var customer = _customerService.GetCustomerByUserId(user.Id);
+
+                    if (user != null && customer != null)
+                    {
+                        customer.Status = 0;
+                        _customerService.UpdateCustomer(customer);
+                        TempData["success"] = "Customer Deactivated Successfully!";
+                        return RedirectToAction("Shop");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Shop");
+                    }
                 }
                 else
                 {
-                    return RedirectToAction("Shop");
+                    return RedirectToAction("Index", "Error");
                 }
+               
             }
             catch (Exception ex)
             {
@@ -569,44 +672,52 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-                var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-                string roleNames = "Customer";
-
-                var roleIds = roleManager.Roles
-                    .Where(r => roleNames.Contains(r.Name))
-                    .Select(r => r.Id)
-                    .ToList();
-
-                var usersWithDetails = context.Users
-                    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-                    .ToList();
-
-                List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
-
-                foreach (var user in usersWithDetails)
+                if (User.IsInRole("Admin"))
                 {
-                    var customer = _customerService.GetCustomerByUserId(user.Id);
-                    if (customer.Status == 0)
+                    var context = new ApplicationDbContext();
+                    var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                    var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
+                    string roleNames = "Customer";
+
+                    var roleIds = roleManager.Roles
+                        .Where(r => roleNames.Contains(r.Name))
+                        .Select(r => r.Id)
+                        .ToList();
+
+                    var usersWithDetails = context.Users
+                        .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
+                        .ToList();
+
+                    List<UserDetailViewModel> usersDetails = new List<UserDetailViewModel>();
+
+                    foreach (var user in usersWithDetails)
                     {
-                        var userDetails = new UserDetailViewModel
+                        var customer = _customerService.GetCustomerByUserId(user.Id);
+                        if (customer.Status == 0)
                         {
-                            Id = user.Id,
-                            Email = user.Email,
-                            Phone = user.PhoneNumber,
-                            ShopName = customer.Name,
-                            City = customer.City,
-                            StreetAddress = customer.StreetAddress,
-                            Thana = customer.Thana,
-                            PostalCode = customer.PostalCode,
-                        };
+                            var userDetails = new UserDetailViewModel
+                            {
+                                Id = user.Id,
+                                Email = user.Email,
+                                Phone = user.PhoneNumber,
+                                ShopName = customer.Name,
+                                City = customer.City,
+                                StreetAddress = customer.StreetAddress,
+                                Thana = customer.Thana,
+                                PostalCode = customer.PostalCode,
+                            };
 
-                        usersDetails.Add(userDetails);
+                            usersDetails.Add(userDetails);
+                        }
                     }
-                }
 
-                return View(usersDetails);
+                    return View(usersDetails);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -623,37 +734,44 @@ namespace IMS.Web.Areas.Admin.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-
-                var History = _inventoryOrderHistoryService.GetByOrderId(orderId);
-                var firstOrderHistory = History.FirstOrDefault();
-
-                if (firstOrderHistory != null)
+                if (User.IsInRole("Admin"))
                 {
-                    var employeeId = firstOrderHistory.EmployeeId;
-                    var GarmentsId = firstOrderHistory.GarmentsId;
-                    var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
-                    List<string> name = new List<string>();
+                    var context = new ApplicationDbContext();
 
-                    foreach (var item in History)
-                    {
-                        var garments = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
-                        name.Add(garments);
-                    }
+                    var History = _inventoryOrderHistoryService.GetByOrderId(orderId);
+                    var firstOrderHistory = History.FirstOrDefault();
 
-                    if (manager != null)
+                    if (firstOrderHistory != null)
                     {
-                        InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
+                        var employeeId = firstOrderHistory.EmployeeId;
+                        var GarmentsId = firstOrderHistory.GarmentsId;
+                        var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
+                        List<string> name = new List<string>();
+
+                        foreach (var item in History)
                         {
-                            orderHistories = History,
-                            GarmentsName = name,
-                            ManagerEmail = manager.Email,
-                        };
-                        return View(inventoryInvoiceViewModel);
-                    }
-                }
+                            var garments = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                            name.Add(garments);
+                        }
 
-                return RedirectToAction("InventoryOrder", "Home");
+                        if (manager != null)
+                        {
+                            InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
+                            {
+                                orderHistories = History,
+                                GarmentsName = name,
+                                ManagerEmail = manager.Email,
+                            };
+                            return View(inventoryInvoiceViewModel);
+                        }
+                    }
+
+                    return RedirectToAction("InventoryOrder", "Home");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
             }
             catch (Exception ex)
             {

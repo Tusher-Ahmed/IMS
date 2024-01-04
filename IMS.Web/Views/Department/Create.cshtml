@@ -23,13 +23,13 @@
             @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", id = "dName" } })
-                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger",id= "nameValidation" })
             </div>
         </div>
         <br />
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Add Department" class="pl-2 pr-2 btn btn-outline-success" />
+                <input type="submit" value="Add Department" id="btnAdd" class="pl-2 pr-2 btn btn-outline-success" />
                 @Html.ActionLink("Back to List", "Index", new { area = "" }, new { @class = "btn btn-outline-info" })
             </div>
         </div>
@@ -61,7 +61,7 @@
 
                     messageTimer = setTimeout(function () {
                         messageElement.remove();
-                    }, 2000);
+                    }, 5000);
                 }
             }
 
@@ -71,6 +71,24 @@
                 document.getElementById("dName").value = "";
 
             }
+
+            $('#btnAdd').on('click', function () {
+                var name = $('#dName').val();
+                if (name === '') {
+                    $('#nameValidation').text('Department name is required.');
+
+                } else {
+                    $('#nameValidation').text("");
+                }
+
+                if (name !== '' && (name.match(/[a-zA-Z]/g) || []).length < 3) {
+                    $('#nameValidation').text('Department name must contain at least three letters.');
+                    e.preventDefault();
+                } else {
+                    $('#nameValidation').text('');
+                }
+
+            })
         </script>
 
         @Scripts.Render("~/bundles/jqueryval")

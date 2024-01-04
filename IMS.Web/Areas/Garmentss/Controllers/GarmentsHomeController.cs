@@ -32,32 +32,40 @@ namespace IMS.Web.Areas.Garmentss.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-                long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var history = _inventoryOrderHistoryService.GetAll().Where(u => u.GarmentsId == userId);
-
-                Dictionary<long, decimal> TotalPrice = new Dictionary<long, decimal>();
-                Dictionary<long, string> orderBy = new Dictionary<long, string>();
-
-                string manager = string.Empty;
-                foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
+                if (User.IsInRole("Supplier"))
                 {
-                    TotalPrice.Add(item.OrderId, TotalAmount(item.OrderId));
-                    manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
-                    orderBy.Add(item.OrderId, manager);
+                    var context = new ApplicationDbContext();
+                    long userId = Convert.ToInt64(User.Identity.GetUserId());
+                    var history = _inventoryOrderHistoryService.GetAll().Where(u => u.GarmentsId == userId);
+
+                    Dictionary<long, decimal> TotalPrice = new Dictionary<long, decimal>();
+                    Dictionary<long, string> orderBy = new Dictionary<long, string>();
+
+                    string manager = string.Empty;
+                    foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
+                    {
+                        TotalPrice.Add(item.OrderId, TotalAmount(item.OrderId));
+                        manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
+                        orderBy.Add(item.OrderId, manager);
+                    }
+
+                    GarmentsDashboardViewModel viewModel = new GarmentsDashboardViewModel
+                    {
+                        Products = _garmentsService.GetAllP(),
+                        TotalProduct = _garmentsService.GetAllP().Where(u => u.GarmentsId == userId).Count(),
+                        TotalHistory = _inventoryOrderHistoryService.GetAll().Where(u => u.GarmentsId == userId).GroupBy(u => u.OrderId).Select(u => u.First()).Count(),
+                        OrderHistory = history,
+                        TotalPrice = TotalPrice,
+                        OrderBy = orderBy,
+                    };
+
+                    return View(viewModel);
                 }
-
-                GarmentsDashboardViewModel viewModel = new GarmentsDashboardViewModel
+                else
                 {
-                    Products = _garmentsService.GetAllP(),
-                    TotalProduct = _garmentsService.GetAllP().Where(u => u.GarmentsId == userId).Count(),
-                    TotalHistory = _inventoryOrderHistoryService.GetAll().Where(u => u.GarmentsId == userId).GroupBy(u => u.OrderId).Select(u => u.First()).Count(),
-                    OrderHistory = history,
-                    TotalPrice = TotalPrice,
-                    OrderBy = orderBy,
-                };
-
-                return View(viewModel);
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -73,30 +81,38 @@ namespace IMS.Web.Areas.Garmentss.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-                long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var history = _inventoryOrderHistoryService.GetAll().Where(u => u.GarmentsId == userId);
-
-                Dictionary<long, decimal> TotalPrice = new Dictionary<long, decimal>();
-                Dictionary<long, string> orderBy = new Dictionary<long, string>();
-
-                string manager = string.Empty;
-
-                foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
+                if (User.IsInRole("Supplier"))
                 {
-                    TotalPrice.Add(item.OrderId, TotalAmount(item.OrderId));
-                    manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
-                    orderBy.Add(item.OrderId, manager);
+                    var context = new ApplicationDbContext();
+                    long userId = Convert.ToInt64(User.Identity.GetUserId());
+                    var history = _inventoryOrderHistoryService.GetAll().Where(u => u.GarmentsId == userId);
+
+                    Dictionary<long, decimal> TotalPrice = new Dictionary<long, decimal>();
+                    Dictionary<long, string> orderBy = new Dictionary<long, string>();
+
+                    string manager = string.Empty;
+
+                    foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
+                    {
+                        TotalPrice.Add(item.OrderId, TotalAmount(item.OrderId));
+                        manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
+                        orderBy.Add(item.OrderId, manager);
+                    }
+
+                    GarmentsOrderHistoryViewModel garmentsOrderHistoryViewModel = new GarmentsOrderHistoryViewModel
+                    {
+                        OrderHistory = history,
+                        TotalPrice = TotalPrice,
+                        OrderBy = orderBy
+                    };
+
+                    return View(garmentsOrderHistoryViewModel);
                 }
-
-                GarmentsOrderHistoryViewModel garmentsOrderHistoryViewModel = new GarmentsOrderHistoryViewModel
+                else
                 {
-                    OrderHistory = history,
-                    TotalPrice = TotalPrice,
-                    OrderBy = orderBy
-                };
-
-                return View(garmentsOrderHistoryViewModel);
+                    return RedirectToAction("Index", "Error");
+                }
+               
             }
             catch (Exception ex)
             {
@@ -112,8 +128,15 @@ namespace IMS.Web.Areas.Garmentss.Controllers
         {
             try
             {
-                var HProd = _inventoryOrderHistoryService.GetByOrderId(orderId).Where(u => u.GarmentsId == Convert.ToInt64(User.Identity.GetUserId()));
-                return View(HProd);
+                if (User.IsInRole("Supplier"))
+                {
+                    var HProd = _inventoryOrderHistoryService.GetByOrderId(orderId).Where(u => u.GarmentsId == Convert.ToInt64(User.Identity.GetUserId()));
+                    return View(HProd);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
             }
             catch (Exception ex)
             {
@@ -140,24 +163,39 @@ namespace IMS.Web.Areas.Garmentss.Controllers
         #region Rejected Order
         public ActionResult RejectedOrder()
         {
-            var context = new ApplicationDbContext();            
-            long userId=Convert.ToInt64(User.Identity.GetUserId());
-            var products = _inventoryOrderHistoryService.GetAllRejectedOrder(userId);
-            Dictionary<long,string> orderBy= new Dictionary<long,string>();
-
-            foreach(var product in products)
+            try
             {
-                string manager = context.Users.FirstOrDefault(u => u.Id == product.CreatedBy).Email;
-                orderBy.Add(product.OrderHistoryId, manager);
+                if (User.IsInRole("Supplier"))
+                {
+                    var context = new ApplicationDbContext();
+                    long userId = Convert.ToInt64(User.Identity.GetUserId());
+                    var products = _inventoryOrderHistoryService.GetAllRejectedOrder(userId);
+                    Dictionary<long, string> orderBy = new Dictionary<long, string>();
+
+                    foreach (var product in products)
+                    {
+                        string manager = context.Users.FirstOrDefault(u => u.Id == product.CreatedBy).Email;
+                        orderBy.Add(product.OrderHistoryId, manager);
+                    }
+
+                    RejectedOrderViewModel rejectedOrderViewModel = new RejectedOrderViewModel
+                    {
+                        product = products,
+                        OrderBy = orderBy,
+                    };
+
+                    return View(rejectedOrderViewModel);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+            }catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("Index", "Error");
             }
-
-            RejectedOrderViewModel rejectedOrderViewModel = new RejectedOrderViewModel
-            {
-                product = products,
-                OrderBy = orderBy,
-            };
-
-            return View(rejectedOrderViewModel);
+           
         }
         #endregion
 

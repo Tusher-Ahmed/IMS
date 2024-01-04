@@ -289,9 +289,12 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                OrderHeader orderheader = _orderHeaderService.GetOrderHeaderById(id);
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-
+                OrderHeader orderheader = _orderHeaderService.GetOrderHeaderByUser(id, userId);
+                if(orderheader == null)
+                {
+                    return RedirectToAction("Index", "Error");
+                }
                 // var customer = _customerService.GetCustomerByUserId(userId);
 
                 var service = new SessionService();
@@ -348,10 +351,15 @@ namespace IMS.Web.Controllers
         #region Invoice for customer
         public ActionResult InvoiceForCustomer(long id)
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
+            
             try
             {
-                OrderHeader orderheader = _orderHeaderService.GetOrderHeaderById(id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                OrderHeader orderheader = _orderHeaderService.GetOrderHeaderByUser(id, userId);
+                if (orderheader == null)
+                {
+                    return RedirectToAction("Index", "Error");
+                }
                 var OrderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == id && u.OrderHeader.CustomerId==userId );
                 List<IMS.Models.Product> products = new List<IMS.Models.Product>();
 
@@ -389,56 +397,94 @@ namespace IMS.Web.Controllers
         [HttpPost]
         public JsonResult IncrementCount(long id)
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            var cart = _customerShopping.GetById(id, userId);
-
-            if (cart != null)
+            try
             {
-                _customerShopping.IncrementCount(cart, 1);
-                var newTotalPrice = CalculateTotalPrice();
-                return Json(new { newCount = cart.Count, newTotalPrice });
-            }
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                var cart = _customerShopping.GetById(id, userId);
 
-            Response.StatusCode = (int)HttpStatusCode.Forbidden;
-            log.Error("User ID mismatch");
-            return Json(new { message = "User ID mismatch" });
+                if (cart != null)
+                {
+                    _customerShopping.IncrementCount(cart, 1);
+                    var newTotalPrice = CalculateTotalPrice();
+                    return Json(new { newCount = cart.Count, newTotalPrice });
+                }
+                else
+                {
+                    Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    return Json(new { error = "Cart not found" });
+                }
+                
+            }catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                return Json(new { message = "User ID mismatch" });
+            }
+            
         }
         [HttpPost]
         public JsonResult DecrementCount(long id)
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            var cart = _customerShopping.GetById(id, userId);
-
-            if(cart != null)
+            try
             {
-                _customerShopping.DecrementCount(cart, 1);
-                var newTotalPrice = CalculateTotalPrice();
-                return Json(new { newCount = cart.Count, newTotalPrice });
-            }
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                var cart = _customerShopping.GetById(id, userId);
 
-            Response.StatusCode = (int)HttpStatusCode.Forbidden;
-            log.Error("User ID mismatch");
-            return Json(new { message = "User ID mismatch" });
+                if (cart != null)
+                {
+                    _customerShopping.DecrementCount(cart, 1);
+                    var newTotalPrice = CalculateTotalPrice();
+                    return Json(new { newCount = cart.Count, newTotalPrice });
+                }
+                else
+                {
+                    Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    return Json(new { error = "Cart not found" });
+                }
+            }
+            catch(Exception ex)
+            {
+                Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                log.Error("An error occurred in YourAction.", ex);
+                return Json(new { message = "User ID mismatch" });
+            }           
+
         }
 
         public ActionResult RemoveFromCart(long id)
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            var cart = _customerShopping.GetById(id, userId);
-
-            if (cart != null)
+            try
             {
-                _customerShopping.RemoveProduct(cart);
-            }
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                var cart = _customerShopping.GetById(id, userId);
 
-            return RedirectToAction("ShoppingCart");
+                if (cart != null)
+                {
+                    _customerShopping.RemoveProduct(cart);
+                }
+
+                return RedirectToAction("ShoppingCart");
+            }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return RedirectToAction("ShoppingCart");
+            }
         }
         private decimal CalculateTotalPrice()
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            var orderCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList();
-            decimal total = orderCarts.Sum(cart => cart.Product.Price * cart.Count);
-            return total;
+            try
+            {
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                var orderCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList();
+                decimal total = orderCarts.Sum(cart => cart.Product.Price * cart.Count);
+                return total;
+            }catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                return 0;
+            }
+            
         }
         #endregion
     }

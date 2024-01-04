@@ -19,6 +19,7 @@ namespace IMS.Service
         List<GarmentsProduct> GetAllPro(int status, long userId);
         GarmentsProductViewModel GetAllProduct(GarmentsProductViewModel garmentsProduct,long? supplierId);
         GarmentsProduct GetGarmentsProductById(long id);
+        GarmentsProduct GetGarmentsProductBySupplierId(long id, long userId);
         GarmentsProduct GetGarmentsProductByProductCode(int id);
         void CreateGarmentsProduct(GarmentsProduct garmentsProduct);
        
@@ -157,6 +158,10 @@ WHERE G.Status = '1'
         {
             var product = _repository.GetById(id);
             return product;
+        }
+        public GarmentsProduct GetGarmentsProductBySupplierId(long id,long userId)
+        {
+           return Session.Query<GarmentsProduct>().Where(u=>u.Id==id && u.GarmentsId==userId).FirstOrDefault();
         }
         #endregion
 

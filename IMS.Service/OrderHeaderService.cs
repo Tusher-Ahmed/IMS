@@ -14,6 +14,7 @@ namespace IMS.Service
     public interface IOrderHeaderService
     {
         OrderHeader GetOrderHeaderById(long id);
+        OrderHeader GetOrderHeaderByUser(long id, long userId);
         IEnumerable<OrderHeader> GetAllOrderHeaders();
         void AddOrderHeader(OrderHeader orderHeader);
         void Update(OrderHeader orderHeader);
@@ -139,6 +140,10 @@ namespace IMS.Service
         public OrderHeader GetOrderHeaderById(long id)
         {
             return _repository.GetById(id);
+        }
+        public OrderHeader GetOrderHeaderByUser(long id, long userId)
+        {
+            return Session.Query<OrderHeader>().Where(u=>u.Id==id && u.CustomerId == userId).FirstOrDefault();
         }
         #endregion
 

@@ -155,6 +155,10 @@ namespace IMS.Web.Controllers
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
                 //var product = _garmentsService.GetAllP().Where(u => u.Status == 1 && u.GarmentsId == userId);
                 var product = _garmentsService.GetAllPro(1, userId);
+                if(product == null)
+                {
+                    return RedirectToAction("Index", "Error");
+                }
                 return View(product);
             }
             catch (Exception ex)
@@ -190,7 +194,13 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var product = _garmentsService.GetGarmentsProductById(id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+
+                var product = _garmentsService.GetGarmentsProductBySupplierId(id,userId);
+                if(product == null)
+                {
+                    return RedirectToAction("Index", "Error");
+                }
                 var departments = _departmentService.GetAllDept();
                 var productTypes = _productTypeService.GetAllType();
                 ViewBag.Departments = new SelectList(departments, "Id", "Name", product.Department.Id);
@@ -221,7 +231,13 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var product = _garmentsService.GetGarmentsProductById(id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+
+                var product = _garmentsService.GetGarmentsProductBySupplierId(id, userId);
+                if (product == null)
+                {
+                    return RedirectToAction("Index", "Error");
+                }
                 gv.GarmentsProduct.Image = product.Image;
 
                 if (gv.GarmentsProduct.Name.Count(char.IsLetter) < 3)
@@ -289,7 +305,13 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var product = _garmentsService.GetGarmentsProductById(id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+
+                var product = _garmentsService.GetGarmentsProductBySupplierId(id, userId);
+                if (product == null)
+                {
+                    return RedirectToAction("Index", "Error");
+                }
                 return View(product);
             }
             catch (Exception ex)
@@ -306,7 +328,13 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var product = _garmentsService.GetGarmentsProductById(id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+
+                var product = _garmentsService.GetGarmentsProductBySupplierId(id, userId);
+                if (product == null)
+                {
+                    return RedirectToAction("Index", "Error");
+                }
                 if (product != null)
                 {
                     product.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
@@ -350,7 +378,10 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var prod = _garmentsService.GetGarmentsProductById(id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+
+                var prod = _garmentsService.GetGarmentsProductBySupplierId(id, userId);
+
                 if (prod != null)
                 {
                     return View(prod);
@@ -370,7 +401,10 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var prod = _garmentsService.GetGarmentsProductById(id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+
+                var prod = _garmentsService.GetGarmentsProductBySupplierId(id, userId);
+
                 if (prod != null)
                 {
                     prod.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());

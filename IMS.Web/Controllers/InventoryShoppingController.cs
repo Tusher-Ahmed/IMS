@@ -65,30 +65,40 @@ namespace IMS.Web.Controllers
             }
             try
             {
-                if (ModelState.IsValid)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role != null)
                 {
-                    // Retrieve the GarmentsProduct based on the ProductId from your service
-                    var garmentsProduct = _garmentsService.GetGarmentsProductById(inventoryOrderCart.ProductId);
-
-                    if (garmentsProduct != null)
+                    if (ModelState.IsValid)
                     {
-                        InventoryOrderCart inventoryOrder = new InventoryOrderCart
+                        // Retrieve the GarmentsProduct based on the ProductId from your service
+                        var garmentsProduct = _garmentsService.GetGarmentsProductById(inventoryOrderCart.ProductId);
+
+                        if (garmentsProduct != null)
                         {
-                            Count = inventoryOrderCart.Count,
-                            EmployeeId = Convert.ToInt64(User.Identity.GetUserId()),
-                            GarmentsId = garmentsProduct.GarmentsId,
-                            GarmentsProduct = garmentsProduct,
-                            ProductId = inventoryOrderCart.ProductId,
-                        };
+                            InventoryOrderCart inventoryOrder = new InventoryOrderCart
+                            {
+                                Count = inventoryOrderCart.Count,
+                                EmployeeId = Convert.ToInt64(User.Identity.GetUserId()),
+                                GarmentsId = garmentsProduct.GarmentsId,
+                                GarmentsProduct = garmentsProduct,
+                                ProductId = inventoryOrderCart.ProductId,
+                            };
 
-                        // Add the inventoryOrder to the shopping cart
-                        _inventoryShoppingService.AddInventoryShoppingCart(inventoryOrder);
-                        return RedirectToAction("Index", "Garments");
+                            // Add the inventoryOrder to the shopping cart
+                            _inventoryShoppingService.AddInventoryShoppingCart(inventoryOrder);
+                            return RedirectToAction("Index", "Garments");
+                        }
                     }
-                }
 
-                // Handle the case where the GarmentsProduct is not found or the model is invalid.
-                return View(inventoryOrderCart);
+                    // Handle the case where the GarmentsProduct is not found or the model is invalid.
+                    return View(inventoryOrderCart);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -131,40 +141,64 @@ namespace IMS.Web.Controllers
         
         public JsonResult IncrementCount(long id)
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-
-            var cart = _inventoryShoppingService.GetproductById(id,userId);
-            if (cart != null)
+            try
             {
-                _inventoryShoppingService.IncrementCount(cart, 1);
-                var newTotalPrice = CalculateTotalPrice();
-                return Json(new { newCount = cart.Count, newTotalPrice });
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+
+                var cart = _inventoryShoppingService.GetproductById(id, userId);
+                if (cart != null)
+                {
+                    _inventoryShoppingService.IncrementCount(cart, 1);
+                    var newTotalPrice = CalculateTotalPrice();
+                    return Json(new { newCount = cart.Count, newTotalPrice });
+                }
+                else
+                {
+                    Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    return Json(new { error = "Cart not found" });
+                }
+            }catch(Exception ex)
+            {
+                Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                log.Error("An error occurred in YourAction.", ex);
+                return Json(new { message = "User ID mismatch" });
             }
-            Response.StatusCode = (int)HttpStatusCode.Forbidden;
-            log.Error("User ID mismatch");
-            return Json(new { message = "User ID mismatch" });
+            
         }
         [HttpPost]
         public JsonResult DecrementCount(long id)
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            var cart = _inventoryShoppingService.GetproductById(id, userId);
-            if(cart != null)
+            try
             {
-                _inventoryShoppingService.DecrementCount(cart, 1);
-                var newTotalPrice = CalculateTotalPrice();
-                return Json(new { newCount = cart.Count, newTotalPrice });
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                var cart = _inventoryShoppingService.GetproductById(id, userId);
+                if (cart != null)
+                {
+                    _inventoryShoppingService.DecrementCount(cart, 1);
+                    var newTotalPrice = CalculateTotalPrice();
+                    return Json(new { newCount = cart.Count, newTotalPrice });
+                }
+                else
+                {
+                    Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    return Json(new { error = "Cart not found" });
+                }
+                
+            }catch(Exception ex)
+            {
+                Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                log.Error("An error occurred in YourAction.", ex);
+                return Json(new { message = "User ID mismatch" });
             }
-            Response.StatusCode = (int)HttpStatusCode.Forbidden;
-            log.Error("User ID mismatch");
-            return Json(new { message = "User ID mismatch" });
+            
         }
 
         public ActionResult RemoveFromCart(long id)
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
+            
             try
             {
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
                 var cart = _inventoryShoppingService.GetproductById(id, userId);
                 if (cart != null)
                 {

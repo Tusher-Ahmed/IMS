@@ -27,8 +27,18 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var data = _productType.GetAllType();
-                return View(data);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
+                {
+                    var data = _productType.GetAllType();
+                    return View(data);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                    
             }
             catch (Exception ex)
             {
@@ -42,17 +52,27 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(pType) == false)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    var data = _productType.GetAllType();
-                    var searchItem = data.Where(u => u.Name.IndexOf(pType, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 1).ToList();
-                    return PartialView("_SearchProductType", searchItem);
+
+                    if (string.IsNullOrEmpty(pType) == false)
+                    {
+                        var data = _productType.GetAllType();
+                        var searchItem = data.Where(u => u.Name.IndexOf(pType, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 1).ToList();
+                        return PartialView("_SearchProductType", searchItem);
+                    }
+                    else
+                    {
+
+                        var data = _productType.GetAllType();
+                        return PartialView("_SearchProductType", data);
+                    }
                 }
                 else
                 {
-
-                    var data = _productType.GetAllType();
-                    return PartialView("_SearchProductType", data);
+                    return RedirectToAction("Index", "Error");
                 }
             }
             catch (Exception ex)
@@ -76,33 +96,47 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                TempData["data"] = "";
-                var data = _productType.GetAllType().Where(u => u.Name == pType.Name);
-                if (data.Any())
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    ModelState.AddModelError("Name", "Product Type is already in use.");
-                }
-
-                if (ModelState.IsValid)
-                {
-                    try
+                    TempData["data"] = "";
+                    if (pType.Name.Count(char.IsLetter) < 3)
                     {
-                        pType.CreatedBy = Convert.ToInt64(User.Identity.GetUserId());
-                        _productType.AddProductType(pType);
-                        TempData["data"] = "Product Type Added Successfully.";
-                        return Json(new { success = true, message = TempData["data"] });
-
+                        ModelState.AddModelError("Name", "Product Type must contain at least three letters.");
                     }
-                    catch
+                    var data = _productType.GetAllType().Where(u => u.Name.ToLower() == pType.Name.ToLower());
+                    if (data.Any())
                     {
-                        TempData["data"] = "Data is not inserted!!"; ;
-                        return Json(new { success = false, message = TempData["data"] });
-
+                        ModelState.AddModelError("Name", "Product Type is already in use.");
                     }
 
+                    if (ModelState.IsValid)
+                    {
+                        try
+                        {
+                            pType.CreatedBy = Convert.ToInt64(User.Identity.GetUserId());
+                            _productType.AddProductType(pType);
+                            TempData["data"] = "Product Type Added Successfully.";
+                            return Json(new { success = true, message = TempData["data"] });
+
+                        }
+                        catch
+                        {
+                            TempData["data"] = "Data is not inserted!!"; ;
+                            return Json(new { success = false, message = TempData["data"] });
+
+                        }
+
+                    }
+                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                    return Json(new { success = false, message = errors, errors = errors });
                 }
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                return Json(new { success = false, message = errors, errors = errors });
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                  
             }
             catch (Exception ex)
             {
@@ -118,16 +152,26 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                if (id == 0)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    return HttpNotFound();
+                    if (id == 0)
+                    {
+                        return HttpNotFound();
+                    }
+                    var productType = _productType.GetProductTypeById(id);
+                    if (productType != null)
+                    {
+                        return View(productType);
+                    }
+                    return RedirectToAction("Index");
                 }
-                var productType = _productType.GetProductTypeById(id);
-                if (productType != null)
+                else
                 {
-                    return View(productType);
+                    return RedirectToAction("Index", "Error");
                 }
-                return RedirectToAction("Index");
+                
             }
             catch (Exception ex)
             {
@@ -142,29 +186,50 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                if (pType == null)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    return HttpNotFound();
+                    if (pType == null)
+                    {
+                        return HttpNotFound();
+                    }
+                    if (pType.Name.Count(char.IsLetter) < 3)
+                    {
+                        ModelState.AddModelError("Name", "Product Type must contain at least three letters.");
+                    }
+                    var data = _productType.GetAllType().Where(u => u.Name.ToLower() == pType.Name.ToLower());
+
+                    if (data.Any())
+                    {
+                        ModelState.AddModelError("Name", "Product Type is already in use.");
+                    }
+
+                    if (ModelState.IsValid)
+                    {
+                        try
+                        {
+                            var deptData = _productType.GetProductTypeById(id);
+                            if (deptData.Status != null) { pType.Status = deptData.Status; }
+                            pType.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                            _productType.UpdateProductType(id, pType);
+                            TempData["data"] = "Product Type Updated Successfully.";
+                            return Json(new { success = true, message = TempData["data"] });
+                        }
+                        catch
+                        {
+                            TempData["data"] = "Data is not Updated!!";
+                            return Json(new { success = false, message = TempData["data"] });
+                        }
+                    }
+                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                    return Json(new { success = false, message = errors, errors = errors });
                 }
-                if (ModelState.IsValid)
+                else
                 {
-                    try
-                    {
-                        var deptData = _productType.GetProductTypeById(id);
-                        if (deptData.Status != null) { pType.Status = deptData.Status; }
-                        pType.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
-                        _productType.UpdateProductType(id, pType);
-                        TempData["data"] = "Product Type Updated Successfully.";
-                        return Json(new { success = true, message = TempData["data"] });
-                    }
-                    catch
-                    {
-                        TempData["data"] = "Data is not Updated!!";
-                        return Json(new { success = false, message = TempData["data"] });
-                    }
+                    return RedirectToAction("Index", "Error");
                 }
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                return Json(new { success = false, message = errors, errors = errors });
+                
             }
             catch (Exception ex)
             {
@@ -179,16 +244,25 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                if (id == 0)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    return HttpNotFound();
+                    if (id == 0)
+                    {
+                        return HttpNotFound();
+                    }
+                    var productType = _productType.GetProductTypeById(id);
+                    if (productType != null)
+                    {
+                        return View(productType);
+                    }
+                    return RedirectToAction("Index");
                 }
-                var productType = _productType.GetProductTypeById(id);
-                if (productType != null)
+                else
                 {
-                    return View(productType);
-                }
-                return RedirectToAction("Index");
+                    return RedirectToAction("Index", "Error");
+                }                
             }
             catch (Exception ex)
             {
@@ -203,16 +277,26 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var productType = _productType.GetProductTypeById(id);
-                if (productType != null)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    productType.Status = 0;
-                    productType.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
-                    _productType.UpdateProductType(id, productType);
-                    TempData["success"] = "Status Updated Successfully!";
-                    return RedirectToAction("Index", "ProductType");
+                    var productType = _productType.GetProductTypeById(id);
+                    if (productType != null)
+                    {
+                        productType.Status = 0;
+                        productType.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                        _productType.UpdateProductType(id, productType);
+                        TempData["success"] = "Status Updated Successfully!";
+                        return RedirectToAction("Index", "ProductType");
+                    }
+                    return View();
                 }
-                return View();
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -228,8 +312,18 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var data = _productType.GetAllType().Where(u => u.Status == 0);
-                return View(data);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
+                {
+                    var data = _productType.GetAllType().Where(u => u.Status == 0);
+                    return View(data);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -243,18 +337,28 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(dept) == false)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    var data = _productType.GetAllType();
-                    var searchItem = data.Where(u => u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 0).ToList();
-                    return PartialView("_SearchProductType", searchItem);
+                    if (string.IsNullOrEmpty(dept) == false)
+                    {
+                        var data = _productType.GetAllType();
+                        var searchItem = data.Where(u => u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 0).ToList();
+                        return PartialView("_SearchProductType", searchItem);
+                    }
+                    else
+                    {
+
+                        var data = _productType.GetAllType().Where(u => u.Status == 0);
+                        return PartialView("_SearchProductType", data);
+                    }
                 }
                 else
                 {
-
-                    var data = _productType.GetAllType().Where(u => u.Status == 0);
-                    return PartialView("_SearchProductType", data);
+                    return RedirectToAction("Index", "Error");
                 }
+                
             }
             catch (Exception ex)
             {
@@ -270,12 +374,22 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var dept = _productType.GetProductTypeById(id);
-                if (dept != null)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    return View(dept);
+                    var dept = _productType.GetProductTypeById(id);
+                    if (dept != null)
+                    {
+                        return View(dept);
+                    }
+                    return RedirectToAction("Deactivate", "ProductType");
                 }
-                return RedirectToAction("Deactivate", "ProductType");
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -290,16 +404,26 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var ProductType = _productType.GetProductTypeById(id);
-                if (ProductType != null)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    ProductType.Status = 1;
-                    ProductType.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
-                    _productType.UpdateProductType(id, ProductType);
-                    TempData["success"] = "Status Updated Successfully!";
-                    return RedirectToAction("Deactivate", "ProductType");
+                    var ProductType = _productType.GetProductTypeById(id);
+                    if (ProductType != null)
+                    {
+                        ProductType.Status = 1;
+                        ProductType.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                        _productType.UpdateProductType(id, ProductType);
+                        TempData["success"] = "Status Updated Successfully!";
+                        return RedirectToAction("Deactivate", "ProductType");
+                    }
+                    return View();
                 }
-                return View();
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+               
             }
             catch (Exception ex)
             {

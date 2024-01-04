@@ -96,6 +96,10 @@
                     $("#count_" + itemId).text(data.newCount);
                     var formattedTotalPrice = data.newTotalPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
                     $("#totalPrice").text(formattedTotalPrice);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Ajax request failed:", status, error);
+                    window.location.href = "@Url.Action("Index", "Error")";
                 }
             });
         }
@@ -109,6 +113,10 @@
                     $("#count_" + itemId).text(data.newCount);
                     var formattedTotalPrice = data.newTotalPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
                     $("#totalPrice").text(formattedTotalPrice);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Ajax request failed:", status, error);
+                    window.location.href = "@Url.Action("Index", "Error")";
                 }
             });
         }

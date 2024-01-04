@@ -27,8 +27,18 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var data = _department.GetAllDept().Where(u => u.Status == 1);
-                return View(data);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if(role == "Admin")
+                {
+                    var data = _department.GetAllDept().Where(u => u.Status == 1);
+                    return View(data);
+                }
+                else
+                {
+                    return View("NotFound", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -42,18 +52,28 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(dept) == false)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    var data = _department.GetAllDept();
-                    var searchItem = data.Where(u => u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 1).ToList();
-                    return PartialView("_SearchDepartment", searchItem);
+                    if (string.IsNullOrEmpty(dept) == false)
+                    {
+                        var data = _department.GetAllDept();
+                        var searchItem = data.Where(u => u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 1).ToList();
+                        return PartialView("_SearchDepartment", searchItem);
+                    }
+                    else
+                    {
+
+                        var data = _department.GetAllDept();
+                        return PartialView("_SearchDepartment", data);
+                    }
                 }
                 else
                 {
-
-                    var data = _department.GetAllDept();
-                    return PartialView("_SearchDepartment", data);
+                    return View("NotFound", "Error");
                 }
+
             }
             catch (Exception ex)
             {
@@ -74,33 +94,48 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                TempData["data"] = "";
-                var data = _department.GetAllDept().Where(u => u.Name == dept.Name);
-                if (data.Any())
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    ModelState.AddModelError("Name", "Department name is already in use.");
-                }
-
-                if (ModelState.IsValid)
-                {
-                    try
+                    if (dept.Name.Count(char.IsLetter) < 3)
                     {
-                        dept.CreatedBy = Convert.ToInt64(User.Identity.GetUserId());
-                        _department.AddDept(dept);
-                        TempData["data"] = "Department Created Successfully.";
-                        return Json(new { success = true, message = TempData["data"] });
+                        ModelState.AddModelError("Name", "Department name must contain at least three letters.");
+                    }
+                    TempData["data"] = "";
+                    var data = _department.GetAllDept().Where(u => u.Name.ToLower() == dept.Name.ToLower());
+                    if (data.Any())
+                    {
+                        ModelState.AddModelError("Name", "Department name is already in use.");
+                    }
+                    
+
+                    if (ModelState.IsValid)
+                    {
+                        try
+                        {
+                            dept.CreatedBy = Convert.ToInt64(User.Identity.GetUserId());
+                            _department.AddDept(dept);
+                            TempData["data"] = "Department Created Successfully.";
+                            return Json(new { success = true, message = TempData["data"] });
+
+                        }
+                        catch
+                        {
+                            TempData["data"] = "Data is not inserted!!"; ;
+                            return Json(new { success = false, message = TempData["data"] });
+
+                        }
 
                     }
-                    catch
-                    {
-                        TempData["data"] = "Data is not inserted!!"; ;
-                        return Json(new { success = false, message = TempData["data"] });
-
-                    }
-
+                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                    return Json(new { success = false, message = errors, errors = errors });
                 }
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                return Json(new { success = false, message = errors, errors = errors });
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -116,16 +151,26 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                if (id == 0)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    return HttpNotFound();
+                    if (id == 0)
+                    {
+                        return HttpNotFound();
+                    }
+                    var dept = _department.GetDeptById(id);
+                    if (dept != null)
+                    {
+                        return View(dept);
+                    }
+                    return RedirectToAction("Index");
                 }
-                var dept = _department.GetDeptById(id);
-                if (dept != null)
+                else
                 {
-                    return View(dept);
+                    return RedirectToAction("Index", "Error");
                 }
-                return RedirectToAction("Index");
+               
             }
             catch (Exception ex)
             {
@@ -139,36 +184,51 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                if (dept == null)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    return HttpNotFound();
-                }
-                var data = _department.GetAllDept().Where(u => u.Name == dept.Name);
-
-                if (data.Any())
-                {
-                    ModelState.AddModelError("Name", "Department name is already in use.");
-                }
-
-                if (ModelState.IsValid)
-                {
-                    try
+                    if (dept == null)
                     {
-                        var deptData = _department.GetDeptById(id);
-                        if (deptData.Status != null) { dept.Status = deptData.Status; }
-                        dept.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
-                        _department.UpdateDept(id, dept);
-                        TempData["data"] = "Department Updated Successfully.";
-                        return Json(new { success = true, message = TempData["data"] });
+                        return HttpNotFound();
                     }
-                    catch
+
+                    if (dept.Name.Count(char.IsLetter) < 3)
                     {
-                        TempData["data"] = "Data is not Updated!!";
-                        return Json(new { success = false, message = TempData["data"] });
+                        ModelState.AddModelError("Name", "Department name must contain at least three letters.");
                     }
+
+                    var data = _department.GetAllDept().Where(u => u.Name.ToLower() == dept.Name.ToLower());
+
+                    if (data.Any())
+                    {
+                        ModelState.AddModelError("Name", "Department name is already in use.");
+                    }
+
+                    if (ModelState.IsValid)
+                    {
+                        try
+                        {
+                            var deptData = _department.GetDeptById(id);
+                            if (deptData.Status != null) { dept.Status = deptData.Status; }
+                            dept.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                            _department.UpdateDept(id, dept);
+                            TempData["data"] = "Department Updated Successfully.";
+                            return Json(new { success = true, message = TempData["data"] });
+                        }
+                        catch
+                        {
+                            TempData["data"] = "Data is not Updated!!";
+                            return Json(new { success = false, message = TempData["data"] });
+                        }
+                    }
+                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                    return Json(new { success = false, message = errors, errors = errors });
                 }
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                return Json(new { success = false, message = errors, errors = errors });
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }                
             }
             catch (Exception ex)
             {
@@ -185,16 +245,26 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                if (id == 0)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    return HttpNotFound();
+                    if (id == 0)
+                    {
+                        return HttpNotFound();
+                    }
+                    var dept = _department.GetDeptById(id);
+                    if (dept != null)
+                    {
+                        return View(dept);
+                    }
+                    return RedirectToAction("Index");
                 }
-                var dept = _department.GetDeptById(id);
-                if (dept != null)
+                else
                 {
-                    return View(dept);
+                    return RedirectToAction("Index", "Error");
                 }
-                return RedirectToAction("Index");
+               
             }
             catch (Exception ex)
             {
@@ -209,16 +279,26 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var deptarment = _department.GetDeptById(id);
-                if (deptarment != null)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    deptarment.Status = 0;
-                    deptarment.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
-                    _department.UpdateDept(id, deptarment);
-                    TempData["success"] = "Status Updated Successfully";
-                    return RedirectToAction("Index", "Department");
+                    var deptarment = _department.GetDeptById(id);
+                    if (deptarment != null)
+                    {
+                        deptarment.Status = 0;
+                        deptarment.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                        _department.UpdateDept(id, deptarment);
+                        TempData["success"] = "Status Updated Successfully";
+                        return RedirectToAction("Index", "Department");
+                    }
+                    return View();
                 }
-                return View();
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -234,8 +314,18 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var data = _department.GetAllDept().Where(u => u.Status == 0);
-                return View(data);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
+                {
+                    var data = _department.GetAllDept().Where(u => u.Status == 0);
+                    return View(data);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+               
             }
             catch (Exception ex)
             {
@@ -249,18 +339,28 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(dept) == false)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    var data = _department.GetAllDept();
-                    var searchItem = data.Where(u => u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 0).ToList();
-                    return PartialView("_SearchDepartment", searchItem);
+                    if (string.IsNullOrEmpty(dept) == false)
+                    {
+                        var data = _department.GetAllDept();
+                        var searchItem = data.Where(u => u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 0).ToList();
+                        return PartialView("_SearchDepartment", searchItem);
+                    }
+                    else
+                    {
+
+                        var data = _department.GetAllDept().Where(u => u.Status == 0);
+                        return PartialView("_SearchDepartment", data);
+                    }
                 }
                 else
                 {
-
-                    var data = _department.GetAllDept().Where(u => u.Status == 0);
-                    return PartialView("_SearchDepartment", data);
+                    return RedirectToAction("Index", "Error");
                 }
+               
             }
             catch (Exception ex)
             {
@@ -276,12 +376,22 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var dept = _department.GetDeptById(id);
-                if (dept != null)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    return View(dept);
+                    var dept = _department.GetDeptById(id);
+                    if (dept != null)
+                    {
+                        return View(dept);
+                    }
+                    return RedirectToAction("Deactivate", "Department");
                 }
-                return RedirectToAction("Deactivate", "Department");
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -296,16 +406,25 @@ namespace IMS.Web.Controllers
         {
             try
             {
-                var deptarment = _department.GetDeptById(id);
-                if (deptarment != null)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role == "Admin")
                 {
-                    deptarment.Status = 1;
-                    deptarment.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
-                    _department.UpdateDept(id, deptarment);
-                    TempData["success"] = "Status Updated Successfully";
-                    return RedirectToAction("Deactivate", "Department");
+                    var deptarment = _department.GetDeptById(id);
+                    if (deptarment != null)
+                    {
+                        deptarment.Status = 1;
+                        deptarment.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                        _department.UpdateDept(id, deptarment);
+                        TempData["success"] = "Status Updated Successfully";
+                        return RedirectToAction("Deactivate", "Department");
+                    }
+                    return View();
                 }
-                return View();
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
             }
             catch (Exception ex)
             {

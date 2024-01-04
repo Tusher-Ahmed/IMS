@@ -3,11 +3,13 @@ using IMS.Web.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using NHibernate;
+using NHibernate.Engine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using WebGrease.Css.Ast;
 
 namespace IMS.Web.Controllers
 {
@@ -34,6 +36,37 @@ namespace IMS.Web.Controllers
             {
                 return HttpContext.GetOwinContext().Authentication;
             }
+        }
+        public string IsAuthorize(long userId)
+        {
+            var context = new ApplicationDbContext();
+            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+            var user = userManager.FindById(userId);
+            if (user != null)
+            {
+                string userRole = "";
+                int status = 0;
+                var roles = userManager.GetRoles(userId);
+                if (roles.Count > 0)
+                {
+                    userRole = roles[0];
+                }
+
+                if (userRole == "Manager")
+                {
+                    status = _employeeService.GetEmployeeByUserId(userId).Status;
+                }
+                if(userRole == "Admin")
+                {
+                    status = 1;
+                }
+
+                if(status == 1)
+                {
+                    return userRole;
+                }
+            }
+            return null;
         }
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
@@ -88,6 +121,37 @@ namespace IMS.Web.Controllers
                 ViewBag.SetPriceCount = TotalInQueue;
             }            
            
+        }
+        public string IsAuthorizeRole(long userId)
+        {
+            var context = new ApplicationDbContext();
+            var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+            var user = userManager.FindById(userId);
+            if (user != null)
+            {
+                string userRole = "";
+                int status = 0;
+                var roles = userManager.GetRoles(userId);
+                if (roles.Count > 0)
+                {
+                    userRole = roles[0];
+                }
+
+                if (userRole == "Manager" || userRole=="Staff")
+                {
+                    status = _employeeService.GetEmployeeByUserId(userId).Status;
+                }
+                if (userRole == "Admin")
+                {
+                    status = 1;
+                }
+
+                if (status == 1)
+                {
+                    return userRole;
+                }
+            }
+            return null;
         }
     }
 }

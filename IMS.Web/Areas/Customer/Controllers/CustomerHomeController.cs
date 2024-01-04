@@ -40,27 +40,35 @@ namespace IMS.Web.Areas.Customer.Controllers
         {
             try
             {
-                long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var orderHeaders = _orderHeaderService.GetOrderByStatus("All", userId);
-                List<OrderDetail> orders = new List<OrderDetail>();
-                foreach (var item in orderHeaders)
+                if (User.IsInRole("Customer"))
                 {
-                    var ODetail = _orderDetailService.GetOrderDetailByOrderHeaderId(item.Id);
-                    orders.Add(ODetail);
+                    long userId = Convert.ToInt64(User.Identity.GetUserId());
+                    var orderHeaders = _orderHeaderService.GetOrderByStatus("All", userId);
+                    List<OrderDetail> orders = new List<OrderDetail>();
+                    foreach (var item in orderHeaders)
+                    {
+                        var ODetail = _orderDetailService.GetOrderDetailByOrderHeaderId(item.Id);
+                        orders.Add(ODetail);
+                    }
+
+                    //OrderDetails=_orderDetailService.getAllOrderDetails().
+                    CustomerDashboardViewModel viewModel = new CustomerDashboardViewModel
+                    {
+                        OrderHeaders = orderHeaders,
+                        OrderDetails = orders,
+                        TotalOrders = _orderHeaderService.GetOrderByStatus("Delivered", userId).Count(),
+                        NewArrival = orderHeaders.Where(u => u.OrderStatus != ShoppingHelper.StatusDelivered &&
+                              u.OrderStatus != ShoppingHelper.StatusCancelled && u.OrderStatus != ShoppingHelper.StatusRefunded).Count(),
+                        TotalCanceledOrder = _orderHeaderService.GetOrderByStatus("Refunded", userId).Count()
+                    };
+
+                    return View(viewModel);
                 }
-
-                //OrderDetails=_orderDetailService.getAllOrderDetails().
-                CustomerDashboardViewModel viewModel = new CustomerDashboardViewModel
+                else
                 {
-                    OrderHeaders = orderHeaders,
-                    OrderDetails = orders,
-                    TotalOrders = _orderHeaderService.GetOrderByStatus("Delivered", userId).Count(),
-                    NewArrival = orderHeaders.Where(u => u.OrderStatus != ShoppingHelper.StatusDelivered &&
-                          u.OrderStatus != ShoppingHelper.StatusCancelled && u.OrderStatus != ShoppingHelper.StatusRefunded).Count(),
-                    TotalCanceledOrder = _orderHeaderService.GetOrderByStatus("Refunded", userId).Count()
-                };
-
-                return View(viewModel);
+                    return RedirectToAction("Index", "Error");
+                }
+               
             }
             catch (Exception ex)
             {
@@ -76,10 +84,17 @@ namespace IMS.Web.Areas.Customer.Controllers
         {
             try
             {
-                long userId = Convert.ToInt64(User.Identity.GetUserId());
-                //var orderHeader = _orderHeaderService.GetAllOrderHeaders().Where(u => u.CustomerId == userId);
-                var orderHeader = _orderHeaderService.GetOrderByStatus(status , userId);              
-                return View(orderHeader);
+                if (User.IsInRole("Customer"))
+                {
+                    long userId = Convert.ToInt64(User.Identity.GetUserId());
+                    //var orderHeader = _orderHeaderService.GetAllOrderHeaders().Where(u => u.CustomerId == userId);
+                    var orderHeader = _orderHeaderService.GetOrderByStatus(status, userId);
+                    return View(orderHeader);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
             }
             catch (Exception ex)
             {

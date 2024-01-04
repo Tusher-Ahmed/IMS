@@ -4,7 +4,7 @@ using IMS.Service;
 using IMS.Utility;
 using IMS.Web.Controllers;
 using IMS.Web.Models;
-
+using Microsoft.AspNet.Identity;
 using NHibernate;
 using Stripe;
 using System;
@@ -38,9 +38,19 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-
-                var orderHeader = _orderHeaderService.GetOrderByStatus(status);
-                return View(orderHeader);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                var orderHeader = new List<OrderHeader>();
+                if (role != null)
+                {
+                    orderHeader = _orderHeaderService.GetOrderByStatus(status);
+                    return View(orderHeader);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -57,7 +67,23 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var orderHeader = _orderHeaderService.GetOrderHeaderById(id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role=IsAuthorize(userId);
+                var orderHeader = new OrderHeader();
+                if (role != null)
+                {
+                    orderHeader = _orderHeaderService.GetOrderHeaderById(id);
+                }
+                else
+                {
+                     orderHeader = _orderHeaderService.GetOrderHeaderByUser(id,userId);
+                }
+
+                if(orderHeader == null)
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+
                 var orderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == orderHeader.Id);
                 var cancleReason = _cancelReasonService.GetReasonByOrderHeaderId(orderHeader.Id);
                 var context = new ApplicationDbContext();
@@ -99,28 +125,38 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var orderHeader = _orderHeaderService.GetOrderHeaderById(customerInvoiceViewModel.OrderHeader.Id);
-                orderHeader.Name = customerInvoiceViewModel.OrderHeader.Name;
-                orderHeader.PhoneNumber = customerInvoiceViewModel.OrderHeader.PhoneNumber;
-                orderHeader.StreetAddress = customerInvoiceViewModel.OrderHeader.StreetAddress;
-                orderHeader.City = customerInvoiceViewModel.OrderHeader.City;
-                orderHeader.Thana = customerInvoiceViewModel.OrderHeader.Thana;
-                orderHeader.PostalCode = customerInvoiceViewModel.OrderHeader.PostalCode;
-
-                if (customerInvoiceViewModel.OrderHeader.Carrier != null)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if(role != null)
                 {
-                    orderHeader.Carrier = customerInvoiceViewModel.OrderHeader.Carrier;
-                }
+                    var orderHeader = _orderHeaderService.GetOrderHeaderById(customerInvoiceViewModel.OrderHeader.Id);
+                    orderHeader.Name = customerInvoiceViewModel.OrderHeader.Name;
+                    orderHeader.PhoneNumber = customerInvoiceViewModel.OrderHeader.PhoneNumber;
+                    orderHeader.StreetAddress = customerInvoiceViewModel.OrderHeader.StreetAddress;
+                    orderHeader.City = customerInvoiceViewModel.OrderHeader.City;
+                    orderHeader.Thana = customerInvoiceViewModel.OrderHeader.Thana;
+                    orderHeader.PostalCode = customerInvoiceViewModel.OrderHeader.PostalCode;
 
-                if (customerInvoiceViewModel.OrderHeader.TrackingNumber != null)
+                    if (customerInvoiceViewModel.OrderHeader.Carrier != null)
+                    {
+                        orderHeader.Carrier = customerInvoiceViewModel.OrderHeader.Carrier;
+                    }
+
+                    if (customerInvoiceViewModel.OrderHeader.TrackingNumber != null)
+                    {
+                        orderHeader.TrackingNumber = customerInvoiceViewModel.OrderHeader.TrackingNumber;
+                    }
+
+                    _orderHeaderService.Update(orderHeader);
+                    TempData["success"] = "Order Details Updated Successfully!";
+
+                    return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
+                }
+                else
                 {
-                    orderHeader.TrackingNumber = customerInvoiceViewModel.OrderHeader.TrackingNumber;
+                    return RedirectToAction("Index", "Error");
                 }
-
-                _orderHeaderService.Update(orderHeader);
-                TempData["success"] = "Order Details Updated Successfully!";
-
-                return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
+                
             }
             catch (Exception ex)
             {
@@ -138,9 +174,19 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                _orderHeaderService.UpdateStatus(customerInvoiceViewModel.OrderHeader.Id, ShoppingHelper.StatusInProces, customerInvoiceViewModel.OrderHeader.PaymentStatus);
-                TempData["success"] = "Order status change successfully!";
-                return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role != null)
+                {
+                    _orderHeaderService.UpdateStatus(customerInvoiceViewModel.OrderHeader.Id, ShoppingHelper.StatusInProces, customerInvoiceViewModel.OrderHeader.PaymentStatus);
+                    TempData["success"] = "Order status change successfully!";
+                    return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -158,15 +204,25 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var orderHeader = _orderHeaderService.GetOrderHeaderById(customerInvoiceViewModel.OrderHeader.Id);
-                orderHeader.TrackingNumber = Guid.NewGuid().ToString();
-                orderHeader.Carrier = customerInvoiceViewModel.OrderHeader.Carrier;
-                orderHeader.OrderStatus = ShoppingHelper.StatusShipped;
-                orderHeader.ShippingDate = DateTime.Now;
-                _orderHeaderService.Update(orderHeader);
-                TempData["success"] = "Order has been shipped successfully!";
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role != null)
+                {
+                    var orderHeader = _orderHeaderService.GetOrderHeaderById(customerInvoiceViewModel.OrderHeader.Id);
+                    orderHeader.TrackingNumber = Guid.NewGuid().ToString();
+                    orderHeader.Carrier = customerInvoiceViewModel.OrderHeader.Carrier;
+                    orderHeader.OrderStatus = ShoppingHelper.StatusShipped;
+                    orderHeader.ShippingDate = DateTime.Now;
+                    _orderHeaderService.Update(orderHeader);
+                    TempData["success"] = "Order has been shipped successfully!";
 
-                return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
+                    return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -184,9 +240,19 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                _orderHeaderService.UpdateStatus(customerInvoiceViewModel.OrderHeader.Id, ShoppingHelper.StatusDelivered, customerInvoiceViewModel.OrderHeader.PaymentStatus);
-                TempData["success"] = "Order status change successfully!";
-                return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role != null)
+                {
+                    _orderHeaderService.UpdateStatus(customerInvoiceViewModel.OrderHeader.Id, ShoppingHelper.StatusDelivered, customerInvoiceViewModel.OrderHeader.PaymentStatus);
+                    TempData["success"] = "Order status change successfully!";
+                    return RedirectToAction("Edit", "CustomerOrder", new { id = customerInvoiceViewModel.OrderHeader.Id });
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -202,7 +268,22 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var orderHeader = _orderHeaderService.GetOrderHeaderById(orderId);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                var orderHeader = new OrderHeader();
+                if (role != null)
+                {
+                    orderHeader = _orderHeaderService.GetOrderHeaderById(orderId);
+                }
+                else
+                {
+                    orderHeader = _orderHeaderService.GetOrderHeaderByUser(orderId, userId);
+                }
+
+                if(orderHeader == null)
+                {
+                    return RedirectToAction("Index", "Error");
+                }
                 var orderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == orderHeader.Id);
                 CustomerInvoiceViewModel customerInvoiceViewModel = new CustomerInvoiceViewModel
                 {
@@ -226,7 +307,22 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var orderHeader = _orderHeaderService.GetOrderHeaderById(customerInvoiceViewModel.OrderHeader.Id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                var orderHeader = new OrderHeader();
+                if (role != null)
+                {
+                    orderHeader = _orderHeaderService.GetOrderHeaderById(customerInvoiceViewModel.OrderHeader.Id);
+                }
+                else
+                {
+                    orderHeader = _orderHeaderService.GetOrderHeaderByUser(customerInvoiceViewModel.OrderHeader.Id, userId);
+                } 
+                
+                if(orderHeader == null)
+                {
+                    return RedirectToAction("Index", "Error");
+                }
 
                 if (customerInvoiceViewModel.CancelReason.Reason == null)
                 {
@@ -263,7 +359,21 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var orderHeader = _orderHeaderService.GetOrderHeaderById(customerInvoiceViewModel.OrderHeader.Id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                var orderHeader = new OrderHeader();
+                if (role != null)
+                {
+                    orderHeader = _orderHeaderService.GetOrderHeaderById(customerInvoiceViewModel.OrderHeader.Id);
+                }
+                else
+                {
+                    orderHeader = _orderHeaderService.GetOrderHeaderByUser(customerInvoiceViewModel.OrderHeader.Id, userId);
+                }  
+                if(orderHeader == null)
+                {
+                    return RedirectToAction("Index", "Error");
+                }
 
                 if (orderHeader.PaymentStatus == ShoppingHelper.StatusApproved)
                 {
@@ -307,7 +417,18 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var orderHeader = _orderHeaderService.GetOrderHeaderById(id);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                var orderHeader = new OrderHeader();
+                if (role != null)
+                {
+                    orderHeader = _orderHeaderService.GetOrderHeaderById(id);
+                }
+                else
+                {
+                    orderHeader = _orderHeaderService.GetOrderHeaderByUser(id, userId);
+                }
+               // var orderHeader = _orderHeaderService.GetOrderHeaderById(id);
                 var orderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == orderHeader.Id);
                 var cancleReason = _cancelReasonService.GetReasonByOrderHeaderId(orderHeader.Id);
 

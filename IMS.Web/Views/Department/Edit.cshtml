@@ -45,7 +45,7 @@
     </div>
 }
 
-@*@section Scripts {
+@section Scripts {
     <script>
         var messageTimer;
 
@@ -67,7 +67,7 @@
 
                 messageTimer = setTimeout(function () {
                     messageElement.remove();
-                }, 2000);
+                }, 5000);
             }
         }
 
@@ -76,10 +76,11 @@
             updateDivDept(ajaxContext.responseJSON);
 
         }
+
     </script>
 
     @Scripts.Render("~/bundles/jqueryval")
-}*@
+}
 <script src="~/Scripts/jquery-3.4.1.min.js"></script>
 <script src="~/Scripts/jquery.validate.min.js"></script>
 <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

@@ -84,9 +84,17 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-               // var product = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true);
-                var product = _product.GetAllApprovedProduct();
-                return View(product);
+                // var product = _product.GetAllProduct().Where(u => u.Status == 1 && u.IsPriceAdded == true && u.Approved == true);
+                if (User.IsInRole("Manager"))
+                {
+                    var product = _product.GetAllApprovedProduct();
+                    return View(product);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -103,12 +111,20 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var prod = _product.GetProductById(id);
-                if (prod != null)
+                if (User.IsInRole("Manager"))
                 {
-                    return View(prod);
+                    var prod = _product.GetProductById(id);
+                    if (prod != null)
+                    {
+                        return View(prod);
+                    }
+                    return RedirectToAction("ProductList");
                 }
-                return RedirectToAction("ProductList");
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -124,35 +140,43 @@ namespace IMS.Web.Areas.Manager.Controllers
             
             try
             {
-                var prod = _product.GetProductById(id);
-
-                long userId = Convert.ToInt64(User.Identity.GetUserId());
-                if (prod != null)
+                if (User.IsInRole("Manager"))
                 {
-                    prod.Price = product.Price;
-                    prod.Name = product.Name;
+                    var prod = _product.GetProductById(id);
 
-                    if (ImageFile != null && ImageFile.ContentLength > 0)
+                    long userId = Convert.ToInt64(User.Identity.GetUserId());
+                    if (prod != null)
                     {
+                        prod.Price = product.Price;
+                        prod.Name = product.Name;
 
-                        var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                        if (ImageFile != null && ImageFile.ContentLength > 0)
+                        {
 
-                        var path = Path.Combine(Server.MapPath("~/Images"), uniqueFileName);
-                        ImageFile.SaveAs(path);
+                            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+
+                            var path = Path.Combine(Server.MapPath("~/Images"), uniqueFileName);
+                            ImageFile.SaveAs(path);
 
 
-                        prod.Image = uniqueFileName;
+                            prod.Image = uniqueFileName;
+                        }
+                        prod.Description = product.Description;
+                        prod.ModifyBy = userId;//ManagerId
+                        prod.Status = 1;
+                        prod.VersionNumber = prod.VersionNumber + 1;
+
+                        _product.UpdateProduct(prod);
+                        TempData["success"] = "Product updated successfully!";
+                        return RedirectToAction("ProductList");
                     }
-                    prod.Description = product.Description;
-                    prod.ModifyBy = userId;//ManagerId
-                    prod.Status = 1;
-                    prod.VersionNumber = prod.VersionNumber + 1;
-
-                    _product.UpdateProduct(prod);
-                    TempData["success"] = "Product updated successfully!";
-                    return RedirectToAction("ProductList");
+                    return View(product);
                 }
-                return View(product);
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -170,16 +194,24 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                if (id == 0)
+                if (User.IsInRole("Manager"))
                 {
-                    return HttpNotFound();
+                    if (id == 0)
+                    {
+                        return HttpNotFound();
+                    }
+                    var prod = _product.GetProductById(id);
+                    if (prod != null)
+                    {
+                        return View(prod);
+                    }
+                    return RedirectToAction("ProductList");
                 }
-                var prod = _product.GetProductById(id);
-                if (prod != null)
+                else
                 {
-                    return View(prod);
+                    return RedirectToAction("Index", "Error");
                 }
-                return RedirectToAction("ProductList");
+                
             }
             catch (Exception ex)
             {
@@ -195,17 +227,25 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var prod = _product.GetProductById(id);
-                long userId = Convert.ToInt64(User.Identity.GetUserId());
-                if (prod != null)
+                if (User.IsInRole("Manager"))
                 {
-                    prod.Status = 0;
-                    prod.ModifyBy = userId;
-                    _product.UpdateProduct(prod);
-                    TempData["success"] = "Product status change successfully!";
-                    return RedirectToAction("ProductList");
+                    var prod = _product.GetProductById(id);
+                    long userId = Convert.ToInt64(User.Identity.GetUserId());
+                    if (prod != null)
+                    {
+                        prod.Status = 0;
+                        prod.ModifyBy = userId;
+                        _product.UpdateProduct(prod);
+                        TempData["success"] = "Product status change successfully!";
+                        return RedirectToAction("ProductList");
+                    }
+                    return View();
                 }
-                return View();
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -222,12 +262,20 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                if (id != 0)
+                if (User.IsInRole("Manager"))
                 {
-                    var prod = _product.GetProductById(id);
-                    return View(prod);
+                    if (id != 0)
+                    {
+                        var prod = _product.GetProductById(id);
+                        return View(prod);
+                    }
+                    return RedirectToAction("ProductList");
                 }
-                return RedirectToAction("ProductList");
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+               
             }
             catch (Exception ex)
             {
@@ -244,13 +292,21 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var prod = _product.GetAllProduct().Where(u => u.Status == 0 && u.Approved == true && u.IsPriceAdded == true);
-                if (prod != null)
+                if (User.IsInRole("Manager"))
                 {
-                    return View(prod);
+                    var prod = _product.GetAllProduct().Where(u => u.Status == 0 && u.Approved == true && u.IsPriceAdded == true);
+                    if (prod != null)
+                    {
+                        return View(prod);
 
+                    }
+                    return RedirectToAction("ProductList");
                 }
-                return RedirectToAction("ProductList");
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+               
             }
             catch (Exception ex)
             {
@@ -267,16 +323,24 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                if (id == 0)
+                if (User.IsInRole("Manager"))
                 {
-                    return HttpNotFound();
+                    if (id == 0)
+                    {
+                        return HttpNotFound();
+                    }
+                    var prod = _product.GetProductById(id);
+                    if (prod != null)
+                    {
+                        return View(prod);
+                    }
+                    return RedirectToAction("ProductList");
                 }
-                var prod = _product.GetProductById(id);
-                if (prod != null)
+                else
                 {
-                    return View(prod);
+                    return RedirectToAction("Index", "Error");
                 }
-                return RedirectToAction("ProductList");
+                
             }
             catch (Exception ex)
             {
@@ -291,17 +355,25 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var prod = _product.GetProductById(id);
-                long userId = Convert.ToInt64(User.Identity.GetUserId());
-                if (prod != null)
+                if (User.IsInRole("Manager"))
                 {
-                    prod.Status = 1;
-                    prod.ModifyBy = userId;
-                    _product.UpdateProduct(prod);
-                    TempData["success"] = "Product status change successfully!";
-                    return RedirectToAction("ProductList");
+                    var prod = _product.GetProductById(id);
+                    long userId = Convert.ToInt64(User.Identity.GetUserId());
+                    if (prod != null)
+                    {
+                        prod.Status = 1;
+                        prod.ModifyBy = userId;
+                        _product.UpdateProduct(prod);
+                        TempData["success"] = "Product status change successfully!";
+                        return RedirectToAction("ProductList");
+                    }
+                    return View();
                 }
-                return View();
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -318,39 +390,47 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-                var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
-                string roleNames = "Staff";
-                var roleIds = roleManager.Roles
-                    .Where(r => roleNames.Contains(r.Name))
-                    .Select(r => r.Id)
-                    .ToList();
-
-                var usersWithDetails = context.Users
-                    .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
-                    .ToList();
-                List<UserDetailViewModel> staffs = new List<UserDetailViewModel>();
-                foreach (var user in usersWithDetails)
+                if (User.IsInRole("Manager"))
                 {
-                    var employee = _employeeService.GetEmployeeByUserId(user.Id);
-                    if (employee.Status != 0)
+                    var context = new ApplicationDbContext();
+                    var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                    var roleManager = new RoleManager<RoleIntPk, long>(new RoleStoreIntPk(context));
+                    string roleNames = "Staff";
+                    var roleIds = roleManager.Roles
+                        .Where(r => roleNames.Contains(r.Name))
+                        .Select(r => r.Id)
+                        .ToList();
+
+                    var usersWithDetails = context.Users
+                        .Where(u => u.Roles.Any(r => roleIds.Contains(r.RoleId)))
+                        .ToList();
+                    List<UserDetailViewModel> staffs = new List<UserDetailViewModel>();
+                    foreach (var user in usersWithDetails)
                     {
-                        UserDetailViewModel users = new UserDetailViewModel
+                        var employee = _employeeService.GetEmployeeByUserId(user.Id);
+                        if (employee.Status != 0)
                         {
-                            Id = user.Id,
-                            Email = user.Email,
-                            Phone = user.PhoneNumber,
-                            City = employee.City,
-                            StreetAddress = employee.StreetAddress,
-                            Thana = employee.Thana,
-                            PostalCode = employee.PostalCode,
-                            ERole = userManager.GetRoles(user.Id).FirstOrDefault()
-                        };
-                        staffs.Add(users);
+                            UserDetailViewModel users = new UserDetailViewModel
+                            {
+                                Id = user.Id,
+                                Email = user.Email,
+                                Phone = user.PhoneNumber,
+                                City = employee.City,
+                                StreetAddress = employee.StreetAddress,
+                                Thana = employee.Thana,
+                                PostalCode = employee.PostalCode,
+                                ERole = userManager.GetRoles(user.Id).FirstOrDefault()
+                            };
+                            staffs.Add(users);
+                        }
                     }
+                    return View(staffs);
                 }
-                return View(staffs);
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -372,56 +452,60 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                int recordsTotal = 0;
-                int recordsFiltered = 0;
-                var data = new List<object>();
-                var history = _inventoryOrderHistoryService.GetAll()
-                       .GroupBy(u => u.OrderId)
-                       .Select(u => u.First())
-                       .ToList();
-                if (startDate != null && finalDate != null)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role != null)
                 {
-                    history = history.Where(x => x.CreationDate >= startDate && x.CreationDate <= finalDate.Value.AddDays(1)).ToList();
-                }
-                if (startDate != null)
-                {
-                    history = history.Where(x => x.CreationDate >= startDate).ToList();
-                }
-
-                if (finalDate != null)
-                {
-                    history = history.Where(x => x.CreationDate <= finalDate.Value.AddDays(1)).ToList();
-                }
-                if (!string.IsNullOrEmpty(search))
-                {
-                    string res = RemoveLeadingZeros(search);
-                    history = history.Where(x => x.OrderId.ToString().Contains(res) || GetEmployeeNameByHistoryId(x.EmployeeId).Contains(res)).ToList();
-                }
-                recordsTotal = history.Count;
-                recordsFiltered = recordsTotal;
-
-                history = history.OrderByDescending(u => u.OrderId).Skip(start).Take(length).ToList();
-
-
-
-                foreach (var item in history)
-                {
-                    var context = new ApplicationDbContext();
-                    string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
-                    var invoiceUrl = Url.Action("Invoice", "ManagerHome", new { area = "Manager", orderId = item.OrderId });
-                    var productDetailsUrl = Url.Action("ProductDetails", "ManagerHome", new { area = "Manager", orderId = item.OrderId });
-
-                    int depth = item.OrderId.ToString().Length;
-                    int dif = 6 - depth;
-                    string num = item.OrderId.ToString();
-
-                    if (dif > 0)
+                    int recordsTotal = 0;
+                    int recordsFiltered = 0;
+                    var data = new List<object>();
+                    var history = _inventoryOrderHistoryService.GetAll()
+                           .GroupBy(u => u.OrderId)
+                           .Select(u => u.First())
+                           .ToList();
+                    if (startDate != null && finalDate != null)
                     {
-                        string newId = new string('0', dif);
-                        num = newId + num;
+                        history = history.Where(x => x.CreationDate >= startDate && x.CreationDate <= finalDate.Value.AddDays(1)).ToList();
+                    }
+                    if (startDate != null)
+                    {
+                        history = history.Where(x => x.CreationDate >= startDate).ToList();
                     }
 
-                    var str = new List<string>()
+                    if (finalDate != null)
+                    {
+                        history = history.Where(x => x.CreationDate <= finalDate.Value.AddDays(1)).ToList();
+                    }
+                    if (!string.IsNullOrEmpty(search))
+                    {
+                        string res = RemoveLeadingZeros(search);
+                        history = history.Where(x => x.OrderId.ToString().Contains(res) || GetEmployeeNameByHistoryId(x.EmployeeId).Contains(res)).ToList();
+                    }
+                    recordsTotal = history.Count;
+                    recordsFiltered = recordsTotal;
+
+                    history = history.OrderByDescending(u => u.OrderId).Skip(start).Take(length).ToList();
+
+
+
+                    foreach (var item in history)
+                    {
+                        var context = new ApplicationDbContext();
+                        string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
+                        var invoiceUrl = Url.Action("Invoice", "ManagerHome", new { area = "Manager", orderId = item.OrderId });
+                        var productDetailsUrl = Url.Action("ProductDetails", "ManagerHome", new { area = "Manager", orderId = item.OrderId });
+
+                        int depth = item.OrderId.ToString().Length;
+                        int dif = 6 - depth;
+                        string num = item.OrderId.ToString();
+
+                        if (dif > 0)
+                        {
+                            string newId = new string('0', dif);
+                            num = newId + num;
+                        }
+
+                        var str = new List<string>()
                 {
                     $"{num}",
                     $"{manager}",
@@ -435,11 +519,17 @@ namespace IMS.Web.Areas.Manager.Controllers
                     </a>"
                 };
 
-                    data.Add(str);
+                        data.Add(str);
+                    }
+
+
+                    return Json(new { draw, recordsTotal, recordsFiltered, start, length, data });
                 }
-
-
-                return Json(new { draw, recordsTotal, recordsFiltered, start, length, data });
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -509,34 +599,44 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-
-                var History = _inventoryOrderHistoryService.GetByOrderId(orderId);
-                var firstOrderHistory = History.FirstOrDefault();
-                List<string> name = new List<string>();
-                foreach (var item in History)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role != null)
                 {
-                    var garments = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
-                    name.Add(garments);
-                }
-                if (firstOrderHistory != null)
-                {
-                    var employeeId = firstOrderHistory.EmployeeId;
-                    var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
+                    var context = new ApplicationDbContext();
 
-                    if (manager != null)
+                    var History = _inventoryOrderHistoryService.GetByOrderId(orderId);
+                    var firstOrderHistory = History.FirstOrDefault();
+                    List<string> name = new List<string>();
+                    foreach (var item in History)
                     {
-                        InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
-                        {
-                            orderHistories = History,
-                            GarmentsName = name,
-                            ManagerEmail = manager.Email,
-                        };
-                        return View(inventoryInvoiceViewModel);
+                        var garments = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                        name.Add(garments);
                     }
-                }
+                    if (firstOrderHistory != null)
+                    {
+                        var employeeId = firstOrderHistory.EmployeeId;
+                        var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
 
-                return RedirectToAction("Index", "Home");
+                        if (manager != null)
+                        {
+                            InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
+                            {
+                                orderHistories = History,
+                                GarmentsName = name,
+                                ManagerEmail = manager.Email,
+                            };
+                            return View(inventoryInvoiceViewModel);
+                        }
+                    }
+
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+               
             }
             catch (Exception ex)
             {
@@ -554,34 +654,44 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-
-                var History = _inventoryOrderHistoryService.GetByOrderId(orderId);
-                var firstOrderHistory = History.FirstOrDefault();
-
-                if (firstOrderHistory != null)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role != null)
                 {
-                    var employeeId = firstOrderHistory.EmployeeId;
-                    var GarmentsId = firstOrderHistory.GarmentsId;
-                    var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
-                    List<string> name = new List<string>();
-                    foreach (var item in History)
+                    var context = new ApplicationDbContext();
+
+                    var History = _inventoryOrderHistoryService.GetByOrderId(orderId);
+                    var firstOrderHistory = History.FirstOrDefault();
+
+                    if (firstOrderHistory != null)
                     {
-                        var garments = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
-                        name.Add(garments);
-                    }
-                    if (manager != null)
-                    {
-                        InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
+                        var employeeId = firstOrderHistory.EmployeeId;
+                        var GarmentsId = firstOrderHistory.GarmentsId;
+                        var manager = context.Users.FirstOrDefault(u => u.Id == employeeId);
+                        List<string> name = new List<string>();
+                        foreach (var item in History)
                         {
-                            orderHistories = History,
-                            GarmentsName = name,
-                            ManagerEmail = manager.Email,
-                        };
-                        return View(inventoryInvoiceViewModel);
+                            var garments = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                            name.Add(garments);
+                        }
+                        if (manager != null)
+                        {
+                            InventoryInvoiceViewModel inventoryInvoiceViewModel = new InventoryInvoiceViewModel
+                            {
+                                orderHistories = History,
+                                GarmentsName = name,
+                                ManagerEmail = manager.Email,
+                            };
+                            return View(inventoryInvoiceViewModel);
+                        }
                     }
+                    return RedirectToAction("InventoryOrder", "Home");
                 }
-                return RedirectToAction("InventoryOrder", "Home");
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -599,14 +709,23 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var startDate = DateTime.Now.AddDays(-7);
-                var endDate = DateTime.Now;
-                var orderHeader = _orderHeaderService.GetSellingReports(startDate, endDate);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role != null)
+                {
+                    var startDate = DateTime.Now.AddDays(-7);
+                    var endDate = DateTime.Now;
+                    var orderHeader = _orderHeaderService.GetSellingReports(startDate, endDate);
 
-                ViewBag.StartDateValue = startDate.ToString("yyyy-MM-dd");
-                ViewBag.EndDateValue = endDate.ToString("yyyy-MM-dd");
+                    ViewBag.StartDateValue = startDate.ToString("yyyy-MM-dd");
+                    ViewBag.EndDateValue = endDate.ToString("yyyy-MM-dd");
 
-                return View(orderHeader);
+                    return View(orderHeader);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
             }
             catch (Exception ex)
             {
@@ -620,10 +739,19 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                List<OrderHeader> orders = new List<OrderHeader>();
-                orders = _orderHeaderService.GetSellingReports(startDate, endDate, searchText);
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role != null)
+                {
+                    List<OrderHeader> orders = new List<OrderHeader>();
+                    orders = _orderHeaderService.GetSellingReports(startDate, endDate, searchText);
 
-                return PartialView("Partial/_SellingReport", orders);
+                    return PartialView("Partial/_SellingReport", orders);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
             }
             catch (Exception ex)
             {
@@ -642,35 +770,45 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var context = new ApplicationDbContext();
-                var product = _product.GetAllProduct();
-                List<OrderHistory> history = new List<OrderHistory>();
-                List<IMS.Models.Product> returnHistory = new List<IMS.Models.Product>();
-
-                Dictionary<long, string> managers = new Dictionary<long, string>();
-                var startDate = DateTime.Now.AddDays(-7);
-                var endDate = DateTime.Now;
-
-                history = _inventoryOrderHistoryService.GetHistories(product.Select(x => x.OrderHistoryId).ToList(), startDate, endDate);
-                returnHistory = _product.GetRejectHistory(startDate, endDate);
-
-                foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role != null)
                 {
-                    string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
-                    managers.Add(item.OrderId, manager);
+                    var context = new ApplicationDbContext();
+                    var product = _product.GetAllProduct();
+                    List<OrderHistory> history = new List<OrderHistory>();
+                    List<IMS.Models.Product> returnHistory = new List<IMS.Models.Product>();
+
+                    Dictionary<long, string> managers = new Dictionary<long, string>();
+                    var startDate = DateTime.Now.AddDays(-7);
+                    var endDate = DateTime.Now;
+
+                    history = _inventoryOrderHistoryService.GetHistories(product.Select(x => x.OrderHistoryId).ToList(), startDate, endDate);
+                    returnHistory = _product.GetRejectHistory(startDate, endDate);
+
+                    foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
+                    {
+                        string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
+                        managers.Add(item.OrderId, manager);
+                    }
+
+                    BuyingReportViewModel viewModel = new BuyingReportViewModel
+                    {
+                        History = history,
+                        Name = managers,
+                        RejectProducts = returnHistory
+                    };
+
+                    ViewBag.StartDateValue = startDate.ToString("yyyy-MM-dd");
+                    ViewBag.EndDateValue = endDate.ToString("yyyy-MM-dd");
+
+                    return View(viewModel);
                 }
-
-                BuyingReportViewModel viewModel = new BuyingReportViewModel
+                else
                 {
-                    History = history,
-                    Name = managers,
-                    RejectProducts=returnHistory
-                };
-
-                ViewBag.StartDateValue = startDate.ToString("yyyy-MM-dd");
-                ViewBag.EndDateValue = endDate.ToString("yyyy-MM-dd");
-
-                return View(viewModel);
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -686,26 +824,36 @@ namespace IMS.Web.Areas.Manager.Controllers
             var product = _product.GetAllProduct().Where(u => u.Rejected != true);
             try
             {
-                List<OrderHistory> history = new List<OrderHistory>();
-                List<IMS.Models.Product> returnHistory = new List<IMS.Models.Product>();
-                history = _inventoryOrderHistoryService.GetHistories(product.Select(x => x.OrderHistoryId).ToList(), startDate, endDate, searchText);
-                returnHistory = _product.GetRejectHistory(startDate, endDate);
-                Dictionary<long, string> managers = new Dictionary<long, string>();
-
-                foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role != null)
                 {
-                    string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
-                    managers.Add(item.OrderId, manager);
+                    List<OrderHistory> history = new List<OrderHistory>();
+                    List<IMS.Models.Product> returnHistory = new List<IMS.Models.Product>();
+                    history = _inventoryOrderHistoryService.GetHistories(product.Select(x => x.OrderHistoryId).ToList(), startDate, endDate, searchText);
+                    returnHistory = _product.GetRejectHistory(startDate, endDate);
+                    Dictionary<long, string> managers = new Dictionary<long, string>();
+
+                    foreach (var item in history.GroupBy(u => u.OrderId).Select(t => t.First()))
+                    {
+                        string manager = context.Users.FirstOrDefault(u => u.Id == item.CreatedBy).Email;
+                        managers.Add(item.OrderId, manager);
+                    }
+
+                    BuyingReportViewModel viewModel = new BuyingReportViewModel
+                    {
+                        History = history,
+                        Name = managers,
+                        RejectProducts = returnHistory
+                    };
+
+                    return PartialView("Partial/_OrderHistory", viewModel);
                 }
-
-                BuyingReportViewModel viewModel = new BuyingReportViewModel
+                else
                 {
-                    History = history,
-                    Name = managers,
-                    RejectProducts=returnHistory
-                };
-
-                return PartialView("Partial/_OrderHistory", viewModel);
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -723,27 +871,37 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var products = _product.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded == true).ToList();
-                List<int> shortage = new List<int>();
-                List<long> productIds = new List<long>();
-                Dictionary<long,bool> IsInOrder=new Dictionary<long, bool>();
-                foreach (var product in products)
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                string role = IsAuthorize(userId);
+                if (role != null)
                 {
-                    int count = 0 - product.Quantity;
-                    long prodId = _garmentsService.GetGarmentsProductByProductCode(product.ProductCode).Id;
-                    bool IsItInOrder=_product.GetAllProductByProductCode(product.ProductCode).Any(u => u.Approved == null || (u.IsPriceAdded==false && u.Rejected==null) );
-                    IsInOrder.Add(prodId, IsItInOrder);
-                    productIds.Add(prodId);
-                    shortage.Add(count);
+                    var products = _product.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded == true).ToList();
+                    List<int> shortage = new List<int>();
+                    List<long> productIds = new List<long>();
+                    Dictionary<long, bool> IsInOrder = new Dictionary<long, bool>();
+                    foreach (var product in products)
+                    {
+                        int count = 0 - product.Quantity;
+                        long prodId = _garmentsService.GetGarmentsProductByProductCode(product.ProductCode).Id;
+                        bool IsItInOrder = _product.GetAllProductByProductCode(product.ProductCode).Any(u => u.Approved == null || (u.IsPriceAdded == false && u.Rejected == null));
+                        IsInOrder.Add(prodId, IsItInOrder);
+                        productIds.Add(prodId);
+                        shortage.Add(count);
+                    }
+                    ProductShortageViewModel productShortageViewModel = new ProductShortageViewModel
+                    {
+                        products = products,
+                        ShortageCounts = shortage,
+                        ProductIds = productIds,
+                        IsInOrders = IsInOrder,
+                    };
+                    return View(productShortageViewModel);
                 }
-                ProductShortageViewModel productShortageViewModel = new ProductShortageViewModel
+                else
                 {
-                    products = products,
-                    ShortageCounts = shortage,
-                    ProductIds = productIds,
-                    IsInOrders= IsInOrder,
-                };
-                return View(productShortageViewModel);
+                    return RedirectToAction("Index", "Error");
+                }
+               
             }
             catch (Exception ex)
             {
