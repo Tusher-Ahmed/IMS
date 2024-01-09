@@ -28,7 +28,8 @@ namespace IMS.Models
         public virtual IFormFile ImageFile { get; set; }
 
         [Required(ErrorMessage = "Product Price is required.")]
-        [Range(1, 1000000, ErrorMessage = "Price must be non-negative and less than or equal to the maximum allowed value.")]
+        //[Range(1, 1000000, ErrorMessage = "Price must be non-negative and less than or equal to the maximum allowed value.")]
+        [RegularExpression(@"^(?!0*(\.0{1,2})?$)([1-9]\d{0,5}(\.\d{1,2})?|1000000)$", ErrorMessage = "Price must be between 1 and maximum allowed value and at most two decimal value.")]
         public virtual decimal Price { get; set; }
 
         [Required(ErrorMessage = "Product Sizes are required")]

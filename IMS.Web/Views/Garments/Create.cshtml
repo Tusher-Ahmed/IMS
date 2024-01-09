@@ -19,8 +19,8 @@
     <br />
     <div class="form-group">
         @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-12" })
-        @Html.TextBoxFor(model => model.Price, new { placeholder = "Price", @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+        @Html.TextBoxFor(model => model.Price, new { placeholder = "Price", @class = "form-control", id="Price" })
+        @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger", id="priceValidation" })
     </div>
     <br />
     <div class="form-group">
@@ -179,9 +179,24 @@
                 $('#desValidation').text('');
                 
             }
+
         })
 
-
+        
+        //$('#Price').on('input', function (e) {
+        //    var price = $('#Price').val();
+           
+        //    var regex = /^\d+([.,]\d{1,2})?$/;
+        //    //console.log(regex.test(price)); 
+        //    if (price == '') {
+        //        $('#priceValidation').text('Product Price is required.');
+        //    } else if (!regex.test(price)) {
+        //        $('#priceValidation').text('Price must have up to two decimal places.');
+        //        e.preventDefault();
+        //    } else {
+        //        $('#priceValidation').text('');
+        //    }
+        //})
     </script>
 }
 <script src="~/Scripts/jquery-3.4.1.min.js"></script>

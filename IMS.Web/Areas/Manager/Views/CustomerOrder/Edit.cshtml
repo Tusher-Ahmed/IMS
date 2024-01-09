@@ -22,7 +22,7 @@
                         }
                         else if (User.IsInRole("Customer"))
                         {
-                            <a href="@Url.Action("Index", "CustomerHome", new {area="Customer",status="All"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
+                            <a href="@Url.Action("OrderDetails", "CustomerHome", new {area="Customer",status="All"})" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
                         }
                         else if (User.IsInRole("Admin"))
                         {

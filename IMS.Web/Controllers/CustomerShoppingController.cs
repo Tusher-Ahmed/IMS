@@ -123,20 +123,28 @@ namespace IMS.Web.Controllers
             try
             {
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-
-                CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
+                var carts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status == 1).ToList();
+                if(carts.Count > 0)
                 {
-                    shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status == 1).ToList(),
-                    OrderHeader = new OrderHeader()
-                };
+                    CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
+                    {
+                        shoppingCarts = carts,
+                        OrderHeader = new OrderHeader()
+                    };
 
-                foreach (var cart in shoppingCartViewModel.shoppingCarts)
-                {
-                    shoppingCartViewModel.OrderHeader.OrderTotal += (cart.Product.Price * cart.Count);
+                    foreach (var cart in shoppingCartViewModel.shoppingCarts)
+                    {
+                        shoppingCartViewModel.OrderHeader.OrderTotal += (cart.Product.Price * cart.Count);
+                    }
+
+
+                    return View(shoppingCartViewModel);
                 }
-
-
-                return View(shoppingCartViewModel);
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -155,29 +163,38 @@ namespace IMS.Web.Controllers
             {
                 var context = new ApplicationDbContext();
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-                var user = userManager.FindById(userId);
-                var customer = _customerService.GetCustomerByUserId(userId);
-
-                CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
+                var carts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status == 1).ToList();
+                if(carts.Count > 0)
                 {
-                    shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status == 1).ToList(),
-                    OrderHeader = new OrderHeader()
-                };
+                    var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                    var user = userManager.FindById(userId);
+                    var customer = _customerService.GetCustomerByUserId(userId);
 
-                foreach (var cart in shoppingCartViewModel.shoppingCarts)
-                {
-                    shoppingCartViewModel.OrderHeader.OrderTotal += (cart.Product.Price * cart.Count);
+                    CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
+                    {
+                        shoppingCarts = carts,
+                        OrderHeader = new OrderHeader()
+                    };
+
+                    foreach (var cart in shoppingCartViewModel.shoppingCarts)
+                    {
+                        shoppingCartViewModel.OrderHeader.OrderTotal += (cart.Product.Price * cart.Count);
+                    }
+
+                    shoppingCartViewModel.OrderHeader.Name = customer.Name;
+                    shoppingCartViewModel.OrderHeader.PhoneNumber = user.PhoneNumber;
+                    shoppingCartViewModel.OrderHeader.StreetAddress = customer.StreetAddress;
+                    shoppingCartViewModel.OrderHeader.City = customer.City;
+                    shoppingCartViewModel.OrderHeader.Thana = customer.Thana;
+                    shoppingCartViewModel.OrderHeader.PostalCode = customer.PostalCode;
+
+                    return View(shoppingCartViewModel);
                 }
-
-                shoppingCartViewModel.OrderHeader.Name = customer.Name;
-                shoppingCartViewModel.OrderHeader.PhoneNumber = user.PhoneNumber;
-                shoppingCartViewModel.OrderHeader.StreetAddress = customer.StreetAddress;
-                shoppingCartViewModel.OrderHeader.City = customer.City;
-                shoppingCartViewModel.OrderHeader.Thana = customer.Thana;
-                shoppingCartViewModel.OrderHeader.PostalCode = customer.PostalCode;
-
-                return View(shoppingCartViewModel);
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -194,86 +211,95 @@ namespace IMS.Web.Controllers
             {
                 var context = new ApplicationDbContext();
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
-                var user = userManager.FindById(userId);
-                var customer = _customerService.GetCustomerByUserId(userId);
-
-                CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
+                var carts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status == 1).ToList();
+                if(carts.Count > 0)
                 {
-                    shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status == 1).ToList(),
-                    OrderHeader = new OrderHeader()
-                };
+                    var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
+                    var user = userManager.FindById(userId);
+                    var customer = _customerService.GetCustomerByUserId(userId);
 
-                foreach (var cart in shoppingCartViewModel.shoppingCarts)
-                {
-                    shoppingCartViewModel.OrderHeader.OrderTotal += (cart.Product.Price * cart.Count);
-                }
-
-                shoppingCartViewModel.OrderHeader.Name = customerShoppingCartViewModel.OrderHeader.Name;
-                shoppingCartViewModel.OrderHeader.PhoneNumber = customerShoppingCartViewModel.OrderHeader.PhoneNumber;
-                shoppingCartViewModel.OrderHeader.StreetAddress = customerShoppingCartViewModel.OrderHeader.StreetAddress;
-                shoppingCartViewModel.OrderHeader.City = customerShoppingCartViewModel.OrderHeader.City;
-                shoppingCartViewModel.OrderHeader.Thana = customerShoppingCartViewModel.OrderHeader.Thana;
-                shoppingCartViewModel.OrderHeader.PostalCode = customerShoppingCartViewModel.OrderHeader.PostalCode;
-                shoppingCartViewModel.OrderHeader.PaymentStatus = ShoppingHelper.PaymentStatusPending;
-                shoppingCartViewModel.OrderHeader.OrderStatus = ShoppingHelper.StatusPending;
-                shoppingCartViewModel.OrderHeader.OrderDate = DateTime.Now;
-                shoppingCartViewModel.OrderHeader.CustomerId = userId;
-                _orderHeaderService.AddOrderHeader(shoppingCartViewModel.OrderHeader);
-
-                foreach (var cart in shoppingCartViewModel.shoppingCarts)
-                {
-                    OrderDetail orderDetail = new OrderDetail
+                    CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
                     {
-                        ProductId = cart.Product.Id,
-                        Product = cart.Product,
-                        OrderHeaderId = shoppingCartViewModel.OrderHeader.Id,
-                        OrderHeader = shoppingCartViewModel.OrderHeader,
-                        Price = cart.Product.Price,
-                        Count = cart.Count
+                        shoppingCarts = carts,
+                        OrderHeader = new OrderHeader()
                     };
-                    _orderDetailService.Add(orderDetail);
 
-                }
-
-                var domain = "https://localhost:44369/";
-
-                var options = new SessionCreateOptions
-                {
-                    LineItems = new List<SessionLineItemOptions>(),
-                    Mode = "payment",
-                    SuccessUrl = domain + $"CustomerShopping/OrderConfirmation?id={shoppingCartViewModel.OrderHeader.Id}",
-                    CancelUrl = domain + $"CustomerShopping/Summary",
-                    PaymentMethodTypes = new List<string> { "card" },
-                };
-
-                foreach (var item in shoppingCartViewModel.shoppingCarts)
-                {
-                    var sessionLineItem = new SessionLineItemOptions
+                    foreach (var cart in shoppingCartViewModel.shoppingCarts)
                     {
-                        PriceData = new SessionLineItemPriceDataOptions
+                        shoppingCartViewModel.OrderHeader.OrderTotal += (cart.Product.Price * cart.Count);
+                    }
+
+                    shoppingCartViewModel.OrderHeader.Name = customerShoppingCartViewModel.OrderHeader.Name;
+                    shoppingCartViewModel.OrderHeader.PhoneNumber = customerShoppingCartViewModel.OrderHeader.PhoneNumber;
+                    shoppingCartViewModel.OrderHeader.StreetAddress = customerShoppingCartViewModel.OrderHeader.StreetAddress;
+                    shoppingCartViewModel.OrderHeader.City = customerShoppingCartViewModel.OrderHeader.City;
+                    shoppingCartViewModel.OrderHeader.Thana = customerShoppingCartViewModel.OrderHeader.Thana;
+                    shoppingCartViewModel.OrderHeader.PostalCode = customerShoppingCartViewModel.OrderHeader.PostalCode;
+                    shoppingCartViewModel.OrderHeader.PaymentStatus = ShoppingHelper.PaymentStatusPending;
+                    shoppingCartViewModel.OrderHeader.OrderStatus = ShoppingHelper.StatusPending;
+                    shoppingCartViewModel.OrderHeader.OrderDate = DateTime.Now;
+                    shoppingCartViewModel.OrderHeader.CustomerId = userId;
+                    _orderHeaderService.AddOrderHeader(shoppingCartViewModel.OrderHeader);
+
+                    foreach (var cart in shoppingCartViewModel.shoppingCarts)
+                    {
+                        OrderDetail orderDetail = new OrderDetail
                         {
-                            UnitAmount = (long)(item.Product.Price * 100),
-                            Currency = "usd",
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
-                            {
-                                Name = item.Product.Name,
-                            },
-                        },
-                        Quantity = item.Count,
+                            ProductId = cart.Product.Id,
+                            Product = cart.Product,
+                            OrderHeaderId = shoppingCartViewModel.OrderHeader.Id,
+                            OrderHeader = shoppingCartViewModel.OrderHeader,
+                            Price = cart.Product.Price,
+                            Count = cart.Count
+                        };
+                        _orderDetailService.Add(orderDetail);
+
+                    }
+
+                    var domain = "https://localhost:44369/";
+
+                    var options = new SessionCreateOptions
+                    {
+                        LineItems = new List<SessionLineItemOptions>(),
+                        Mode = "payment",
+                        SuccessUrl = domain + $"CustomerShopping/OrderConfirmation?id={shoppingCartViewModel.OrderHeader.Id}",
+                        CancelUrl = domain + $"CustomerShopping/Summary",
+                        PaymentMethodTypes = new List<string> { "card" },
                     };
 
-                    options.LineItems.Add(sessionLineItem);
+                    foreach (var item in shoppingCartViewModel.shoppingCarts)
+                    {
+                        var sessionLineItem = new SessionLineItemOptions
+                        {
+                            PriceData = new SessionLineItemPriceDataOptions
+                            {
+                                UnitAmount = (long)(item.Product.Price * 100),
+                                Currency = "usd",
+                                ProductData = new SessionLineItemPriceDataProductDataOptions
+                                {
+                                    Name = item.Product.Name,
+                                },
+                            },
+                            Quantity = item.Count,
+                        };
+
+                        options.LineItems.Add(sessionLineItem);
+                    }
+
+                    var service = new SessionService();
+                    Session session = service.Create(options);
+                    shoppingCartViewModel.OrderHeader.PaymentIntentId = session.PaymentIntentId;
+                    shoppingCartViewModel.OrderHeader.SessionId = session.Id;
+                    shoppingCartViewModel.OrderHeader.PaymentDate = DateTime.Now;
+                    _orderHeaderService.Update(shoppingCartViewModel.OrderHeader);
+
+                    return Redirect(session.Url);
                 }
-
-                var service = new SessionService();
-                Session session = service.Create(options);
-                shoppingCartViewModel.OrderHeader.PaymentIntentId = session.PaymentIntentId;
-                shoppingCartViewModel.OrderHeader.SessionId = session.Id;
-                shoppingCartViewModel.OrderHeader.PaymentDate = DateTime.Now;
-                _orderHeaderService.Update(shoppingCartViewModel.OrderHeader);
-
-                return Redirect(session.Url);
+                else
+                {
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {

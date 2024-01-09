@@ -557,25 +557,33 @@ namespace IMS.Web.Areas.Manager.Controllers
         {
             try
             {
-                var history = _product.GetAllProduct().Where(u => u.Approved == false && u.Rejected == true);
-                Dictionary<long, string> managers = new Dictionary<long, string>();
-                Dictionary<long, string> staffs = new Dictionary<long, string>();
-                Dictionary<long, string> garments = new Dictionary<long, string>();
-                foreach (var item in history)
+                if (User.IsInRole("Manager"))
                 {
-                    managers.Add(item.Id, GetUserEmailById(item.CreatedBy));
-                    staffs.Add(item.Id, GetUserEmailById(item.ApprovedBy));
-                    var gName = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
-                    garments.Add(item.Id, gName);
+                    var history = _product.GetAllProduct().Where(u => u.Approved == false && u.Rejected == true);
+                    Dictionary<long, string> managers = new Dictionary<long, string>();
+                    Dictionary<long, string> staffs = new Dictionary<long, string>();
+                    Dictionary<long, string> garments = new Dictionary<long, string>();
+                    foreach (var item in history)
+                    {
+                        managers.Add(item.Id, GetUserEmailById(item.CreatedBy));
+                        staffs.Add(item.Id, GetUserEmailById(item.ApprovedBy));
+                        var gName = _supplierService.GetSupplierByUserId(item.GarmentsId).Name;
+                        garments.Add(item.Id, gName);
+                    }
+                    RejectedProductListViewModel rejectedProductListViewModel = new RejectedProductListViewModel
+                    {
+                        Products = history,
+                        Managers = managers,
+                        Staffs = staffs,
+                        Garments = garments
+                    };
+                    return View(rejectedProductListViewModel);
                 }
-                RejectedProductListViewModel rejectedProductListViewModel = new RejectedProductListViewModel
+                else
                 {
-                    Products = history,
-                    Managers = managers,
-                    Staffs = staffs,
-                    Garments = garments
-                };
-                return View(rejectedProductListViewModel);
+                    return RedirectToAction("Index", "Error");
+                }
+                
             }
             catch (Exception ex)
             {
