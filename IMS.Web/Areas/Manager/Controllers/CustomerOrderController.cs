@@ -84,6 +84,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                     return RedirectToAction("Index", "Error");
                 }
 
+                //TODO: Task: Optimize order details load
                 var orderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == orderHeader.Id);
                 var cancleReason = _cancelReasonService.GetReasonByOrderHeaderId(orderHeader.Id);
                 var context = new ApplicationDbContext();

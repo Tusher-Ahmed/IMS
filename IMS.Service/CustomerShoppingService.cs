@@ -1,4 +1,5 @@
 ﻿using IMS.DAO;
+using IMS.DataAccess;
 using IMS.Models;
 using NHibernate;
 using System;
@@ -15,37 +16,40 @@ namespace IMS.Service
     {
         void AddCutomerShoppingCart(ShoppingCart shoppingCart);
         IEnumerable<ShoppingCart> GetAllOrders();
-        ShoppingCart GetById(long id,long userId);
+        ShoppingCart GetById(long id, long userId);
         int IncrementCount(ShoppingCart shoppingCart, int count);
         int DecrementCount(ShoppingCart shoppingCart, int count);
         void RemoveProduct(ShoppingCart shoppingCart);
+        List<ShoppingCart> GetAllCartOrders(long userId);
     }
-    public class CustomerShoppingService: ICustomerShoppingService
+    public class CustomerShoppingService : ICustomerShoppingService
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly BaseDAO<ShoppingCart> _repository;
+        private readonly ICustomerShoppingDao _customerShoppingDao;
         private ISession _session;
 
         public ISession Session
         {
             get { return _session; }
-            set { _session = value; _repository.Session = value; }
+            set { _session = value; _repository.Session = value; _customerShoppingDao.Session = value; }
         }
         public CustomerShoppingService()
         {
-            _repository=new BaseDAO<ShoppingCart>();
+            _repository = new BaseDAO<ShoppingCart>();
+            _customerShoppingDao = new CustomerShoppingDao();
         }
 
         #region Add Customer Shopping Cart
         public void AddCutomerShoppingCart(ShoppingCart shoppingCart)
         {
-            var Existproduct = _session.Query<ShoppingCart>()
-       .FirstOrDefault(cart => cart.CustomerId == shoppingCart.CustomerId && cart.Product.Id == shoppingCart.ProductId);
+
+
             using (var transaction = _session.BeginTransaction())
             {
                 try
                 {
-
-
+                    var Existproduct = _customerShoppingDao.IsProductExist(shoppingCart);
                     if (Existproduct != null)
                     {
                         IncrementProductCount(Existproduct, shoppingCart.Count);
@@ -57,56 +61,80 @@ namespace IMS.Service
 
                     transaction.Commit();
                 }
-                catch
+                catch (Exception ex)
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
+
+
         }
         public int IncrementProductCount(ShoppingCart shoppingCart, int count)
         {
-            shoppingCart.Count += count;
+            try
+            {
+                shoppingCart.Count += count;
 
-                    _repository.Update(shoppingCart);
-        
-            return shoppingCart.Count;
+                _repository.Update(shoppingCart);
+
+                return shoppingCart.Count;
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+
         }
         #endregion
 
         public IEnumerable<ShoppingCart> GetAllOrders()
         {
-            return _repository.GetAll();
+            try
+            {
+                return _repository.GetAll();
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+
+        }
+        public List<ShoppingCart> GetAllCartOrders(long userId)
+        {
+            try
+            {
+                return _customerShoppingDao.GetAllCartOrders(userId);
+
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
         public ShoppingCart GetById(long id, long userId)
         {
-            return Session.Query<ShoppingCart>().Where(u => u.Id == id && u.CustomerId == userId).FirstOrDefault();
+            try
+            {
+                return _customerShoppingDao.GetById(id, userId);
+
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
 
         public int IncrementCount(ShoppingCart shoppingCart, int count)
         {
-            shoppingCart.Count += count;
-            using (var transaction = _session.BeginTransaction())
+            try
             {
-                try
-                {
-                    _repository.Update(shoppingCart);
-                    transaction.Commit();
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
-
-            return shoppingCart.Count;
-        }
-        public int DecrementCount(ShoppingCart shoppingCart, int count)
-        {
-            if (shoppingCart.Count > 1)
-            {
-                shoppingCart.Count -= count;
+                shoppingCart.Count += count;
                 using (var transaction = _session.BeginTransaction())
                 {
                     try
@@ -121,9 +149,46 @@ namespace IMS.Service
                     }
                 }
 
+                return shoppingCart.Count;
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
             }
 
-            return shoppingCart.Count;
+        }
+        public int DecrementCount(ShoppingCart shoppingCart, int count)
+        {
+            try
+            {
+                if (shoppingCart.Count > 1)
+                {
+                    shoppingCart.Count -= count;
+                    using (var transaction = _session.BeginTransaction())
+                    {
+                        try
+                        {
+                            _repository.Update(shoppingCart);
+                            transaction.Commit();
+                        }
+                        catch
+                        {
+                            transaction.Rollback();
+                            throw;
+                        }
+                    }
+
+                }
+
+                return shoppingCart.Count;
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+
         }
 
         public void RemoveProduct(ShoppingCart shoppingCart)
@@ -135,9 +200,10 @@ namespace IMS.Service
                     _repository.Delete(shoppingCart);
                     transaction.Commit();
                 }
-                catch
+                catch (Exception ex)
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }

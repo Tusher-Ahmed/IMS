@@ -883,7 +883,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                 string role = IsAuthorize(userId);
                 if (role != null)
                 {
-                    var products = _product.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded == true).ToList();
+                    var products = _product.GetAllShortageProduct();
                     List<int> shortage = new List<int>();
                     List<long> productIds = new List<long>();
                     Dictionary<long, bool> IsInOrder = new Dictionary<long, bool>();
@@ -891,7 +891,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                     {
                         int count = 0 - product.Quantity;
                         long prodId = _garmentsService.GetGarmentsProductByProductCode(product.ProductCode).Id;
-                        bool IsItInOrder = _product.GetAllProductByProductCode(product.ProductCode).Any(u => u.Approved == null || (u.IsPriceAdded == false && u.Rejected == null));
+                        bool IsItInOrder = _product.GetAllProductByProductCode(product.ProductCode);
                         IsInOrder.Add(prodId, IsItInOrder);
                         productIds.Add(prodId);
                         shortage.Add(count);

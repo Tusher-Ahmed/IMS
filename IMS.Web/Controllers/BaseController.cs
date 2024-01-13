@@ -114,10 +114,10 @@ namespace IMS.Web.Controllers
                 int NeedApprovalCount = _productService.GetAllProduct().Where(u => u.Approved == null).Count();
                 ViewBag.NeedApproval = NeedApprovalCount;
 
-                int productShortageCount = _productService.GetAllProduct().Where(u => u.Quantity <= 0 && u.IsPriceAdded == true).Count();
+                int productShortageCount = _productService.GetAllShortageProduct().Count();
                 ViewBag.ProductShortageCount = productShortageCount;
 
-                int TotalInQueue = _productService.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).Count();
+                int TotalInQueue = _productService.GetAllNewProduct().Count();
                 ViewBag.SetPriceCount = TotalInQueue;
             }            
            

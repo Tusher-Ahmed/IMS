@@ -508,7 +508,7 @@ namespace IMS.Web.Controllers
                 string role = IsAuthorize(userId);
                 if (role != null)
                 {
-                    var product = _product.GetAllProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0).ToList();
+                    var product = _product.GetAllNewProduct();
                     Dictionary<long, string> garments = new Dictionary<long, string>();
                     foreach (var item in product)
                     {

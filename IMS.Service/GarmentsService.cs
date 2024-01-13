@@ -50,6 +50,8 @@ namespace IMS.Service
         #endregion
 
         #region Get All Product with Page number
+
+        //TODO : Task: move all querys to repository
         public GarmentsProductViewModel GetAllProduct(GarmentsProductViewModel garmentsProduct, long? supplierId)
         {
             string condition = string.Empty;

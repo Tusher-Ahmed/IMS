@@ -1,4 +1,5 @@
 ﻿using IMS.DAO;
+using IMS.DataAccess;
 using IMS.Models;
 using NHibernate;
 using System;
@@ -15,20 +16,24 @@ namespace IMS.Service
         Customer GetCustomerByUserId(long userId);
         IEnumerable<Customer> GetAllCustomer();
         void UpdateCustomer(Customer customer);
+        
     }
 
     public class CustomerService:ICustomerService
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly BaseDAO<Customer> _repository;
+        private readonly ICustomerDao _customerDao;
         private ISession _session;
         public ISession Session
         {
             get { return _session; }
-            set { _session = value; _repository.Session = value; }
+            set { _session = value; _repository.Session = value; _customerDao.Session = value; }
         }
         public CustomerService()
         {
             _repository = new BaseDAO<Customer>();
+            _customerDao = new CustomerDao();
         }
 
         public void AddCustomer(Customer customer)
@@ -40,9 +45,10 @@ namespace IMS.Service
                     _repository.Add(customer);
                     transaction.Commit();
                 }
-                catch
+                catch(Exception ex)
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
@@ -50,12 +56,28 @@ namespace IMS.Service
 
         public Customer GetCustomerByUserId(long userId)
         {
-            return _session.Query<Customer>().FirstOrDefault(u=>u.UserId == userId);
+            try
+            {
+                return _customerDao.LoadCustomerById(userId);
+
+            }catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
 
         public IEnumerable<Customer> GetAllCustomer()
         {
-            return _repository.GetAll();
+            try
+            {
+                return _repository.GetAll();
+            }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
 
         public void UpdateCustomer(Customer customer)
@@ -67,9 +89,10 @@ namespace IMS.Service
                     _repository.Update(customer);
                     transaction.Commit();
                 }
-                catch
+                catch(Exception ex ) 
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }

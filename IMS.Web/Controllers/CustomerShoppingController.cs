@@ -124,7 +124,7 @@ namespace IMS.Web.Controllers
             {
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
                 var carts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status == 1).ToList();
-                if(carts.Count > 0)
+                if(carts.Count !=null)
                 {
                     CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
                     {
@@ -502,7 +502,8 @@ namespace IMS.Web.Controllers
             try
             {
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var orderCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList();
+                //var orderCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList();
+                var orderCarts = _customerShopping.GetAllCartOrders(userId);
                 decimal total = orderCarts.Sum(cart => cart.Product.Price * cart.Count);
                 return total;
             }catch(Exception ex)
