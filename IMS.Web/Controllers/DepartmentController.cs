@@ -1,4 +1,5 @@
-﻿using IMS.Models;
+﻿using FluentNHibernate.Mapping;
+using IMS.Models;
 using IMS.Service;
 using Microsoft.AspNet.Identity;
 using NHibernate;
@@ -182,6 +183,7 @@ namespace IMS.Web.Controllers
         [HttpPost]
         public ActionResult Edit(long id,Department dept)
         {
+            bool success = false;
             try
             {
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
@@ -218,12 +220,11 @@ namespace IMS.Web.Controllers
                         }
                         catch
                         {
-                            TempData["data"] = "Data is not Updated!!";
-                            return Json(new { success = false, message = TempData["data"] });
+                            TempData["data"] = "Data is not Updated!!";                           
                         }
                     }
                     var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                    return Json(new { success = false, message = errors, errors = errors });
+                    TempData["data"] = string.Join("; ", errors);
                 }
                 else
                 {
@@ -233,9 +234,10 @@ namespace IMS.Web.Controllers
             catch (Exception ex)
             {
                 log.Error("An error occurred in YourAction.", ex);
-                return RedirectToAction("Index", "Error");
+                throw;
+                //return RedirectToAction("Index", "Error");
             }
-           
+            return Json(new { success = success, message = TempData["data"] });
 
         }
         #endregion

@@ -26,7 +26,11 @@ namespace IMS.Service
         List<Product> GetRejectHistory(DateTime? startDate=null, DateTime? endDate = null);
         List<Product> GetAllShortageProduct();
         List<Product> GetAllNewProduct();
-        
+        List<Product> LoadYetApprovedProduct();
+        List<Product> LoadAllApprovedProducts();
+        List<Product> LoadAllRejectedProducts();
+        List<Product> LoadDeactivatedProducts();
+
     }
 
     public class ProductService:IProductService
@@ -73,12 +77,61 @@ namespace IMS.Service
             {
                 log.Error("An error occurred in YourAction.", ex);
                 throw;
-            }
-            
+            }            
         }
         #endregion
 
-        
+        public List<Product> LoadYetApprovedProduct()
+        {
+            try
+            {
+                return _productDAO.LoadYetApprovedProduct();
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+        }
+
+        public List<Product> LoadAllApprovedProducts()
+        {
+            try
+            {
+                return _productDAO.LoadAllApprovedProducts();
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+        }
+
+        public List<Product> LoadDeactivatedProducts()
+        {
+            try
+            {
+                return _productDAO.LoadDeactivatedProducts();
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+        }
+
+        public List<Product> LoadAllRejectedProducts()
+        {
+            try
+            {
+                return _productDAO.LoadAllRejectedProducts();
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+        }
 
         #region Add Product
         public void Add(Product product)
@@ -229,6 +282,7 @@ namespace IMS.Service
         }
         #endregion
 
+        #region Shortage Product
         public List<Product> GetAllShortageProduct()
         {
             try
@@ -240,7 +294,9 @@ namespace IMS.Service
                 throw;
             }
         }
+        #endregion
 
+        #region New Product for Set Price
         public List<Product> GetAllNewProduct()
         {
             //GetAllNewProduct().Where(u => u.Approved == true && u.IsPriceAdded == false && u.Status == 0)
@@ -253,5 +309,6 @@ namespace IMS.Service
                 throw;
             }
         }
+        #endregion
     }
 }

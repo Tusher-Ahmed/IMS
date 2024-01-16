@@ -85,7 +85,8 @@ namespace IMS.Web.Areas.Manager.Controllers
                 }
 
                 //TODO: Task: Optimize order details load
-                var orderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == orderHeader.Id);
+                //var orderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == orderHeader.Id);
+                var orderDetails = _orderDetailService.LoadAllOrdersDetails(orderHeader.Id);
                 var cancleReason = _cancelReasonService.GetReasonByOrderHeaderId(orderHeader.Id);
                 var context = new ApplicationDbContext();
                 var customer = context.Users.FirstOrDefault(u => u.Id == orderHeader.CustomerId);
@@ -285,7 +286,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                 {
                     return RedirectToAction("Index", "Error");
                 }
-                var orderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == orderHeader.Id);
+                var orderDetails = _orderDetailService.LoadAllOrdersDetails(orderHeader.Id);
                 CustomerInvoiceViewModel customerInvoiceViewModel = new CustomerInvoiceViewModel
                 {
                     OrderHeader = orderHeader,
@@ -388,7 +389,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                     Refund refund = service.Create(options);
                     _orderHeaderService.UpdateStatus(orderHeader.Id, ShoppingHelper.StatusCancelled, ShoppingHelper.StatusRefunded);
                     TempData["success"] = "Payment Refunded Successfully!";
-                    var orderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == orderHeader.Id).ToList();
+                    var orderDetails = _orderDetailService.LoadAllOrdersDetails(orderHeader.Id);
 
                     foreach (var item in orderDetails)
                     {
@@ -430,7 +431,7 @@ namespace IMS.Web.Areas.Manager.Controllers
                     orderHeader = _orderHeaderService.GetOrderHeaderByUser(id, userId);
                 }
                // var orderHeader = _orderHeaderService.GetOrderHeaderById(id);
-                var orderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == orderHeader.Id);
+                var orderDetails = _orderDetailService.LoadAllOrdersDetails(orderHeader.Id);
                 var cancleReason = _cancelReasonService.GetReasonByOrderHeaderId(orderHeader.Id);
 
                 CustomerInvoiceViewModel customerInvoiceViewModel = new CustomerInvoiceViewModel

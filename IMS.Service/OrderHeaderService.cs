@@ -23,22 +23,28 @@ namespace IMS.Service
         List<OrderHeader> GetSellingReports(DateTime? start = null, DateTime? end = null, string searchText="");
         List<OrderHeader> GetAllOrderHeadersWithCondition(string orderStatus = "", string paymentStatus = "");
         List<OrderHeader> GetOrderByStatus(string status = "All", long? userId = 0);
+        List<OrderHeader> LoadTotalOrders(string orderStatus1, string OrderStatus2);
+        List<OrderHeader> LoadNewOrders(string orderStatus1, string orderStatus2, string orderStatus3);
+        List<OrderHeader> LoadCancelOrders(string orderStatus, string paymentStatus);
     }
     public class OrderHeaderService:IOrderHeaderService
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly BaseDAO<OrderHeader> _repository;
         private readonly ISellingReportDAO _sellingReportDAO;
+        private readonly IOrderHeaderDao _orderHeaderDao;
         private ISession _session;
 
         public ISession Session
         {
             get { return _session; }
-            set { _session = value; _repository.Session = value; _sellingReportDAO.Session = value; }
+            set { _session = value; _repository.Session = value; _sellingReportDAO.Session = value;_orderHeaderDao.Session = value; }
         }
         public OrderHeaderService()
         {
             _repository = new BaseDAO<OrderHeader>();
             _sellingReportDAO = new SellingReportDAO();
+            _orderHeaderDao = new OrderHeaderDao();
         }
 
         #region Add Order Header
@@ -46,17 +52,18 @@ namespace IMS.Service
         {
             
             using (var transaction = _session.BeginTransaction())
-            {
-                orderHeader.BusinessId = Guid.NewGuid().ToString();
-                orderHeader.VersionNumber = 1;
+            {                
                 try
                 {
+                    orderHeader.BusinessId = Guid.NewGuid().ToString();
+                    orderHeader.VersionNumber = 1;
                     _repository.Add(orderHeader);
                     transaction.Commit();
                 }
-                catch
+                catch(Exception ex)
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
@@ -73,9 +80,10 @@ namespace IMS.Service
                     _repository.Update(orderHeader);
                     transaction.Commit();
                 }
-                catch
+                catch(Exception ex)
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
@@ -85,25 +93,27 @@ namespace IMS.Service
         #region Update Status
         public void UpdateStatus(long id, string orderStatus, string PaymentStatus = null)
         {
-            var orderFromDb=_repository.GetById(id);
-            if(orderFromDb != null)
-            {
-                orderFromDb.OrderStatus = orderStatus;
-                if (PaymentStatus != null)
-                {
-                    orderFromDb.PaymentStatus= PaymentStatus;
-                }   
-            }
+            
             using (var transaction = _session.BeginTransaction())
             {
                 try
                 {
+                    var orderFromDb = _repository.GetById(id);
+                    if (orderFromDb != null)
+                    {
+                        orderFromDb.OrderStatus = orderStatus;
+                        if (PaymentStatus != null)
+                        {
+                            orderFromDb.PaymentStatus = PaymentStatus;
+                        }
+                    }
                     _repository.Update(orderFromDb);
                     transaction.Commit();
                 }
-                catch
+                catch (Exception ex)
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
@@ -113,25 +123,34 @@ namespace IMS.Service
         #region Update Stripe Session And Intent
         public void UpdateStripeSessionAndIntent(long id, string sessionId, string paymentIntentId)
         {
-            var orderFromDb = _repository.GetById(id);
-            if (orderFromDb != null)
+            try
             {
-                orderFromDb.SessionId = sessionId;
-                orderFromDb.PaymentIntentId= paymentIntentId;
-                using (var transaction = _session.BeginTransaction())
+                var orderFromDb = _repository.GetById(id);
+                if (orderFromDb != null)
                 {
-                    try
+                    orderFromDb.SessionId = sessionId;
+                    orderFromDb.PaymentIntentId = paymentIntentId;
+                    using (var transaction = _session.BeginTransaction())
                     {
-                        _repository.Update(orderFromDb);
-                        transaction.Commit();
-                    }
-                    catch
-                    {
-                        transaction.Rollback();
-                        throw;
+                        try
+                        {
+                            _repository.Update(orderFromDb);
+                            transaction.Commit();
+                        }
+                        catch
+                        {
+                            transaction.Rollback();
+                            throw;
+                        }
                     }
                 }
             }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+            
            
         }
         #endregion
@@ -139,102 +158,133 @@ namespace IMS.Service
         #region Get Order By Id
         public OrderHeader GetOrderHeaderById(long id)
         {
-            return _repository.GetById(id);
+            try
+            {
+                return _repository.GetById(id);
+            }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+            
         }
         public OrderHeader GetOrderHeaderByUser(long id, long userId)
         {
-            return Session.Query<OrderHeader>().Where(u=>u.Id==id && u.CustomerId == userId).FirstOrDefault();
+            try
+            {
+                return _orderHeaderDao.GetOrderHeaderByUser(id, userId);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
         #endregion
 
         #region Get All Order Headers
         public IEnumerable<OrderHeader> GetAllOrderHeaders()
         {
-            return _repository.GetAll();
+            try
+            {
+                return _repository.GetAll();
+            }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+        }
+        #endregion
+
+        #region LoadTotalOrders
+        public List<OrderHeader> LoadTotalOrders(string orderStatus1, string OrderStatus2) 
+        {
+            try
+            {
+                return _orderHeaderDao.LoadTotalOrders(orderStatus1, OrderStatus2);       
+            }
+            catch( Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+        }
+        #endregion
+
+        #region LoadNewOrders
+        public List<OrderHeader> LoadNewOrders(string orderStatus1, string orderStatus2,string orderStatus3)
+        {
+            try
+            {
+                return _orderHeaderDao.LoadNewOrders(orderStatus1, orderStatus2,orderStatus3);
+            }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+        }
+        #endregion
+
+        #region LoadCancelOrders
+        public List<OrderHeader> LoadCancelOrders(string orderStatus, string paymentStatus)
+        {
+            try
+            {
+                return _orderHeaderDao.LoadCancelOrders(orderStatus, paymentStatus);
+            }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
         #endregion
 
         #region Get Selling Reports
         public List<OrderHeader> GetSellingReports(DateTime? start = null, DateTime? end = null, string searchText = "")
         {
-            return _sellingReportDAO.SellingRecords(start, end, searchText);
+            try
+            {
+                return _sellingReportDAO.SellingRecords(start, end, searchText);
+
+            }catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+            
         }
         #endregion
 
         #region GetAllOrderHeadersWithCondition
         public List<OrderHeader> GetAllOrderHeadersWithCondition(string orderStatus = "", string paymentStatus = "")
         {
-            string condition = string.Empty;
-            if (!string.IsNullOrEmpty(orderStatus))
+            try
             {
-                condition += $" OH.OrderStatus = '{orderStatus}'";
-            }
-
-            if (!string.IsNullOrEmpty(paymentStatus))
+                return _orderHeaderDao.GetAllOrderHeadersWithCondition(orderStatus, paymentStatus);
+            }catch(Exception ex)
             {
-                condition += $" AND OH.PaymentStatus = '{paymentStatus}'";
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
             }
-            string res = $@"
-SELECT * 
-FROM OrderHeader AS OH 
-WHERE {condition}
-";
-            var iquery = Session.CreateSQLQuery(res);
-            iquery.AddEntity(typeof(OrderHeader));  
-            var result=iquery.List<OrderHeader>().ToList();
-
-            return result;
         }
         #endregion
 
         #region GetOrderByStatus
         public List<OrderHeader> GetOrderByStatus(string status = "All", long? userId = 0)
         {
-            string condition=string.Empty;
-            if(userId != 0)
+            try
             {
-                condition += $" OH.CustomerId = '{userId}' AND";
+                return _orderHeaderDao.GetOrderByStatus(status, userId);
             }
-
-            if (status == "Approved")
+            catch(Exception ex)
             {
-                condition += $" OH.OrderStatus = 'Approved'";
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
             }
-            else if (status == "Shipped")
-            {
-                condition += $" OH.OrderStatus = 'Shipped'";
-            }
-            else if (status == "InProcess")
-            {
-                condition += $" OH.OrderStatus = 'InProcess'";
-            }
-            else if (status == "Delivered")
-            {
-                condition += $" OH.OrderStatus = 'Delivered'";
-            }
-            else if (status == "Cancelled")
-            {
-                condition += $" OH.OrderStatus = 'Cancelled' AND OH.PaymentStatus <> 'Refunded'";
-            }
-            else if (status == "Refunded")
-            {
-                condition += $" OH.OrderStatus = 'Cancelled' AND OH.PaymentStatus = 'Refunded'";
-            }
-            else if (status == "All")
-            {
-                condition += $" OH.OrderStatus IS NOT NULL ";
-            }
-
-            string res = $@"
-SELECT *  
-FROM OrderHeader AS OH  
-WHERE {condition}
-";
-            var iquery = Session.CreateSQLQuery(res);
-            iquery.AddEntity(typeof(OrderHeader));
-            var result = iquery.List<OrderHeader>().ToList();
-
-            return result;
         }
         #endregion
     }

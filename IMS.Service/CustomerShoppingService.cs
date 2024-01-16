@@ -15,7 +15,6 @@ namespace IMS.Service
     public interface ICustomerShoppingService
     {
         void AddCutomerShoppingCart(ShoppingCart shoppingCart);
-        IEnumerable<ShoppingCart> GetAllOrders();
         ShoppingCart GetById(long id, long userId);
         int IncrementCount(ShoppingCart shoppingCart, int count);
         int DecrementCount(ShoppingCart shoppingCart, int count);
@@ -43,8 +42,6 @@ namespace IMS.Service
         #region Add Customer Shopping Cart
         public void AddCutomerShoppingCart(ShoppingCart shoppingCart)
         {
-
-
             using (var transaction = _session.BeginTransaction())
             {
                 try
@@ -90,19 +87,7 @@ namespace IMS.Service
         }
         #endregion
 
-        public IEnumerable<ShoppingCart> GetAllOrders()
-        {
-            try
-            {
-                return _repository.GetAll();
-            }
-            catch (Exception ex)
-            {
-                log.Error("An error occurred in YourAction.", ex);
-                throw;
-            }
-
-        }
+        #region GetAllCartOrders
         public List<ShoppingCart> GetAllCartOrders(long userId)
         {
             try
@@ -116,6 +101,9 @@ namespace IMS.Service
                 throw;
             }
         }
+        #endregion
+
+        #region Get order By Id
         public ShoppingCart GetById(long id, long userId)
         {
             try
@@ -129,7 +117,9 @@ namespace IMS.Service
                 throw;
             }
         }
+        #endregion
 
+        #region IncrementCount
         public int IncrementCount(ShoppingCart shoppingCart, int count)
         {
             try
@@ -158,6 +148,9 @@ namespace IMS.Service
             }
 
         }
+        #endregion
+
+        #region DecrementCount
         public int DecrementCount(ShoppingCart shoppingCart, int count)
         {
             try
@@ -190,7 +183,9 @@ namespace IMS.Service
             }
 
         }
+        #endregion
 
+        #region Remove Product From Cart
         public void RemoveProduct(ShoppingCart shoppingCart)
         {
             using (var transaction = _session.BeginTransaction())
@@ -208,5 +203,6 @@ namespace IMS.Service
                 }
             }
         }
+        #endregion 
     }
 }

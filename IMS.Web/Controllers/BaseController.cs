@@ -102,16 +102,16 @@ namespace IMS.Web.Controllers
 
             if (User.IsInRole("Customer"))
             {
-                int cartItemCount = _customerShopping.GetAllOrders().Where(u => u.CustomerId == Convert.ToInt64(User.Identity.GetUserId()) && u.Product.Status == 1).Count();
+                int cartItemCount = _customerShopping.GetAllCartOrders(Convert.ToInt64(User.Identity.GetUserId())).Where(u => u.Product.Status == 1).Count();
                 HttpContext.Session["CartItemCount"] = cartItemCount;
             }
             
             if(User.IsInRole("Admin") || User.IsInRole("Manager"))
             {
-                int InventoryCartCount = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == Convert.ToInt64(User.Identity.GetUserId())).Count();
+                int InventoryCartCount = _inventoryShoppingService.LoadAllInventoryOrders(Convert.ToInt64(User.Identity.GetUserId())).Count();
                 HttpContext.Session["InventoryCartItemCount"] = InventoryCartCount;
 
-                int NeedApprovalCount = _productService.GetAllProduct().Where(u => u.Approved == null).Count();
+                int NeedApprovalCount = _productService.LoadYetApprovedProduct().Count();
                 ViewBag.NeedApproval = NeedApprovalCount;
 
                 int productShortageCount = _productService.GetAllShortageProduct().Count();

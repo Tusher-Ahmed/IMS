@@ -1,4 +1,5 @@
 ﻿using IMS.DAO;
+using IMS.DataAccess;
 using IMS.Models;
 using IMS.Models.ViewModel;
 using NHibernate;
@@ -17,35 +18,46 @@ namespace IMS.Service
     {
         IEnumerable<GarmentsProduct> GetAllP();
         List<GarmentsProduct> GetAllPro(int status, long userId);
-        GarmentsProductViewModel GetAllProduct(GarmentsProductViewModel garmentsProduct,long? supplierId);
+        GarmentsProductViewModel GetAllProduct(GarmentsProductViewModel garmentsProduct, long? supplierId);
         GarmentsProduct GetGarmentsProductById(long id);
         GarmentsProduct GetGarmentsProductBySupplierId(long id, long userId);
         GarmentsProduct GetGarmentsProductByProductCode(int id);
         void CreateGarmentsProduct(GarmentsProduct garmentsProduct);
-       
+
         void UpdateGarmentsProduct(long id, GarmentsProduct garmentsProduct);
-        void UpdateStatus(long id,GarmentsProduct prod);
+        void UpdateStatus(long id, GarmentsProduct prod);
         void ActivateStatus(long id, GarmentsProduct product);
     }
     public class GarmentsService : IGarmentsService
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly BaseDAO<GarmentsProduct> _repository;
+        private readonly IGarmentsDao _garmentsDao;
         private ISession _session;
 
         public ISession Session
         {
             get { return _session; }
-            set { _session = value; _repository.Session = value; }
+            set { _session = value; _repository.Session = value; _garmentsDao.Session = value; }
         }
 
         public GarmentsService()
         {
             _repository = new BaseDAO<GarmentsProduct>();
+            _garmentsDao = new GarmentsDao();
         }
         #region Get All Product
         public IEnumerable<GarmentsProduct> GetAllP()
         {
-            return _repository.GetAll().ToList();
+            try
+            {
+                return _repository.GetAll().ToList();
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
         #endregion
 
@@ -54,100 +66,54 @@ namespace IMS.Service
         //TODO : Task: move all querys to repository
         public GarmentsProductViewModel GetAllProduct(GarmentsProductViewModel garmentsProduct, long? supplierId)
         {
-            string condition = string.Empty;
-            if (supplierId != 0)
+            try
             {
-               // query = query.Where(u => u.GarmentsId == supplierId).ToList();
-                condition = $" AND G.GarmentsId = '{supplierId}'";
+                return _garmentsDao.GetAllProduct(garmentsProduct, supplierId);
             }
-            int pageNumber = 0;
-            if (garmentsProduct.PageNumber == 0)
+            catch (Exception ex)
             {
-                pageNumber = 1;
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
             }
-            else
-            {
-                pageNumber = garmentsProduct.PageNumber;
-            }
-
-            int pageSize = 12;
-
-            //var query = _repository.GetAll().Where(u=>u.IsPriceAdded==true && u.Status==1);
-
-            if (garmentsProduct.SearchProductTypeId.HasValue)
-            {
-                condition += $" AND G.ProductTypeId = '{garmentsProduct.SearchProductTypeId.Value}'";
-            }
-
-            if (garmentsProduct.SearchDepartmentId.HasValue)
-            {
-                condition += $" AND G.DepartmentId = '{garmentsProduct.SearchDepartmentId.Value}'";
-            }
-
-            if (!string.IsNullOrWhiteSpace(garmentsProduct.SearchProductName))
-            {
-                condition += $" AND G.Name LIKE '%{garmentsProduct.SearchProductName}%' ";
-            }
-
-            var re = $@"
-SELECT *
-FROM GarmentsProduct AS G
-WHERE G.Status = '1'
-{condition}
-";
-            var iquery = Session.CreateSQLQuery(re);
-            iquery.AddEntity(typeof(GarmentsProduct));
-            var query = iquery.List<GarmentsProduct>().ToList();
-           
-            int totalCount = query.Count();
-
-            var products = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-            var resultModel = new GarmentsProductViewModel
-            {
-                GarmentsProducts = products,
-                TotalCount = totalCount,
-                PageNumber = pageNumber,
-                PageSize = pageSize
-            };
-
-            return resultModel;
         }
         #endregion
 
         #region Create Garments Product
         public void CreateGarmentsProduct(GarmentsProduct model)
         {
-            //int prod = this.GetAllP().Count();
-            int highRank = Convert.ToInt32(_repository.GetAll().Max(u => u.Rank));
-            int prodCode= Convert.ToInt32(_repository.GetAll().Max(u => u.ProductCode));
+            //int prod = this.GetAllP().Count();            
             using (var transaction = _session.BeginTransaction())
             {
-                GarmentsProduct garmentsProduct = new GarmentsProduct
-                {
-                    Name = model.Name,
-                    Image = model.Image,
-                    SKU = model.SKU,
-                    Price = model.Price,
-                    GarmentsId = model.GarmentsId,
-                    Description = model.Description,
-                    ProductType = model.ProductType,
-                    Department = model.Department,
-                    ProductCode = prodCode + 1,
-                    CreatedBy = model.GarmentsId,
-                    CreationDate = DateTime.Now,
-                    Status = 1,
-                    Rank = highRank + 1,
-                    VersionNumber = 1,
-                    BusinessId = Guid.NewGuid().ToString()
-                };
                 try
                 {
+                    int highRank = Convert.ToInt32(_repository.GetAll().Max(u => u.Rank));
+                    int prodCode = Convert.ToInt32(_repository.GetAll().Max(u => u.ProductCode));
+                    GarmentsProduct garmentsProduct = new GarmentsProduct
+                    {
+                        Name = model.Name,
+                        Image = model.Image,
+                        SKU = model.SKU,
+                        Price = model.Price,
+                        GarmentsId = model.GarmentsId,
+                        Description = model.Description,
+                        ProductType = model.ProductType,
+                        Department = model.Department,
+                        ProductCode = prodCode + 1,
+                        CreatedBy = model.GarmentsId,
+                        CreationDate = DateTime.Now,
+                        Status = 1,
+                        Rank = highRank + 1,
+                        VersionNumber = 1,
+                        BusinessId = Guid.NewGuid().ToString()
+                    };
+
                     _repository.Add(garmentsProduct);
                     transaction.Commit();
                 }
-                catch
+                catch (Exception ex)
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
 
@@ -158,12 +124,30 @@ WHERE G.Status = '1'
         #region Get Garments Product By Id
         public GarmentsProduct GetGarmentsProductById(long id)
         {
-            var product = _repository.GetById(id);
-            return product;
+            try
+            {
+                var product = _repository.GetById(id);
+                return product;
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+
         }
-        public GarmentsProduct GetGarmentsProductBySupplierId(long id,long userId)
+        public GarmentsProduct GetGarmentsProductBySupplierId(long id, long userId)
         {
-           return Session.Query<GarmentsProduct>().Where(u=>u.Id==id && u.GarmentsId==userId).FirstOrDefault();
+            try
+            {
+                return _garmentsDao.GetGarmentsProductBySupplierId(id, userId);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+
         }
         #endregion
 
@@ -175,27 +159,27 @@ WHERE G.Status = '1'
             {
                 using (var transaction = _session.BeginTransaction())
                 {
-
-                    prod.Name = garmentsProduct.Name;
-                    prod.SKU = garmentsProduct.SKU;
-                    prod.Price = garmentsProduct.Price;
-                    prod.Image = garmentsProduct.Image;
-                    prod.Department = garmentsProduct.Department;
-                    prod.ProductType = garmentsProduct.ProductType;
-                    prod.ProductCode = prod.ProductCode;
-                    prod.Description = garmentsProduct.Description;
-                    prod.VersionNumber = prod.VersionNumber + 1;
-                    prod.ModifyBy = garmentsProduct.ModifyBy;
-                    prod.ModificationDate = DateTime.Now;
-
                     try
                     {
+                        prod.Name = garmentsProduct.Name;
+                        prod.SKU = garmentsProduct.SKU;
+                        prod.Price = garmentsProduct.Price;
+                        prod.Image = garmentsProduct.Image;
+                        prod.Department = garmentsProduct.Department;
+                        prod.ProductType = garmentsProduct.ProductType;
+                        prod.ProductCode = prod.ProductCode;
+                        prod.Description = garmentsProduct.Description;
+                        prod.VersionNumber = prod.VersionNumber + 1;
+                        prod.ModifyBy = garmentsProduct.ModifyBy;
+                        prod.ModificationDate = DateTime.Now;
+
                         _repository.Update(prod);
                         transaction.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         transaction.Rollback();
+                        log.Error("An error occurred in YourAction.", ex);
                         throw;
                     }
                 }
@@ -212,18 +196,20 @@ WHERE G.Status = '1'
             {
                 using (var transaction = _session.BeginTransaction())
                 {
-                    prod.Status = 0;
-                    prod.VersionNumber=prod.VersionNumber + 1;
-                    prod.ModifyBy = product.ModifyBy;
-                    prod.ModificationDate = DateTime.Now;
                     try
                     {
+                        prod.Status = 0;
+                        prod.VersionNumber = prod.VersionNumber + 1;
+                        prod.ModifyBy = product.ModifyBy;
+                        prod.ModificationDate = DateTime.Now;
+
                         _repository.Update(prod);
                         transaction.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         transaction.Rollback();
+                        log.Error("An error occurred in YourAction.", ex);
                         throw;
                     }
                 }
@@ -236,23 +222,24 @@ WHERE G.Status = '1'
         public void ActivateStatus(long id, GarmentsProduct product)
         {
             var prod = GetGarmentsProductById(id);
-            if(prod != null)
+            if (prod != null)
             {
                 using (var transaction = _session.BeginTransaction())
                 {
-                    prod.Status = 1;
-                    prod.VersionNumber = prod.VersionNumber + 1;
-                    prod.ModifyBy = product.ModifyBy;
-                    prod.ModificationDate = DateTime.Now;
-
                     try
                     {
+                        prod.Status = 1;
+                        prod.VersionNumber = prod.VersionNumber + 1;
+                        prod.ModifyBy = product.ModifyBy;
+                        prod.ModificationDate = DateTime.Now;
+
                         _repository.Update(prod);
                         transaction.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         transaction.Rollback();
+                        log.Error("An error occurred in YourAction.", ex);
                         throw;
                     }
                 }
@@ -262,24 +249,37 @@ WHERE G.Status = '1'
 
         #endregion
 
+        #region GetGarmentsProductByProductCode
         public GarmentsProduct GetGarmentsProductByProductCode(int id)
         {
-            return _session.Query<GarmentsProduct>().FirstOrDefault(x=>x.ProductCode == id);
-        }
+            try
+            {
+                return _garmentsDao.GetGarmentsProductByProductCode(id);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
 
+        }
+        #endregion
+
+        #region Get All Product
         public List<GarmentsProduct> GetAllPro(int status, long userId)
         {
-            string query = $@"
-SELECT *
-FROM GarmentsProduct AS GP
-WHERE GP.Status = '{status}' AND GP.GarmentsId = '{userId}'
-";
-            var iquery = Session.CreateSQLQuery(query);
-            iquery.AddEntity(typeof(GarmentsProduct));
-            var res = iquery.List<GarmentsProduct>().ToList();
+            try
+            {
+                return _garmentsDao.GetAllPro(status, userId);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
 
-            return res;
-        }        
+        }
+        #endregion
 
     }
 }

@@ -105,7 +105,7 @@ namespace IMS.Web.Controllers
             try
             {
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var Order = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == userId);
+                var Order = _inventoryShoppingService.LoadAllInventoryOrders(userId);
                 var maxOrderId = _inventoryOrderHistoryService.GetAll().Max(u => (long?)u.OrderId);
                 long orderId = maxOrderId.HasValue ? maxOrderId.Value + 1 : 1;
                 var garmentsProduct = _garmentsService.GetAllP();
@@ -276,9 +276,17 @@ namespace IMS.Web.Controllers
         #region Calculate Total Price
         private decimal CalculateTotalPrice(long EmployeeId)
         {
-            var orderCarts = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == EmployeeId).ToList();
-            decimal total = orderCarts.Sum(cart => cart.GarmentsProduct.Price * cart.Count);
-            return total;
+            try
+            {
+                var orderCarts = _inventoryShoppingService.LoadAllInventoryOrders(EmployeeId);
+                decimal total = orderCarts.Sum(cart => cart.GarmentsProduct.Price * cart.Count);
+                return total;
+            }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
         #endregion
 
@@ -293,7 +301,7 @@ namespace IMS.Web.Controllers
                 
                 if (role != null)
                 {
-                    var product = _product.GetAllProduct().Where(u => u.Approved == null).ToList();
+                    var product = _product.LoadYetApprovedProduct();
                     Dictionary<long, string> garments = new Dictionary<long, string>();
                     Dictionary<long, long> orderId = new Dictionary<long, long>();
 
@@ -448,7 +456,7 @@ namespace IMS.Web.Controllers
 
                 if (role == "Admin" || role == "Staff")
                 {
-                    var prod = _product.GetAllProduct().Where(u => u.Approved == false && u.Rejected == true).ToList();
+                    var prod = _product.LoadAllRejectedProducts();
                     Dictionary<long, long> orderId = new Dictionary<long, long>();
                     Dictionary<long, string> staffs = new Dictionary<long, string>();
                     Dictionary<long, string> garments = new Dictionary<long, string>();

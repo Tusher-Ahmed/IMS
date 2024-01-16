@@ -1,10 +1,12 @@
 ﻿using IMS.DAO;
 using IMS.Models;
 using NHibernate;
+using NHibernate.Engine;
 using NHibernate.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace IMS.DataAccess
 {
@@ -12,6 +14,7 @@ namespace IMS.DataAccess
     {
         ISession Session { get; set; }
         List<OrderHistory> GetOrderHistories(List<long> ids, DateTime? startDate = null, DateTime? endDate = null, string searchText = "");
+        List<OrderHistory> LoadHistoryByGarmentsId(long garmentsId);      
     }
 
     public class OrderHistoryDao : BaseDAO<OrderHistory>, IOrderHistoryDao
@@ -57,5 +60,20 @@ WHERE oh.Id IN({string.Join(",", ids)})
         {
             return input.TrimStart('0');
         }
+
+        public List<OrderHistory> LoadHistoryByGarmentsId(long garmentsId)
+        {
+            string query = $@"
+SELECT *
+FROM OrderHistory AS OH
+WHERE OH.GarmentsId = '{garmentsId}'
+";
+            var iquery = Session.CreateSQLQuery(query);
+            iquery.AddEntity(typeof(OrderHistory));
+            var res = iquery.List<OrderHistory>().ToList();
+
+            return res;
+        }
+      
     }
 }

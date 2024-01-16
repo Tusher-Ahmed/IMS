@@ -71,7 +71,8 @@ namespace IMS.Service
         {
             try
             {
-                return _repository.GetAll();
+                return _customerDao.GetAllCustomers();
+                //return _repository.GetAll();
             }
             catch(Exception ex)
             {

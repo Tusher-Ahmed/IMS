@@ -337,7 +337,7 @@ namespace IMS.Web.Controllers
                 }
                 if (product != null)
                 {
-                    product.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
+                    product.ModifyBy = userId;
                     _garmentsService.UpdateStatus(id, product);
                     TempData["success"] = "Status Updated Successfully";
                     return RedirectToAction("ProductList");
@@ -360,7 +360,7 @@ namespace IMS.Web.Controllers
             try
             {
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var prod = _garmentsService.GetAllP().Where(u => u.Status == 0 && u.GarmentsId == userId);
+                var prod = _garmentsService.GetAllPro(0,userId);
                 return View(prod);
             }
             catch (Exception ex)

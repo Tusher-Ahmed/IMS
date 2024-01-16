@@ -5,7 +5,6 @@ using NHibernate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,7 +12,7 @@ namespace IMS.DataAccess
 {
     public interface IProductDAO
     {
-        NHibernate.ISession Session { get; set; }
+        ISession Session { get; set; }
         ProductViewModel GetProducts(ProductViewModel product);
         List<Product> GetRejectHistory(DateTime? startDate = null, DateTime? endDate = null);
         List<Product> GetApprovedProducts();
@@ -22,10 +21,14 @@ namespace IMS.DataAccess
         Product GetProductByProductCode(int ProductCode);
         bool GetAllProductByProductCode(int ProductCode);
         List<Product> LoadAllProductForManagePrice();
+        List<Product> LoadYetApprovedProduct();
+        List<Product> LoadAllApprovedProducts();
+        List<Product> LoadAllRejectedProducts();
+        List<Product> LoadDeactivatedProducts();
     }
     public class ProductDAO : BaseDAO<ProductViewModel>, IProductDAO
     {
-        public new NHibernate.ISession Session { get; set; }
+        public new ISession Session { get; set; }
 
 
         public List<Product> GetAllNewProduct()
@@ -177,6 +180,60 @@ WHERE P.Approved = 'False' And P.Rejected = 'True' {condition}
             return result;
         }
 
-       
+        public List<Product> LoadYetApprovedProduct()
+        {
+            string res = $@"
+SELECT *
+FROM Product AS P
+WHERE P.Approved IS NULL
+";
+            var iquery = Session.CreateSQLQuery(res);
+            iquery.AddEntity(typeof(Product));
+            var result = iquery.List<Product>().ToList();
+
+            return result;
+        }
+
+        public List<Product> LoadAllApprovedProducts()
+        {
+            string res = $@"
+SELECT *
+FROM Product AS P
+WHERE P.Approved = 'True'
+";
+            var iquery = Session.CreateSQLQuery(res);
+            iquery.AddEntity(typeof(Product));
+            var result = iquery.List<Product>().ToList();
+
+            return result;
+        }
+
+        public List<Product> LoadAllRejectedProducts()
+        {
+            string res = $@"
+SELECT *
+FROM Product AS P
+WHERE (P.Approved = 'False' AND P.Rejected = 'True')
+";
+            var iquery = Session.CreateSQLQuery(res);
+            iquery.AddEntity(typeof(Product));
+            var result = iquery.List<Product>().ToList();
+
+            return result;
+        }
+
+        public List<Product> LoadDeactivatedProducts()
+        {
+            string res = $@"
+SELECT *
+FROM Product AS P
+WHERE (P.Approved = 'True' AND P.IsPriceAdded = 'True' AND P.Status = '0')
+";
+            var iquery = Session.CreateSQLQuery(res);
+            iquery.AddEntity(typeof(Product));
+            var result = iquery.List<Product>().ToList();
+
+            return result;
+        }
     }
 }

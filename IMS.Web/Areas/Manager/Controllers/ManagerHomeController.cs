@@ -294,7 +294,7 @@ namespace IMS.Web.Areas.Manager.Controllers
             {
                 if (User.IsInRole("Manager"))
                 {
-                    var prod = _product.GetAllProduct().Where(u => u.Status == 0 && u.Approved == true && u.IsPriceAdded == true);
+                    var prod = _product.LoadDeactivatedProducts();
                     if (prod != null)
                     {
                         return View(prod);

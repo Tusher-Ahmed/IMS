@@ -75,12 +75,10 @@ namespace IMS.Web.Areas.Admin.Controllers
                     TotalProduct = _product.GetAllApprovedProduct().Count(),
                     TotalEmployee = GetEmployeeWithRoles(),
                     TotalShop = GetShopsWithRoles(),
-                    orderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).ToList(),
-                    TotalOrders = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == ShoppingHelper.StatusShipped || u.OrderStatus == ShoppingHelper.StatusDelivered).Count(),
-                    TotalNewOrders = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus != ShoppingHelper.StatusCancelled &&
-                        u.OrderStatus != ShoppingHelper.StatusRefunded && u.OrderStatus != ShoppingHelper.StatusShipped).Count(),
-                    TotalCancelOrder = _orderHeaderService.GetAllOrderHeaders().Where(u => u.OrderStatus == ShoppingHelper.StatusCancelled && u.PaymentStatus == ShoppingHelper.StatusRefunded).Count()
-
+                    orderHeaders = _orderHeaderService.GetAllOrderHeaders().OrderByDescending(u => u.Id).ToList(),                  
+                    TotalOrders = _orderHeaderService.LoadTotalOrders(ShoppingHelper.StatusShipped, ShoppingHelper.StatusDelivered).Count(),
+                    TotalNewOrders = _orderHeaderService.LoadNewOrders(ShoppingHelper.StatusCancelled, ShoppingHelper.StatusRefunded, ShoppingHelper.StatusShipped).Count(),
+                    TotalCancelOrder = _orderHeaderService.LoadCancelOrders(ShoppingHelper.StatusCancelled, ShoppingHelper.StatusRefunded).Count()
                 };
                 return View(prod);
             }
@@ -299,7 +297,7 @@ namespace IMS.Web.Areas.Admin.Controllers
             {
                 if (User.IsInRole("Admin"))
                 {
-                    var prod = _product.GetAllProduct().Where(u => u.Status == 0 && u.Approved == true && u.IsPriceAdded == true);
+                    var prod = _product.LoadDeactivatedProducts();
                     if (prod != null)
                     {
                         return View(prod);
@@ -397,13 +395,13 @@ namespace IMS.Web.Areas.Admin.Controllers
         #region Get total employee and store
         public int GetEmployeeWithRoles()
         {
-            var employee = _employeeService.GetAllEmployee().Where(u=>u.Status==1).ToList();
+            var employee = _employeeService.GetAllEmployee();
             return employee.Count();
         }
 
         public int GetShopsWithRoles()
         {         
-            var shops = _customerService.GetAllCustomer().Where(u => u.Status == 1).ToList();
+            var shops = _customerService.GetAllCustomer();
             return shops.Count();
         }
         #endregion

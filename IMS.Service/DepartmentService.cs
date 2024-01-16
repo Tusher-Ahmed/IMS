@@ -1,11 +1,14 @@
 ﻿using IMS.DAO;
+using IMS.DataAccess;
 using IMS.Models;
+using log4net;
 using NHibernate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 
 namespace IMS.Service
 {
@@ -19,12 +22,13 @@ namespace IMS.Service
     }
     public class DepartmentService : IDepartmentService
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly BaseDAO<Department> _repository;
         private ISession _session;
         public ISession Session
         {
             get { return _session; }
-            set { _session = value; _repository.Session = value; }
+            set { _session = value; _repository.Session = value;}
         }
         public DepartmentService()
         {
@@ -32,32 +36,49 @@ namespace IMS.Service
         }
         #region Add Department
         public void AddDept(Department dept)
-        {
-            int highRank = Convert.ToInt32(_repository.GetAll().Max(u => u.Rank));
+        {           
+            if (dept == null)
+            {
+                throw new ArgumentNullException(nameof(dept));
+            }
+
+            int highRank;
+            try
+            {
+                highRank = Convert.ToInt32(_repository.GetAll().Max(u => u.Rank));
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+
             using (var transaction = _session.BeginTransaction())
             {
-                Department department = new Department
-                {
-                    Name = dept.Name,
-                    CreatedBy = dept.CreatedBy,
-                    CreationDate = DateTime.Now,
-                    Status = 1,
-                    VersionNumber = 1,
-                    Rank = highRank + 1,
-                    BusinessId = Guid.NewGuid().ToString()
-                };
                 try
                 {
+                    Department department = new Department
+                    {
+                        Name = dept.Name,
+                        CreatedBy = dept.CreatedBy,
+                        CreationDate = DateTime.Now,
+                        Status = 1,
+                        VersionNumber = 1,
+                        Rank = highRank + 1,
+                        BusinessId = Guid.NewGuid().ToString()
+                    };
+
                     _repository.Add(department);
                     transaction.Commit();
                 }
-                catch
+                catch (Exception ex)
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
-           
+
         }
         #endregion
 
@@ -67,6 +88,10 @@ namespace IMS.Service
             using (var transaction = _session.BeginTransaction())
             {
                 var data = _repository.GetById(id);
+                if (data == null)
+                {
+                    throw new ArgumentNullException(nameof(data));
+                }
                 if (data != null)
                 {
                     try
@@ -74,9 +99,10 @@ namespace IMS.Service
                         _repository.Delete(data);
                         transaction.Commit();
                     }
-                    catch
+                    catch(Exception ex)
                     {
                         transaction.Rollback();
+                        log.Error("An error occurred in YourAction.", ex);
                         throw;
                     }
                 }
@@ -88,14 +114,32 @@ namespace IMS.Service
         #region Get All Department
         public IEnumerable<Department> GetAllDept()
         {
-           return _repository.GetAll().ToList();
+            try
+            {
+                return _repository.GetAll().ToList();
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+           
         }
         #endregion
 
         #region Get Department By Id
         public Department GetDeptById(long id)
         {
-            return _repository.GetById(id);
+            try
+            {
+                return _repository.GetById(id);
+
+            }catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+            
         }
         #endregion
 
@@ -104,23 +148,25 @@ namespace IMS.Service
         {
             using (var transaction = _session.BeginTransaction())
             {
-                var deptData = _repository.GetById(id);
-                if (deptData != null)
-                {
-                    deptData.Name = dept.Name;
-                    deptData.ModifyBy = dept.ModifyBy;
-                    deptData.Status = dept.Status;
-                    deptData.ModificationDate = DateTime.Now;
-                    deptData.VersionNumber = deptData.VersionNumber + 1;
-                }
+                
                 try
                 {
+                    var deptData = _repository.GetById(id);
+                    if (deptData != null)
+                    {
+                        deptData.Name = dept.Name;
+                        deptData.ModifyBy = dept.ModifyBy;
+                        deptData.Status = dept.Status;
+                        deptData.ModificationDate = DateTime.Now;
+                        deptData.VersionNumber = deptData.VersionNumber + 1;
+                    }
                     _repository.Update(deptData);
                     transaction.Commit();
                 }
-                catch
+                catch(Exception ex) 
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }

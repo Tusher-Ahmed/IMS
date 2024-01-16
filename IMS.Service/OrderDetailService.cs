@@ -1,4 +1,5 @@
 ﻿using IMS.DAO;
+using IMS.DataAccess;
 using IMS.Models;
 using NHibernate;
 using System;
@@ -14,28 +15,32 @@ namespace IMS.Service
         void Add(OrderDetail orderDetail);
         OrderDetail GetOrderDetailById(int id);
         OrderDetail GetOrderDetailByOrderHeaderId(long id);
-        IEnumerable<OrderDetail> getAllOrderDetails();
+        List<OrderDetail> LoadAllOrdersDetails(long orderHeaderId);
     }
     public class OrderDetailService:IOrderDetailService
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly BaseDAO<OrderDetail> _repository;
+        private readonly IOrderDetailsDao _orderDetailsDao;
         private ISession _session;
 
         public ISession Session
         {
             get { return _session; }
-            set { _session = value; _repository.Session = value; }
+            set { _session = value; _repository.Session = value;_orderDetailsDao.Session = value; }
         }
         public OrderDetailService()
         {
             _repository = new BaseDAO<OrderDetail>();
+            _orderDetailsDao = new OrderDetailsDao();
         }
 
         public void Add(OrderDetail orderDetail)
         {
-            int highRank = _repository.GetAll().Select(u => u.Rank).DefaultIfEmpty(0).Max();
+            
             using (var transaction = _session.BeginTransaction())
             {
+                int highRank = _repository.GetAll().Select(u => u.Rank).DefaultIfEmpty(0).Max();
                 orderDetail.Rank= highRank+1;         
                 orderDetail.BusinessId = Guid.NewGuid().ToString();
                 try
@@ -43,27 +48,53 @@ namespace IMS.Service
                     _repository.Add(orderDetail);
                     transaction.Commit();
                 }
-                catch
+                catch(Exception ex) 
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
         }
 
-        public IEnumerable<OrderDetail> getAllOrderDetails()
-        {
-            return _repository.GetAll();
-        }
 
+        public List<OrderDetail> LoadAllOrdersDetails( long orderHeaderId)
+        {
+            try
+            {
+                return _orderDetailsDao.LoadAllOrdersDetails(orderHeaderId);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+        }
         public OrderDetail GetOrderDetailById(int id)
         {
-           return _repository.GetById(id);
+            try
+            {
+                return _repository.GetById(id);
+            }
+           catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
 
         public OrderDetail GetOrderDetailByOrderHeaderId(long id)
         {
-            return _session.Query<OrderDetail>().Where(u=>u.OrderHeader.Id==id).FirstOrDefault();
+            try
+            {
+                return _orderDetailsDao.GetOrderDetailByOrderHeaderId(id);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+           
         }
     }
 }

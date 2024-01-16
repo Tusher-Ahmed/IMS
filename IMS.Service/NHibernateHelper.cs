@@ -19,7 +19,7 @@ namespace IMS.Service
         {
             ISessionFactory sessionFactory = Fluently.Configure()
                 .Database(MsSqlConfiguration.MsSql2012
-                  .ConnectionString(@"Server=DESKTOP-44VLE5Q;Database=InventoryManagementSystem;Integrated Security=True;")
+                  .ConnectionString(@"Server=DESKTOP-L4HFC5H\SQLEXPRESS;Database=InventoryManagementSystem;Integrated Security=True;")
                               .ShowSql()
                 )
                .Mappings(m =>

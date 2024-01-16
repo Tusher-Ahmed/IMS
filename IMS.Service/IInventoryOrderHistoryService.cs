@@ -19,23 +19,28 @@ namespace IMS.Service
         List<OrderHistory> GetHistories(List<long> ids, DateTime? startDate = null, DateTime? endDate = null, string searchText = "");
         List<Product> GetAllRejectedOrder(long userId);
         OrderHistory GetById(long id);
+        List<OrderHistory> LoadHistoryByGarmentsId(long garmentsId);
+        List<OrderHistory> LoadTotalHistory(long orderId);
     }
     public class InventoryOrderHistoryService : IInventoryOrderHistoryService
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly BaseDAO<OrderHistory> _repository;
         private readonly IOrderHistoryDao _orderHistoryDao;
+        private readonly IInventoryOrderHistoryDao _inventoryOrderHistoryDao;
         private ISession _session;
 
         public ISession Session
         {
             get { return _session; }
-            set { _session = value; _repository.Session = value; _orderHistoryDao.Session = value; }
+            set { _session = value; _repository.Session = value; _orderHistoryDao.Session = value;_inventoryOrderHistoryDao.Session = value; }
         }
 
         public InventoryOrderHistoryService()
         {
             _repository = new BaseDAO<OrderHistory>();
             _orderHistoryDao = new OrderHistoryDao();
+            _inventoryOrderHistoryDao = new InventoryOrderHistoryDao();
         }
 
         public void Add(OrderHistory orderHistory)
@@ -47,9 +52,10 @@ namespace IMS.Service
                     _repository.Add(orderHistory);
                     transaction.Commit();
                 }
-                catch
+                catch(Exception ex) 
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
@@ -57,37 +63,91 @@ namespace IMS.Service
 
         public IEnumerable<OrderHistory> GetAll()
         {
-            return _repository.GetAll();
+            try
+            {
+                return _repository.GetAll();
+            }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }            
+        }
+
+        public List<OrderHistory> LoadHistoryByGarmentsId(long garmentsId)
+        {
+            try
+            {
+                return _orderHistoryDao.LoadHistoryByGarmentsId(garmentsId);
+            }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
         public IEnumerable<OrderHistory> GetByOrderId(long orderId)
         {
-            return _session.Query<OrderHistory>().Where(u => u.OrderId == orderId);
+            try
+            {
+                return _inventoryOrderHistoryDao.GetByOrderId(orderId);
+            }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
+        }
+        public List<OrderHistory> LoadTotalHistory(long userId)
+        {
+            try
+            {
+                return _orderHistoryDao.LoadHistoryByGarmentsId(userId);
+            }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
 
         public OrderHistory GetById(long id)
         {
-            return _repository.GetById(id);
+            try
+            {
+                return _repository.GetById(id);
+            }
+            catch(Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }            
         }
 
         public List<OrderHistory> GetHistories(List<long> ids, DateTime? startDate = null, DateTime? endDate = null, string searchText = "" )
         {
-            return _orderHistoryDao.GetOrderHistories(ids, startDate, endDate, searchText);
+            try
+            {
+                return _orderHistoryDao.GetOrderHistories(ids, startDate, endDate, searchText);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
 
         public List<Product> GetAllRejectedOrder(long userId)
         {
-            string product = $@"
-SELECT *
-FROM Product AS P
-WHERE P.GarmentsId = '{userId}' 
-AND P.Rejected = 'True'
-";
-            var iquery = Session.CreateSQLQuery(product);
-            iquery.AddEntity(typeof(Product));
-            var result = iquery.List<Product>().ToList();
-
-            return result;
-            
+            try
+            {
+                return _inventoryOrderHistoryDao.GetAllRejectedOrder(userId);
+            }
+            catch( Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
 
         }
     }

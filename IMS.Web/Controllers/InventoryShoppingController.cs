@@ -118,7 +118,7 @@ namespace IMS.Web.Controllers
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
                 InventoryCartViewModel inventoryCartViewModel = new InventoryCartViewModel
                 {
-                    OrderCarts = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == userId).ToList()
+                    OrderCarts = _inventoryShoppingService.LoadAllInventoryOrders(userId)
                 };
                 foreach (var cart in inventoryCartViewModel.OrderCarts)
                 {
@@ -216,10 +216,18 @@ namespace IMS.Web.Controllers
 
         private decimal CalculateTotalPrice()
         {
-            long userId = Convert.ToInt64(User.Identity.GetUserId());
-            var orderCarts = _inventoryShoppingService.GetAllInventoryOrders().Where(u => u.EmployeeId == userId).ToList();
-            decimal total = orderCarts.Sum(cart => cart.GarmentsProduct.Price * cart.Count);
-            return total;
+            try
+            {
+                long userId = Convert.ToInt64(User.Identity.GetUserId());
+                var orderCarts = _inventoryShoppingService.LoadAllInventoryOrders(userId);
+                decimal total = orderCarts.Sum(cart => cart.GarmentsProduct.Price * cart.Count);
+                return total;
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
 
         #endregion

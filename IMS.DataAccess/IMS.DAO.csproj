@@ -62,8 +62,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CancelReasonDao.cs" />
     <Compile Include="CustomerDao.cs" />
     <Compile Include="CustomerShoppingDao.cs" />
+    <Compile Include="EmployeeDao.cs" />
+    <Compile Include="GarmentsDao.cs" />
+    <Compile Include="InventoryOrderHistoryDao.cs" />
+    <Compile Include="InventoryShoppingDao.cs" />
     <Compile Include="Mapping\CancelReasonMap.cs" />
     <Compile Include="Mapping\CustomerMap.cs" />
     <Compile Include="Mapping\DepartmentMap.cs" />
@@ -77,11 +82,15 @@
     <Compile Include="Mapping\ProductTypeMap.cs" />
     <Compile Include="Mapping\ShoppingCartMap.cs" />
     <Compile Include="Mapping\SupplierMap.cs" />
+    <Compile Include="OrderDetailsDao.cs" />
+    <Compile Include="OrderHeaderDao.cs" />
     <Compile Include="OrderHistoryDao.cs" />
     <Compile Include="ProductDAO.cs" />
+    <Compile Include="ProductTypeDao.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseDAO.cs" />
     <Compile Include="SellingReportDAO.cs" />
+    <Compile Include="SupplierDao.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IMS.Models\IMS.Models.csproj">

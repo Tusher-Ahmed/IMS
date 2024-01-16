@@ -36,7 +36,7 @@ namespace IMS.Web.Areas.Garmentss.Controllers
                 {
                     var context = new ApplicationDbContext();
                     long userId = Convert.ToInt64(User.Identity.GetUserId());
-                    var history = _inventoryOrderHistoryService.GetAll().Where(u => u.GarmentsId == userId);
+                    var history = _inventoryOrderHistoryService.LoadHistoryByGarmentsId(userId);
 
                     Dictionary<long, decimal> TotalPrice = new Dictionary<long, decimal>();
                     Dictionary<long, string> orderBy = new Dictionary<long, string>();
@@ -51,9 +51,10 @@ namespace IMS.Web.Areas.Garmentss.Controllers
 
                     GarmentsDashboardViewModel viewModel = new GarmentsDashboardViewModel
                     {
-                        Products = _garmentsService.GetAllP(),
-                        TotalProduct = _garmentsService.GetAllP().Where(u => u.GarmentsId == userId).Count(),
-                        TotalHistory = _inventoryOrderHistoryService.GetAll().Where(u => u.GarmentsId == userId).GroupBy(u => u.OrderId).Select(u => u.First()).Count(),
+                        //Products = _garmentsService.GetAllP(),
+                        TotalProduct = _garmentsService.GetAllPro(1,userId).Count(),
+                        TotalHistory = history.GroupBy(u => u.OrderId).Select(u => u.First()).Count(),
+                        //TotalHistory = _inventoryOrderHistoryService.LoadTotalHistory(userId).Count(),
                         OrderHistory = history,
                         TotalPrice = TotalPrice,
                         OrderBy = orderBy,
@@ -85,7 +86,7 @@ namespace IMS.Web.Areas.Garmentss.Controllers
                 {
                     var context = new ApplicationDbContext();
                     long userId = Convert.ToInt64(User.Identity.GetUserId());
-                    var history = _inventoryOrderHistoryService.GetAll().Where(u => u.GarmentsId == userId);
+                    var history = _inventoryOrderHistoryService.LoadHistoryByGarmentsId(userId);
 
                     Dictionary<long, decimal> TotalPrice = new Dictionary<long, decimal>();
                     Dictionary<long, string> orderBy = new Dictionary<long, string>();

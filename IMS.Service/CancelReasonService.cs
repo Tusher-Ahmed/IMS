@@ -1,4 +1,5 @@
 ﻿using IMS.DAO;
+using IMS.DataAccess;
 using IMS.Models;
 using NHibernate;
 using System;
@@ -16,16 +17,19 @@ namespace IMS.Service
     }
     public class CancelReasonService:ICancelReasonService
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly BaseDAO<CancelReason> _repository;
         private ISession _session;
+        private readonly ICancelReasonDao _cancelReasonDao;
         public ISession Session
         {
             get { return _session; }
-            set { _session = value; _repository.Session = value; }
+            set { _session = value; _repository.Session = value;_cancelReasonDao.Session = value; }
         }
         public CancelReasonService()
         {
             _repository = new BaseDAO<CancelReason>();
+            _cancelReasonDao = new CancelReasonDao();
         }
 
         public void AddReason(CancelReason reason)
@@ -37,9 +41,10 @@ namespace IMS.Service
                     _repository.Add(reason);
                     transaction.Commit();
                 }
-                catch
+                catch(Exception ex) 
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
@@ -48,7 +53,15 @@ namespace IMS.Service
         //TODO: Task: move it to repository
         public CancelReason GetReasonByOrderHeaderId(long id)
         {
-            return Session.Query<CancelReason>().Where(u=>u.OrderHeader.Id == id).FirstOrDefault();
+            try
+            {
+                return _cancelReasonDao.GetReasonByOrderHeaderId(id);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
     }
 }

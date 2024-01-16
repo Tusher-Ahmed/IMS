@@ -31,7 +31,7 @@ namespace IMS.Web.Controllers
                 string role = IsAuthorize(userId);
                 if (role == "Admin")
                 {
-                    var data = _productType.GetAllType();
+                    var data = _productType.LoadProductTypeThroughStatus(1);
                     return View(data);
                 }
                 else
@@ -59,14 +59,15 @@ namespace IMS.Web.Controllers
 
                     if (string.IsNullOrEmpty(pType) == false)
                     {
-                        var data = _productType.GetAllType();
-                        var searchItem = data.Where(u => u.Name.IndexOf(pType, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 1).ToList();
+                       // var data = _productType.GetAllType();
+                        //var searchItem = data.Where(u => u.Name.IndexOf(pType, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 1).ToList();
+                        var searchItem = _productType.SearchProductType(pType,1);
                         return PartialView("_SearchProductType", searchItem);
                     }
                     else
                     {
 
-                        var data = _productType.GetAllType();
+                        var data = _productType.LoadProductTypeThroughStatus(1);
                         return PartialView("_SearchProductType", data);
                     }
                 }
@@ -105,7 +106,8 @@ namespace IMS.Web.Controllers
                     {
                         ModelState.AddModelError("Name", "Product Type must contain at least three letters.");
                     }
-                    var data = _productType.GetAllType().Where(u => u.Name.ToLower() == pType.Name.ToLower());
+                   // var data = _productType.GetAllType().Where(u => u.Name.ToLower() == pType.Name.ToLower());
+                    var data = _productType.LoadProductTypes(pType.Name);
                     if (data.Any())
                     {
                         ModelState.AddModelError("Name", "Product Type is already in use.");
@@ -198,7 +200,7 @@ namespace IMS.Web.Controllers
                     {
                         ModelState.AddModelError("Name", "Product Type must contain at least three letters.");
                     }
-                    var data = _productType.GetAllType().Where(u => u.Name.ToLower() == pType.Name.ToLower());
+                    var data = _productType.LoadProductTypes(pType.Name.ToLower());
 
                     if (data.Any())
                     {
@@ -210,7 +212,9 @@ namespace IMS.Web.Controllers
                         try
                         {
                             var deptData = _productType.GetProductTypeById(id);
+
                             if (deptData.Status != null) { pType.Status = deptData.Status; }
+
                             pType.ModifyBy = Convert.ToInt64(User.Identity.GetUserId());
                             _productType.UpdateProductType(id, pType);
                             TempData["data"] = "Product Type Updated Successfully.";
@@ -316,7 +320,7 @@ namespace IMS.Web.Controllers
                 string role = IsAuthorize(userId);
                 if (role == "Admin")
                 {
-                    var data = _productType.GetAllType().Where(u => u.Status == 0);
+                    var data = _productType.LoadProductTypeThroughStatus(0);
                     return View(data);
                 }
                 else
@@ -333,7 +337,7 @@ namespace IMS.Web.Controllers
             
         }
         [HttpPost]
-        public ActionResult Deactivate(string dept)
+        public ActionResult Deactivate(string pType)
         {
             try
             {
@@ -341,16 +345,16 @@ namespace IMS.Web.Controllers
                 string role = IsAuthorize(userId);
                 if (role == "Admin")
                 {
-                    if (string.IsNullOrEmpty(dept) == false)
+                    if (string.IsNullOrEmpty(pType) == false)
                     {
-                        var data = _productType.GetAllType();
-                        var searchItem = data.Where(u => u.Name.IndexOf(dept, StringComparison.OrdinalIgnoreCase) >= 0 && u.Status == 0).ToList();
+                        //var data = _productType.GetAllType();
+                        var searchItem = _productType.SearchProductType(pType, 0);
                         return PartialView("_SearchProductType", searchItem);
                     }
                     else
                     {
 
-                        var data = _productType.GetAllType().Where(u => u.Status == 0);
+                        var data = _productType.LoadProductTypeThroughStatus(0);
                         return PartialView("_SearchProductType", data);
                     }
                 }

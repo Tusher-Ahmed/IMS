@@ -49,7 +49,7 @@ namespace IMS.Web.Areas.Staff.Controllers
                 var status = _employeeService.GetEmployeeByUserId(userId).Status;
                 if(User.IsInRole("Staff") && status != 0)
                 {
-                    var product = _product.GetAllProduct().Where(u => u.Approved == null).ToList();
+                    var product = _product.LoadYetApprovedProduct();
                     Dictionary<long, string> garments = new Dictionary<long, string>();
                     foreach (var item in product)
                     {
@@ -61,9 +61,9 @@ namespace IMS.Web.Areas.Staff.Controllers
                     {
                         Products = product,
                         GName = garments,
-                        TotalNewProduct = _product.GetAllProduct().Where(u => u.Approved == null).Count(),
-                        TotalApprovedProduct = _product.GetAllProduct().Where(u => u.Approved == true).Count(),
-                        TotalRejectedProduct = _product.GetAllProduct().Where(u => u.Approved == false && u.Rejected == true).Count(),
+                        TotalNewProduct = _product.LoadYetApprovedProduct().Count(),
+                        TotalApprovedProduct = _product.LoadAllApprovedProducts().Count(),
+                        TotalRejectedProduct = _product.LoadAllRejectedProducts().Count(),
                     };
                     return View(staffDashboardViewModel);
                 }

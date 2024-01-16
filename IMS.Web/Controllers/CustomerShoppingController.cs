@@ -123,7 +123,7 @@ namespace IMS.Web.Controllers
             try
             {
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var carts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status == 1).ToList();
+                var carts = _customerShopping.GetAllCartOrders(userId).Where(u => u.Product.Status == 1).ToList();
                 if(carts.Count !=null)
                 {
                     CustomerShoppingCartViewModel shoppingCartViewModel = new CustomerShoppingCartViewModel
@@ -163,7 +163,7 @@ namespace IMS.Web.Controllers
             {
                 var context = new ApplicationDbContext();
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var carts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status == 1).ToList();
+                var carts = _customerShopping.GetAllCartOrders(userId).Where(u => u.Product.Status == 1).ToList();
                 if(carts.Count > 0)
                 {
                     var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
@@ -211,7 +211,7 @@ namespace IMS.Web.Controllers
             {
                 var context = new ApplicationDbContext();
                 long userId = Convert.ToInt64(User.Identity.GetUserId());
-                var carts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId && u.Product.Status == 1).ToList();
+                var carts = _customerShopping.GetAllCartOrders(userId).Where(u => u.Product.Status == 1).ToList();
                 if(carts.Count > 0)
                 {
                     var userManager = new UserManager<ApplicationUser, long>(new UserStoreIntPk(context));
@@ -332,13 +332,13 @@ namespace IMS.Web.Controllers
                     _orderHeaderService.UpdateStatus(id, ShoppingHelper.StatusApproved, ShoppingHelper.PaymentStatusApproved);
                 }
 
-                List<ShoppingCart> shoppingCarts = _customerShopping.GetAllOrders().Where(u => u.CustomerId == userId).ToList();
+                List<ShoppingCart> shoppingCarts = _customerShopping.GetAllCartOrders(userId).ToList();
                 foreach (var cart in shoppingCarts)
                 {
                     _customerShopping.RemoveProduct(cart);
                 }
 
-                var OrderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == id);
+                var OrderDetails = _orderDetailService.LoadAllOrdersDetails(orderheader.Id);
                 List<IMS.Models.Product> products = new List<IMS.Models.Product>();
 
                 foreach (var orderDetail in OrderDetails)
@@ -386,7 +386,7 @@ namespace IMS.Web.Controllers
                 {
                     return RedirectToAction("Index", "Error");
                 }
-                var OrderDetails = _orderDetailService.getAllOrderDetails().Where(u => u.OrderHeader.Id == id && u.OrderHeader.CustomerId==userId );
+                var OrderDetails = _orderDetailService.LoadAllOrdersDetails(id);
                 List<IMS.Models.Product> products = new List<IMS.Models.Product>();
 
                 if(OrderDetails == null)

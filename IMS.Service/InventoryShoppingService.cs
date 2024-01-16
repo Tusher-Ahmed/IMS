@@ -14,27 +14,31 @@ namespace IMS.Service
     public interface IInventoryShoppingService
     {
         void AddInventoryShoppingCart(InventoryOrderCart inventoryOrderCart);
-        IEnumerable<InventoryOrderCart> GetAllInventoryOrders();
+        //IEnumerable<InventoryOrderCart> GetAllInventoryOrders();
         InventoryOrderCart GetproductById(long id, long userId);
         int IncrementCount(InventoryOrderCart inventoryOrderCart, int count);
         int DecrementCount(InventoryOrderCart inventoryOrderCart, int count);
         void RemoveProduct(InventoryOrderCart Cart);
         void RemoveProductFromList(InventoryOrderCart Cart);
+        List<InventoryOrderCart> LoadAllInventoryOrders(long userId);
     }
     public class InventoryShoppingService:IInventoryShoppingService
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly BaseDAO<InventoryOrderCart> _repository;
+        private readonly IInventoryShoppingDao _inventoryShoppingDao;
         private ISession _session;
 
         public ISession Session
         {
             get { return _session; }
-            set { _session = value; _repository.Session = value; }
+            set { _session = value; _repository.Session = value; _inventoryShoppingDao.Session = value; }
         }
 
         public InventoryShoppingService()
         {
             _repository = new BaseDAO<InventoryOrderCart>();
+            _inventoryShoppingDao = new InventoryShoppingDao();
         }
 
 
@@ -42,15 +46,12 @@ namespace IMS.Service
         public void AddInventoryShoppingCart(InventoryOrderCart inventoryOrderCart)
         {
             
-            inventoryOrderCart.GarmentsId = inventoryOrderCart.GarmentsProduct.GarmentsId; // Correctly set GarmentsId based on the selected ProductId
-
-
             using (var transaction = _session.BeginTransaction())
             {
                 try
                 {
-                    var Existproduct = _session.Query<InventoryOrderCart>()
-                           .FirstOrDefault(cart => cart.EmployeeId == inventoryOrderCart.EmployeeId && cart.GarmentsProduct.Id==inventoryOrderCart.ProductId );
+                    inventoryOrderCart.GarmentsId = inventoryOrderCart.GarmentsProduct.GarmentsId; // Correctly set GarmentsId based on the selected ProductId
+                    var Existproduct = _inventoryShoppingDao.IsExist(inventoryOrderCart.EmployeeId, inventoryOrderCart.ProductId);
 
                     if (Existproduct != null)
                     {
@@ -63,9 +64,10 @@ namespace IMS.Service
                     
                     transaction.Commit();
                 }
-                catch
+                catch (Exception ex)
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
@@ -74,12 +76,41 @@ namespace IMS.Service
 
         public InventoryOrderCart GetproductById(long id, long userId)
         {
-            return Session.Query<InventoryOrderCart>().Where(u=>u.Id==id && u.EmployeeId==userId).FirstOrDefault();
+            try
+            {
+                return _inventoryShoppingDao.GetproductById(id, userId);
+            }catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
 
-        public IEnumerable<InventoryOrderCart> GetAllInventoryOrders()
+        //public IEnumerable<InventoryOrderCart> GetAllInventoryOrders()
+        //{
+        //    try
+        //    {
+        //        return _repository.GetAll();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        log.Error("An error occurred in YourAction.", ex);
+        //        throw;
+        //    }
+            
+        //}
+
+        public List<InventoryOrderCart> LoadAllInventoryOrders(long userId)
         {
-            return _repository.GetAll();
+            try
+            {
+                return _inventoryShoppingDao.LoadAllInventoryOrders(userId);
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
 
         public void RemoveProductFromList(InventoryOrderCart Cart)
@@ -91,9 +122,10 @@ namespace IMS.Service
                     _repository.Delete(Cart);
                     transaction.Commit();
                 }
-                catch
+                catch(Exception ex)
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
@@ -101,24 +133,33 @@ namespace IMS.Service
 
         public int IncrementProductCount(InventoryOrderCart inventoryOrderCart, int count)
         {
-            inventoryOrderCart.Count += count;
-           _repository.Update(inventoryOrderCart);
-            return inventoryOrderCart.Count;
+            try
+            {
+                inventoryOrderCart.Count += count;
+                _repository.Update(inventoryOrderCart);
+                return inventoryOrderCart.Count;
+            }
+            catch (Exception ex)
+            {
+                log.Error("An error occurred in YourAction.", ex);
+                throw;
+            }
         }
 
         public int IncrementCount(InventoryOrderCart inventoryOrderCart, int count)
-        {
-            inventoryOrderCart.Count += count;
+        {            
             using (var transaction = _session.BeginTransaction())
             {
                 try
                 {
+                    inventoryOrderCart.Count += count;
                     _repository.Update(inventoryOrderCart);
                     transaction.Commit();
                 }
-                catch
+                catch(Exception ex)
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
@@ -138,9 +179,10 @@ namespace IMS.Service
                         _repository.Update(inventoryOrderCart);
                         transaction.Commit();
                     }
-                    catch
+                    catch( Exception ex)
                     {
                         transaction.Rollback();
+                        log.Error("An error occurred in YourAction.", ex);
                         throw;
                     }
                 }
@@ -159,9 +201,10 @@ namespace IMS.Service
                     _repository.Delete(Cart);
                     transaction.Commit();
                 }
-                catch
+                catch (Exception ex)
                 {
                     transaction.Rollback();
+                    log.Error("An error occurred in YourAction.", ex);
                     throw;
                 }
             }
